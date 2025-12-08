@@ -887,11 +887,11 @@ const QuantaPitchDeckLite = () => {
 
       <div className="fade-in" style={{animationDelay: '0.5s'}}>
         <div className="summary-links">
-          <a href="/" className="sum-link">qsub.net</a>
-          <span className="sum-sep">|</span>
           <a href="/pitch" className="sum-link">Full Pitch Deck</a>
           <span className="sum-sep">|</span>
-          <a href="/litepaper" className="sum-link">Litepaper</a>
+          <a href="/faq" className="sum-link">FAQ</a>
+          <span className="sum-sep">|</span>
+          <a href="/contact" className="sum-link">Contact</a>
         </div>
       </div>
     </div>

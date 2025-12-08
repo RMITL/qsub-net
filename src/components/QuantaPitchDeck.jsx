@@ -2917,8 +2917,8 @@ const QuantaPitchDeckFinal = () => {
           <a href="/docs/QUANTA_Technical_Specification_v3.pdf" className="cta-secondary" target="_blank">Technical Spec</a>
         </div>
         <div className="cta-links">
-          <button onClick={() => setShowContactModal(true)} className="cta-text-link">Questions & Investment</button>
-          <a href="/" className="cta-text-link">Join Our Team</a>
+          <a href="/contact" className="cta-text-link">Contact Us</a>
+          <a href="/faq" className="cta-text-link">FAQ</a>
         </div>
       </div>
       <div className="fade-in" style={{animationDelay: '0.5s'}}>

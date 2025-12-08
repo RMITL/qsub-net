@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const QuantaFAQ = () => {
   const [openSection, setOpenSection] = useState('basics');
   const [openQuestions, setOpenQuestions] = useState({});
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleSection = (sectionId) => {
     setOpenSection(openSection === sectionId ? null : sectionId);
@@ -48,7 +49,7 @@ const QuantaFAQ = () => {
         {
           id: 'contact',
           q: 'How do I contact your team?',
-          a: 'Email us at info@qsub.net or use the contact form at qsub.net/contact. We\'re also active on Discord and Twitter for community discussions.'
+          a: <>Email us at <a href="mailto:info@qsub.net" style={{color: '#d4af37'}}>info@qsub.net</a> or use the <a href="/contact" style={{color: '#d4af37'}}>contact form</a>. We're also active on Discord and Twitter for community discussions.</>
         }
       ]
     },
@@ -255,7 +256,27 @@ const QuantaFAQ = () => {
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
         </nav>
+        <button
+          className="hamburger-btn"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
+        </button>
       </header>
+
+      {mobileMenuOpen && (
+        <nav className="mobile-menu">
+          <a href="#basics" onClick={(e) => { e.preventDefault(); scrollToSection('basics'); setMobileMenuOpen(false); }}>FAQ</a>
+          <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); setMobileMenuOpen(false); }}>Concepts</a>
+          <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); setMobileMenuOpen(false); }}>Glossary</a>
+          <a href="/pitch-lite">Overview</a>
+          <a href="/pitch">Deck</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      )}
 
 
       <main className="faq-main">
@@ -712,6 +733,72 @@ const QuantaFAQ = () => {
           color: #d4af37;
         }
 
+        /* Hamburger button - hidden on desktop */
+        .hamburger-btn {
+          display: none;
+          flex-direction: column;
+          justify-content: center;
+          gap: 5px;
+          width: 32px;
+          height: 32px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+        }
+
+        .hamburger-line {
+          display: block;
+          width: 100%;
+          height: 2px;
+          background: #d4af37;
+          border-radius: 2px;
+          transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .hamburger-line.open:nth-child(1) {
+          transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-line.open:nth-child(2) {
+          opacity: 0;
+        }
+
+        .hamburger-line.open:nth-child(3) {
+          transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Mobile menu - hidden by default */
+        .mobile-menu {
+          display: none;
+          flex-direction: column;
+          position: fixed;
+          top: 52px;
+          left: 0;
+          right: 0;
+          background: rgba(10, 10, 15, 0.98);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+          padding: 1rem;
+          z-index: 99;
+        }
+
+        .mobile-menu a {
+          color: rgba(232, 230, 227, 0.9);
+          text-decoration: none;
+          padding: 0.875rem 1rem;
+          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+          transition: color 0.2s, background 0.2s;
+        }
+
+        .mobile-menu a:last-child {
+          border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.05);
+        }
+
         .faq-main {
           max-width: 900px;
           margin: 0 auto;
@@ -1142,11 +1229,15 @@ const QuantaFAQ = () => {
           }
 
           .faq-nav {
-            gap: 1rem;
+            display: none;
           }
 
-          .faq-nav a {
-            font-size: 0.8rem;
+          .hamburger-btn {
+            display: flex;
+          }
+
+          .mobile-menu {
+            display: flex;
           }
 
           .faq-intro h1 {
