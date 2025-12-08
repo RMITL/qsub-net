@@ -1017,15 +1017,9 @@ const QuantaFAQ = () => {
         }
 
         .glossary-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1.25rem;
-        }
-
-        @media (min-width: 900px) {
-          .glossary-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
         }
 
         .glossary-category {
@@ -1037,7 +1031,7 @@ const QuantaFAQ = () => {
 
         .glossary-category h3 {
           color: #d4af37;
-          font-size: 0.95rem;
+          font-size: 1rem;
           font-weight: 600;
           margin: 0 0 1rem 0;
           padding-bottom: 0.5rem;
@@ -1046,26 +1040,31 @@ const QuantaFAQ = () => {
 
         .glossary-list {
           margin: 0;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1rem 2rem;
         }
 
         .glossary-item {
-          margin-bottom: 0.75rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(212, 175, 55, 0.08);
         }
 
         .glossary-item:last-child {
-          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
         }
 
         .glossary-item dt {
           color: #e8e6e3;
           font-weight: 600;
-          font-size: 0.85rem;
-          margin-bottom: 0.2rem;
+          font-size: 0.9rem;
+          margin-bottom: 0.3rem;
         }
 
         .glossary-item dd {
           color: rgba(232, 230, 227, 0.7);
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           line-height: 1.5;
           margin: 0;
         }
@@ -1169,20 +1168,20 @@ const QuantaFAQ = () => {
             display: none;
           }
 
-          .glossary-grid {
-            grid-template-columns: 1fr;
-          }
-
           .glossary-category {
             padding: 1rem;
           }
 
+          .glossary-list {
+            grid-template-columns: 1fr;
+          }
+
           .glossary-item dt {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
           }
 
           .glossary-item dd {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
           }
         }
       `}</style>
