@@ -2886,10 +2886,9 @@ const QuantaPitchDeckFinal = () => {
       </div>
       <div className="fade-in" style={{animationDelay: '0.1s'}}>
         <h2 className="vision-statement">
-          QUANTA creates a <span className="gold">self-sustaining marketplace</span> with
+          QUANTA creates a <span className="gold">self-sustaining network</span> with
           <span className="gold"> unlimited participation</span> where portfolio signals are
-          evaluated objectively, rewarded meritocratically, and monetized transparently—transforming
-          <span className="gold"> skill into tokenized value</span>.
+          evaluated objectively, rewarded meritocratically, and monetized transparently.
         </h2>
       </div>
       <div className="fade-in" style={{animationDelay: '0.2s'}}>

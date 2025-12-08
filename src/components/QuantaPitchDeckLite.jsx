@@ -220,7 +220,6 @@ const QuantaPitchDeckLite = () => {
         <p className="hero-subtitle">
           A Decentralized Stock Picking Competition
         </p>
-        <p className="hero-tagline">Where the crowd beats Wall Street—and gets paid for it</p>
       </div>
       <div className="fade-in" style={{animationDelay: '0.4s'}}>
         <div className="bittensor-badge">

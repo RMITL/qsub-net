@@ -609,7 +609,6 @@ const QuantaFAQ = () => {
         </div>
 
         <footer className="faq-footer">
-          <p>QUANTA: Where talent meets transparency, and skill becomes tokenized value.</p>
           <div className="footer-links">
             <a href="/pitch-lite">Overview</a>
             <a href="/pitch">Full Pitch Deck</a>

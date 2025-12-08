@@ -1188,7 +1188,6 @@ const QuantaLitepaper = () => {
           </div>
 
           <div className="lp-final-cta">
-            <p><em>Where talent meets transparency, and skill becomes tokenized value.</em></p>
             <div className="lp-cta-buttons">
               <a href="/docs/QUANTA_Technical_Specification_v3.pdf" className="lp-btn-primary" target="_blank">
                 Download Full Technical Spec
