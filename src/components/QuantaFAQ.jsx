@@ -336,12 +336,20 @@ const QuantaFAQ = () => {
                   <dd>The native cryptocurrency of the Bittensor network. Think of it like "Bitcoin for AI" - earned by contributing valuable work to the network.</dd>
                 </div>
                 <div className="glossary-item">
+                  <dt>Bittensor</dt>
+                  <dd>A decentralized AI network where different subnets compete to provide valuable intelligence. QUANTA runs on Bittensor as Subnet 87.</dd>
+                </div>
+                <div className="glossary-item">
                   <dt>Subnet</dt>
                   <dd>A specialized network within Bittensor focused on a specific task. QUANTA is a subnet focused on stock picking. Each subnet has its own token.</dd>
                 </div>
                 <div className="glossary-item">
                   <dt>α-token (Alpha Token)</dt>
                   <dd>QUANTA's native token used for staking, rewards, and governance. Earned by successful stock pickers.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>dTAO (Dynamic TAO)</dt>
+                  <dd>Bittensor's system where each subnet has its own token paired with TAO. Better-performing subnets attract more stake and earn larger emission shares.</dd>
                 </div>
                 <div className="glossary-item">
                   <dt>UID</dt>
@@ -352,8 +360,24 @@ const QuantaFAQ = () => {
                   <dd>A digital account that stores your cryptocurrency. Like a bank account for crypto, with a public address (like an account number) and private key (like a password).</dd>
                 </div>
                 <div className="glossary-item">
+                  <dt>Hotkey / Coldkey</dt>
+                  <dd>Bittensor uses two keys: a hotkey for daily operations (signing transactions) and a coldkey for security (stored offline, controls funds).</dd>
+                </div>
+                <div className="glossary-item">
                   <dt>On-chain</dt>
                   <dd>Recorded on the blockchain - permanent, transparent, and verifiable by anyone. Your track record is stored on-chain.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Staking</dt>
+                  <dd>Locking up tokens to participate in the network. Stakers earn rewards proportional to their stake and the subnet's performance.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Emissions</dt>
+                  <dd>New tokens created and distributed to network participants. QUANTA receives emissions from Bittensor based on subnet performance.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Consensus</dt>
+                  <dd>Agreement among validators on scores and rankings. QUANTA uses Yuma Consensus - a stake-weighted voting system that resists manipulation.</dd>
                 </div>
               </dl>
             </div>
@@ -392,6 +416,14 @@ const QuantaFAQ = () => {
                   <dd>Returns above the market average. If the market goes up 10% and you make 15%, your alpha is 5%. QUANTA rewards alpha generation.</dd>
                 </div>
                 <div className="glossary-item">
+                  <dt>Beta</dt>
+                  <dd>How much your portfolio moves with the market. Beta of 1 = moves with market. Beta of 2 = twice as volatile. Beta of 0.5 = half as volatile.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Volatility</dt>
+                  <dd>How much prices swing up and down. High volatility = big swings, more risk. Low volatility = steady performance.</dd>
+                </div>
+                <div className="glossary-item">
                   <dt>Risk-Adjusted Returns</dt>
                   <dd>Performance that accounts for how much risk you took. Making 20% with wild swings is less impressive than making 15% steadily.</dd>
                 </div>
@@ -410,6 +442,64 @@ const QuantaFAQ = () => {
                 <div className="glossary-item">
                   <dt>Maximum Drawdown</dt>
                   <dd>The biggest peak-to-trough decline in your portfolio value. If you went from $100 to $80, that's a 20% drawdown.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Turnover</dt>
+                  <dd>How often you change your portfolio. High turnover = frequent trading. QUANTA penalizes excessive turnover to reward conviction.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Benchmark</dt>
+                  <dd>A standard to compare performance against, like the S&P 500. Beating the benchmark means you generated alpha.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Long Position</dt>
+                  <dd>Betting a stock will go up. You profit when the price rises. Standard stock ownership.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Short Position</dt>
+                  <dd>Betting a stock will go down. You profit when the price falls. More advanced strategy (not available in QUANTA v1).</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Paper Trading</dt>
+                  <dd>Simulated trading without real money. QUANTA uses paper trading to score portfolios - you don't actually buy stocks.</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="glossary-category">
+              <h3>Anti-Gaming & Security</h3>
+              <dl className="glossary-list">
+                <div className="glossary-item">
+                  <dt>Sybil Attack</dt>
+                  <dd>Creating multiple fake identities to game the system. QUANTA prevents this with stake requirements - each identity needs real tokens at risk.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Variance Gaming</dt>
+                  <dd>"Swinging for the fences" - taking extreme risks hoping to get lucky. QUANTA's risk-adjusted scoring and ante mechanism discourage this.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Correlation Gaming</dt>
+                  <dd>Copying others' portfolios to free-ride on their research. Detected via originality scoring - portfolios too similar to others get penalized.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Front-Running</dt>
+                  <dd>Seeing someone's picks before they're final and trading ahead of them. Prevented by the commit-reveal protocol with time delays.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Collusion</dt>
+                  <dd>Multiple parties secretly coordinating to manipulate scores. Yuma Consensus clips outlier scores, making collusion ineffective.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Originality Score</dt>
+                  <dd>Measures how unique your portfolio is compared to others. High correlation (&gt;0.7) with other submissions triggers penalties.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Skin in the Game</dt>
+                  <dd>Having something to lose if you perform poorly. The ante mechanism ensures everyone has real tokens at stake.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Scoring Delay</dt>
+                  <dd>20+ day delay before final scores are published. Prevents copy-follow strategies where people mimic top performers.</dd>
                 </div>
               </dl>
             </div>
@@ -430,7 +520,7 @@ const QuantaFAQ = () => {
                   <dd>The system that allows unlimited participants despite Bittensor's 256 UID limit. Submit signals through the pool without needing your own UID.</dd>
                 </div>
                 <div className="glossary-item">
-                  <dt>QUANTA Score</dt>
+                  <dt>QUANTA Score (QS)</dt>
                   <dd>Your composite performance rating combining multiple risk metrics across different time windows. Determines your rank and rewards.</dd>
                 </div>
                 <div className="glossary-item">
@@ -440,6 +530,56 @@ const QuantaFAQ = () => {
                 <div className="glossary-item">
                   <dt>Meta-Signal</dt>
                   <dd>The aggregated wisdom of all participants combined. Often more accurate than any individual signal.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Time Horizons</dt>
+                  <dd>QUANTA scores across 7-day (30%), 30-day (45%), and 90-day (25%) windows. Balances short-term skill with long-term consistency.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Reward Tiers</dt>
+                  <dd>Performance bands: Top 15% (premium rewards), profitable tier (positive ROI), break-even (ante returned), penalty band (ante forfeited).</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Track Record</dt>
+                  <dd>Your historical performance stored on-chain. Builds over time and unlocks progression to higher participation tiers.</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="glossary-category">
+              <h3>Tokenomics & Economics</h3>
+              <dl className="glossary-list">
+                <div className="glossary-item">
+                  <dt>Power-Law Distribution</dt>
+                  <dd>Reward formula where top performers get disproportionately more. #1 earns more than #2, who earns more than #3, etc.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Network Rake</dt>
+                  <dd>The percentage (8%) taken by the network from the reward pool. Ensures network profitability regardless of individual outcomes.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Burn Mechanism</dt>
+                  <dd>Permanently destroying tokens to reduce supply. 50% of forfeited antes are burned, making remaining tokens more scarce.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Deflationary</dt>
+                  <dd>Token supply decreasing over time due to burns. QUANTA is designed to be net deflationary as adoption grows.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>AMM (Automated Market Maker)</dt>
+                  <dd>A system that automatically prices tokens based on supply and demand. α-token is paired with TAO in an AMM pool.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Dual Revenue Model</dt>
+                  <dd>QUANTA earns from two sources: Bittensor emissions (base rewards) and the competition pot (antes from participants).</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Zero-Sum Game</dt>
+                  <dd>A competition where winners' gains equal losers' losses. The reward pool is zero-sum - top performers win what underperformers lose.</dd>
+                </div>
+                <div className="glossary-item">
+                  <dt>Flywheel Effect</dt>
+                  <dd>A virtuous cycle: better signals → more users → higher token value → more stake → larger emissions → attracts more talent.</dd>
                 </div>
               </dl>
             </div>
@@ -844,7 +984,13 @@ const QuantaFAQ = () => {
         .glossary-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 1.5rem;
+          gap: 1.25rem;
+        }
+
+        @media (min-width: 900px) {
+          .glossary-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
         }
 
         .glossary-category {
