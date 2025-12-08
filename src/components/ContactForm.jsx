@@ -41,7 +41,7 @@ const ContactForm = () => {
           min-height: 100vh;
           background: linear-gradient(135deg, #0d0d14 0%, #151520 50%, #0d0d14 100%);
           color: #e8e6e3;
-          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
 
         .contact-page::before {
