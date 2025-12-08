@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const QuantaFAQ = () => {
-  const [openSection, setOpenSection] = useState('overview');
+  const [openSection, setOpenSection] = useState('basics');
   const [openQuestions, setOpenQuestions] = useState({});
 
   const toggleSection = (sectionId) => {
@@ -16,6 +16,42 @@ const QuantaFAQ = () => {
   };
 
   const sections = [
+    {
+      id: 'basics',
+      title: 'The Basics',
+      questions: [
+        {
+          id: 'why-subnet',
+          q: 'Why is a subnet necessary for QUANTA?',
+          a: 'Subnets provide the decentralized infrastructure QUANTA needs: trustless validation (no single entity controls scoring), censorship resistance (anyone can participate globally), transparent incentives (rewards distributed by code, not committees), and crypto-native payments (instant, borderless compensation). Building on Bittensor means QUANTA inherits battle-tested consensus mechanisms rather than building from scratch.'
+        },
+        {
+          id: 'why-bittensor',
+          q: 'Why is Bittensor an ideal fit for QUANTA?',
+          a: 'Bittensor was designed for exactly this: incentivizing valuable intelligence. Its dTAO mechanism rewards subnets that produce useful outputs, validators reach consensus on quality scores, emissions scale with performance, and the existing ecosystem provides liquidity and staking infrastructure. QUANTA\'s stock-picking signals fit naturally as "valuable intelligence" that Bittensor rewards.'
+        },
+        {
+          id: 'why-emissions',
+          q: 'Why are emissions necessary?',
+          a: 'Emissions bootstrap the network before external revenue kicks in. They compensate validators for infrastructure costs (market data feeds, compute), reward early miners taking risk on an unproven system, and fund ongoing development. As QUANTA matures, external revenue (API subscriptions, licensing) will supplement and eventually exceed emissions—but emissions provide the initial runway.'
+        },
+        {
+          id: 'vs-school-game',
+          q: 'How does this compare to the stock trading game I played in economics class?',
+          a: 'Those games reward whoever takes the most risk and gets lucky. QUANTA is fundamentally different: we score risk-adjusted returns (Sortino, Calmar ratios), not raw gains. A portfolio up 50% with massive volatility loses to one up 20% with steady growth. We also penalize drawdowns, reward consistency across multiple time horizons, and require skin-in-the-game via staking. It\'s closer to how professional fund managers are evaluated.'
+        },
+        {
+          id: 'how-validation-works',
+          q: 'How do miners and validators authenticate portfolios?',
+          a: 'Miners submit portfolio signals (ticker-weight pairs) via a commit-reveal protocol: first a hash commitment, then the actual portfolio after a delay. Validators independently fetch real market prices from licensed data providers (Polygon, Tiingo), compute paper-trading P&L for each portfolio, calculate risk metrics (Sharpe, Sortino, drawdown), and reach consensus on scores using Yuma Consensus. No actual trades occur—it\'s all simulated using real prices.'
+        },
+        {
+          id: 'contact',
+          q: 'How do I contact your team?',
+          a: 'Email us at info@qsub.net or use the contact form at qsub.net/contact. We\'re also active on Discord and Twitter for community discussions.'
+        }
+      ]
+    },
     {
       id: 'overview',
       title: 'General Overview',
@@ -213,7 +249,7 @@ const QuantaFAQ = () => {
           <span className="brand-page">FAQ</span>
         </div>
         <nav className="faq-nav">
-          <a href="#faq-intro" onClick={(e) => { e.preventDefault(); scrollToSection('faq-intro'); }}>FAQ</a>
+          <a href="#basics" onClick={(e) => { e.preventDefault(); scrollToSection('basics'); }}>FAQ</a>
           <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); }}>Concepts</a>
           <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); }}>Glossary</a>
           <a href="/pitch-lite">Overview</a>
