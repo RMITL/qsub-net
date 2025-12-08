@@ -3098,7 +3098,7 @@ const QuantaPitchDeckFinal = () => {
           font-size: 4.5rem;
           font-weight: 700;
           font-family: 'Space Grotesk', sans-serif;
-          letter-spacing: 0.2em;
+          letter-spacing: 0.15em;
           background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;

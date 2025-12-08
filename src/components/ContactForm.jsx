@@ -73,12 +73,28 @@ const ContactForm = () => {
           gap: 0.75rem;
         }
 
+        .brand-logo {
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 16px;
+          color: #0d0d14;
+          text-decoration: none;
+          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         .brand-link {
           font-size: 1.25rem;
-          font-weight: 600;
+          font-weight: 700;
           color: #d4af37;
           text-decoration: none;
           letter-spacing: 0.1em;
+          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .brand-separator {
@@ -312,6 +328,7 @@ const ContactForm = () => {
 
       <header className="contact-header">
         <div className="contact-brand">
+          <a href="/" className="brand-logo">Q</a>
           <a href="/" className="brand-link">QUANTA</a>
           <span className="brand-separator">|</span>
           <span className="brand-page">Contact</span>

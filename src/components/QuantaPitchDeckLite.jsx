@@ -992,9 +992,10 @@ const QuantaPitchDeckLite = () => {
 
         .hero-title {
           font-size: clamp(3rem, 10vw, 6rem);
-          font-weight: 800;
-          letter-spacing: 0.1em;
-          background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%);
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          font-family: 'Space Grotesk', sans-serif;
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
