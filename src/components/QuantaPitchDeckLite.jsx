@@ -976,29 +976,9 @@ const QuantaPitchDeckLite = () => {
           text-align: center;
         }
 
-        /* Animations */
+        /* Animations disabled - caused double-render flash on hydration */
         .fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-          opacity: 0;
-          will-change: opacity, transform;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* When parent has animations-complete, disable all fade-in animations */
-        .animations-complete .fade-in {
-          animation: none !important;
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-          will-change: auto;
-        }
-
-        /* Prevent re-animation on scroll-triggered re-renders */
-        .slide-content {
-          contain: layout style;
+          opacity: 1;
         }
 
         /* Typography */

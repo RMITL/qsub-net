@@ -2985,22 +2985,9 @@ const QuantaPitchDeckFinal = () => {
           pointer-events: none;
         }
 
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(15px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* Animations disabled - caused double-render flash on hydration */
         .fade-in {
-          animation: fadeInUp 0.5s ease-out both;
-          will-change: opacity, transform;
-        }
-
-        /* When parent has animations-complete, disable all fade-in animations */
-        .animations-complete .fade-in {
-          animation: none !important;
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-          will-change: auto;
+          opacity: 1;
         }
 
         /* Header */
