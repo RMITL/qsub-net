@@ -3066,14 +3066,9 @@ const QuantaPitchDeckFinal = () => {
           padding: 1rem 2rem 100px;
         }
 
-        /* Slide transition - fade in when mounted via key change */
+        /* Slide transition - no container animation, let individual fade-ins handle it */
         .slide-transition {
-          animation: slideEnter 0.3s ease-out forwards;
-        }
-
-        @keyframes slideEnter {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          opacity: 1;
         }
 
         .slide-wrapper {
