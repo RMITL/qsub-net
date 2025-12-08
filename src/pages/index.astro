@@ -1,0 +1,928 @@
+---
+// Join Page - QUANTA Recruitment
+---
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Join QUANTA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8f9fb;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border: #e5e7eb;
+            --border-light: #f0f1f3;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-tertiary: #a855f7;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 28px;
+            color: #0d0d14;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 24px;
+        }
+
+        .intro {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        /* Areas of Interest */
+        .areas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .areas-grid { grid-template-columns: 1fr; }
+        }
+
+        .area-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .area-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+
+        .area-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .area-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .area-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        /* Culture List */
+        .culture-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .culture-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .culture-list li:last-child {
+            border-bottom: none;
+        }
+
+        .culture-list li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Form */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-intro {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .label-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* Areas of Interest Checkboxes */
+        .areas-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 500px) {
+            .areas-checkbox-grid { grid-template-columns: 1fr; }
+        }
+
+        .area-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .area-checkbox:hover {
+            border-color: var(--accent-primary);
+            background: #f5f3ff;
+        }
+
+        .area-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .area-checkbox input[type="checkbox"]:checked + .area-checkbox-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .area-checkbox:has(input:checked) {
+            border-color: var(--accent-primary);
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+        }
+
+        .area-checkbox-label {
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            color: #0d0d14;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 24px;
+        }
+
+        .success-message h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .success-message p {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #0d0d14;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .footer-brand span {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-text a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Tech Stack Pills */
+        .tech-hint {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .tech-pill {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 4px 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Required asterisk */
+        .required::after {
+            content: ' *';
+            color: var(--error);
+        }
+
+        /* File Upload Styles */
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .file-upload-display {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+        }
+
+        .file-upload-wrapper:hover .file-upload-display {
+            border-color: var(--accent-primary);
+            background: #f5f3ff;
+        }
+
+        .file-upload-icon {
+            display: block;
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .file-upload-text {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .file-upload-hint {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .file-selected {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .file-remove:hover {
+            background: rgba(0,0,0,0.1);
+            color: var(--error);
+        }
+
+        .file-upload-wrapper.dragover .file-upload-display {
+            border-color: var(--accent-primary);
+            background: #eef2ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Q</div>
+            <h1>Join QUANTA</h1>
+            <p class="subtitle">A lean, early-stage experiment in decentralized intelligence.</p>
+            <p class="intro">
+                QUANTA is an emerging Bittensor subnet currently in development. We're in an early proof-of-concept phase, building a small, highly capable group of contributors interested in decentralized systems, applied computation, and real-world performance evaluation.
+            </p>
+        </header>
+
+        <section>
+            <h2>What We're Building</h2>
+            <p>
+                We're developing infrastructure for decentralized signal evaluation and incentive-aligned computation. The system combines cryptographic protocols, real-time data processing, and economic mechanisms to create a network where performance is measured objectively and contributions are rewarded proportionally.
+            </p>
+            <p>
+                Our stack emphasizes correctness, security, and operational reliability. We work with Python, async systems, time-series data, and integrate with blockchain networks. The project sits at the intersection of distributed systems, applied mathematics, and financial technology.
+            </p>
+        </section>
+
+        <section>
+            <h2>Areas of Interest</h2>
+            <p>We're not posting formal job openings yet. Instead, we're collecting CVs, resumes, and portfolios from people who see themselves contributing in one or more of the following areas:</p>
+
+            <div class="areas-grid">
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x2699;</span> Protocol Engineering</h3>
+                    <p>Experience with decentralized systems, Bittensor, or Python-based networked services. Comfort with async programming and protocol design.</p>
+                </div>
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x1F4CA;</span> Data & Infrastructure</h3>
+                    <p>Proficiency with data pipelines, time-series processing, and long-running backend services. PostgreSQL, Redis, and streaming architectures.</p>
+                </div>
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x1F9E0;</span> Quantitative Methods</h3>
+                    <p>Background in applied ML, statistical modeling, or algorithm evaluation. Understanding of risk-adjusted metrics and performance analysis.</p>
+                </div>
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x1F5A5;</span> Systems & DevOps</h3>
+                    <p>Familiarity with Linux, containers, deployment automation, and monitoring in lean environments. Security-conscious operations.</p>
+                </div>
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x1F4BB;</span> Frontend & Tooling</h3>
+                    <p>Building dashboards, interfaces, and developer tools for interacting with complex systems. Real-time data visualization.</p>
+                </div>
+                <div class="area-card">
+                    <h3><span class="area-icon">&#x1F91D;</span> Community & Ecosystem</h3>
+                    <p>Technical documentation, developer onboarding, and helping others integrate and build. Clear communication of complex concepts.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Who Tends to Thrive Here</h2>
+            <p>We're drawn to people who:</p>
+            <ul class="culture-list">
+                <li>Prefer small teams and direct impact over large organizations and layers of process</li>
+                <li>Take ownership and work with a high degree of independence</li>
+                <li>Care more about shipping real, working systems than talking about them</li>
+                <li>Are comfortable with ambiguity and iterative development</li>
+                <li>Understand that this is a proof-of-concept phase, not a finished product</li>
+                <li>Have intellectual curiosity about decentralized systems and incentive design</li>
+            </ul>
+            <p style="margin-top: 16px;">If that sounds like you, you're likely aligned with how we work.</p>
+        </section>
+
+        <section>
+            <h2>Submit Your Details</h2>
+            <div class="form-card">
+                <div class="form-intro">
+                    <p style="margin-bottom: 0;">
+                        If you'd like to be considered as QUANTA grows, share your information below. There are no rigid roles or titles at this stage&mdash;we're interested in understanding your skills, experience, and how you think you might contribute.
+                    </p>
+                </div>
+
+                <form id="application-form">
+                    <div class="form-group">
+                        <label for="name" class="required">Full Name</label>
+                        <input type="text" id="name" name="name" required placeholder="So we know who we're talking to">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="required">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Where we can reach you">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location / Time Zone <span class="label-hint">(optional)</span></label>
+                        <input type="text" id="location" name="location" placeholder="Helps us understand collaboration windows">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Social Handles <span class="label-hint">(optional)</span></label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 6px;">
+                            <input type="text" id="discord" name="discord" placeholder="Discord">
+                            <input type="text" id="twitter" name="twitter" placeholder="X / Twitter">
+                            <input type="text" id="telegram" name="telegram" placeholder="Telegram">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Areas of Interest <span class="label-hint">(select all that apply)</span></label>
+                        <div class="areas-checkbox-grid">
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="protocol">
+                                <span class="area-checkbox-label">Protocol Engineering</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="data">
+                                <span class="area-checkbox-label">Data & Infrastructure</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="quant">
+                                <span class="area-checkbox-label">Quantitative Methods</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="devops">
+                                <span class="area-checkbox-label">Systems / DevOps</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="frontend">
+                                <span class="area-checkbox-label">Frontend & Tooling</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="community">
+                                <span class="area-checkbox-label">Community & Ecosystem</span>
+                            </label>
+                            <label class="area-checkbox">
+                                <input type="checkbox" name="areas" value="other">
+                                <span class="area-checkbox-label">Other</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="portfolio">Link to Portfolio / LinkedIn / GitHub <span class="label-hint">(optional if uploading resume)</span></label>
+                        <input type="url" id="portfolio" name="portfolio" placeholder="URL to your site, GitHub, LinkedIn, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resume">Upload Resume / CV <span class="label-hint">(PDF, DOC, DOCX - max 10MB)</span></label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" class="file-input">
+                            <div class="file-upload-display" id="file-display">
+                                <span class="file-upload-icon">&#128196;</span>
+                                <span class="file-upload-text">Drop file here or click to browse</span>
+                                <span class="file-upload-hint">PDF, DOC, or DOCX</span>
+                            </div>
+                            <div class="file-selected" id="file-selected" style="display: none;">
+                                <span class="file-name" id="file-name"></span>
+                                <button type="button" class="file-remove" onclick="removeFile()">&#x2715;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience" class="required">Relevant Experience</label>
+                        <textarea id="experience" name="experience" required placeholder="A few sentences on what you've worked on that feels most relevant to what we're building."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contribution">How You'd Like to Contribute <span class="label-hint">(optional)</span></label>
+                        <textarea id="contribution" name="contribution" placeholder="What you're excited to work on, and where you think you add the most value."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="early-stage" name="early_stage">
+                            <label for="early-stage">I'm comfortable working with an early-stage, experimental project where requirements evolve and we're building the plane while flying it.</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Profile</button>
+                </form>
+
+                <div class="success-message" id="success-message">
+                    <div class="success-icon">&#x2713;</div>
+                    <h3>Thank you for your submission</h3>
+                    <p>We review every submission manually and will reach out if there's a strong fit as the project progresses.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-brand">
+                <div class="footer-logo">Q</div>
+                <span>QUANTA</span>
+            </div>
+            <p class="footer-text">
+                Building decentralized intelligence infrastructure on Bittensor.<br>
+                &copy; 2025
+            </p>
+            <div class="tech-hint">
+                <span class="tech-pill">Python 3.11+</span>
+                <span class="tech-pill">FastAPI</span>
+                <span class="tech-pill">PostgreSQL</span>
+                <span class="tech-pill">Bittensor</span>
+                <span class="tech-pill">Async</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = 'https://qsub.net';
+
+        const form = document.getElementById('application-form');
+        const successMessage = document.getElementById('success-message');
+        const fileInput = document.getElementById('resume');
+        const fileDisplay = document.getElementById('file-display');
+        const fileSelected = document.getElementById('file-selected');
+        const fileName = document.getElementById('file-name');
+        const uploadWrapper = document.querySelector('.file-upload-wrapper');
+
+        let uploadedFileId = null;
+
+        // File input change handler
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await uploadFile(file);
+            }
+        });
+
+        // Drag and drop handlers
+        uploadWrapper.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadWrapper.classList.add('dragover');
+        });
+
+        uploadWrapper.addEventListener('dragleave', () => {
+            uploadWrapper.classList.remove('dragover');
+        });
+
+        uploadWrapper.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            uploadWrapper.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                await uploadFile(file);
+            }
+        });
+
+        async function uploadFile(file) {
+            // Validate file type
+            const allowedTypes = ['.pdf', '.doc', '.docx'];
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(ext)) {
+                alert('Please upload a PDF, DOC, or DOCX file.');
+                return;
+            }
+
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB.');
+                return;
+            }
+
+            // Show uploading state
+            fileDisplay.style.display = 'none';
+            fileSelected.style.display = 'flex';
+            fileName.textContent = 'Uploading...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    uploadedFileId = result.file_id;
+                    fileName.textContent = file.name;
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                alert('Failed to upload file. Please try again.');
+                removeFile();
+            }
+        }
+
+        window.removeFile = function() {
+            uploadedFileId = null;
+            fileInput.value = '';
+            fileDisplay.style.display = 'block';
+            fileSelected.style.display = 'none';
+            fileName.textContent = '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.early_stage = formData.get('early_stage') === 'on';
+            data.submitted_at = new Date().toISOString();
+
+            // Collect selected areas (checkboxes)
+            const selectedAreas = Array.from(document.querySelectorAll('input[name="areas"]:checked'))
+                .map(cb => cb.value);
+            data.areas = selectedAreas;
+            delete data.areas; // Remove the single value from formData entries
+            data.areas = selectedAreas; // Re-add as array
+
+            // Add uploaded file ID if present
+            if (uploadedFileId) {
+                data.resume_file_id = uploadedFileId;
+            }
+
+            // Remove the file input from data (already uploaded)
+            delete data.resume;
+
+            // Validate: need at least one area selected
+            if (selectedAreas.length === 0) {
+                alert('Please select at least one area of interest.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Profile';
+                return;
+            }
+
+            // Validate: need either portfolio link or resume
+            if (!data.portfolio && !uploadedFileId) {
+                alert('Please provide either a portfolio link or upload a resume.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Profile';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/apply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    form.style.display = 'none';
+                    document.querySelector('.form-intro').style.display = 'none';
+                    successMessage.classList.add('show');
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                alert('There was an error submitting your application. Please try again or email us directly.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Profile';
+            }
+        });
+    </script>
+</body>
+</html>

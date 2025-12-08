@@ -1,0 +1,674 @@
+﻿import React, { useState } from react;
+
+const steps = [
+  {
+    id staking,
+    label 1. TAO → QUANTA,
+    title TAO Staking into QUANTA Subnet,
+    subtitle Capital enters the subnet,
+    body [
+      Users stake TAO into the QUANTA subnet.,
+      Staking mints subnet-specific α-tokens via the TAOα AMM.,
+      This establishes the economic base and security for the subnet.
+    ]
+  },
+  {
+    id emissions,
+    label 2. Emissions,
+    title TAO Emissions to α-Holders,
+    subtitle Passive yield layer,
+    body [
+      Bittensor’s dTAO logic routes TAO emissions to subnets.,
+      Within QUANTA, emissions go pro-rata to α-holders.,
+      Validators, miners, pool operators, and passive stakers all benefit.
+    ]
+  },
+  {
+    id competition,
+    label 3. Competition,
+    title QUANTA Signal Competition,
+    subtitle Active skill layer,
+    body [
+      Traders submit portfolio signals and ante with α-token.,
+      Risk-adjusted scoring ranks performance across multiple horizons.,
+      Ante from the penalty band is burned or redistributed into reward pools.
+    ]
+  },
+  {
+    id demand,
+    label 4. Demand,
+    title Rising α-Token Demand,
+    subtitle Utility + speculation,
+    body [
+      Competitors need α to play (ante, pool participation).,
+      Stakers accumulate α for emissions and upside.,
+      Pool operators accumulate α to scale their UIDs and miner pools.
+    ]
+  },
+  {
+    id feedback,
+    label 5. Feedback Loop,
+    title Positive Feedback Under dTAO,
+    subtitle More stake → more emissions → more growth,
+    body [
+      Higher α price → larger share of network-wide TAO emissions.,
+      More emissions and rewards attract more capital and talent.,
+      The subnet evolves into a self-sustaining stock-intelligence engine.
+    ]
+  }
+];
+
+const QuantaEmissionsFlow = () = {
+  const [activeId, setActiveId] = useState(staking);
+
+  return (
+    
+      style{`
+        .quanta-flow-root {
+          position relative;
+          width 100%;
+          max-width 1100px;
+          margin 0 auto;
+          padding 2.5rem 1.5rem;
+          border-radius 1.5rem;
+          background radial-gradient(circle at top left, #1f2937, #020617 55%);
+          color #f9fafb;
+          box-shadow 0 30px 80px rgba(15,23,42,0.9);
+          overflow hidden;
+          border 1px solid rgba(148,163,184,0.25);
+        }
+
+        .quanta-flow-rootbefore {
+          content ;
+          position absolute;
+          inset -40%;
+          background
+            radial-gradient(circle at 10% 0%, rgba(34,197,94,0.08), transparent 50%),
+            radial-gradient(circle at 90% 100%, rgba(59,130,246,0.12), transparent 55%);
+          opacity 0.9;
+          pointer-events none;
+        }
+
+        .quanta-flow-inner {
+          position relative;
+          display grid;
+          gap 1.75rem;
+          grid-template-columns minmax(0, 2.1fr) minmax(0, 1.4fr);
+          align-items stretch;
+        }
+
+        @media (max-width 900px) {
+          .quanta-flow-inner {
+            grid-template-columns minmax(0, 1fr);
+          }
+        }
+
+        .quanta-flow-header {
+          display flex;
+          flex-direction column;
+          gap 0.35rem;
+          margin-bottom 1.25rem;
+        }
+
+        .quanta-flow-overline {
+          text-transform uppercase;
+          letter-spacing 0.2em;
+          font-size 0.7rem;
+          color #9ca3af;
+          display flex;
+          align-items center;
+          gap 0.5rem;
+        }
+
+        .quanta-flow-pill {
+          padding 0.1rem 0.5rem;
+          border-radius 999px;
+          border 1px solid rgba(148,163,184,0.6);
+          font-size 0.65rem;
+        }
+
+        .quanta-flow-title {
+          font-size 1.6rem;
+          font-weight 700;
+          letter-spacing 0.03em;
+          display flex;
+          align-items baseline;
+          gap 0.5rem;
+        }
+
+        .quanta-flow-title span.accent {
+          background linear-gradient(to right, #22c55e, #a855f7);
+          -webkit-background-clip text;
+          background-clip text;
+          color transparent;
+        }
+
+        .quanta-flow-subtitle {
+          font-size 0.9rem;
+          color #9ca3af;
+        }
+
+         left diagram column 
+
+        .quanta-flow-diagram {
+          position relative;
+          border-radius 1.25rem;
+          padding 1.5rem 1.25rem;
+          background radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(2,6,23,0.95));
+          border 1px solid rgba(148,163,184,0.35);
+          overflow hidden;
+        }
+
+        .quanta-flow-step-row {
+          display grid;
+          grid-template-columns 1.5fr auto 1.5fr;
+          align-items center;
+          gap 0.8rem;
+          margin-bottom 1.1rem;
+          position relative;
+        }
+
+        .quanta-flow-node {
+          padding 0.85rem 0.9rem;
+          border-radius 0.9rem;
+          background radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(17,24,39,0.98));
+          border 1px solid rgba(148,163,184,0.5);
+          box-shadow 0 0 0 1px rgba(15,23,42,0.6);
+          position relative;
+        }
+
+        .quanta-flow-node-label {
+          font-size 0.65rem;
+          text-transform uppercase;
+          letter-spacing 0.15em;
+          color #9ca3af;
+          margin-bottom 0.35rem;
+        }
+
+        .quanta-flow-node-title {
+          font-size 0.9rem;
+          font-weight 600;
+          margin-bottom 0.15rem;
+        }
+
+        .quanta-flow-node-meta {
+          font-size 0.75rem;
+          color #a3e635;
+        }
+
+        .quanta-flow-node-secondary {
+          font-size 0.75rem;
+          color #9ca3af;
+        }
+
+        .quanta-flow-arrow {
+          display flex;
+          align-items center;
+          justify-content center;
+          height 100%;
+        }
+
+        .quanta-flow-arrow svg {
+          width 42px;
+          height 42px;
+          filter drop-shadow(0 0 12px rgba(34,197,94,0.7));
+          animation quanta-arrow-pulse 2.2s infinite ease-in-out;
+        }
+
+        @keyframes quanta-arrow-pulse {
+          0%, 100% {
+            transform translateX(0);
+            opacity 0.85;
+          }
+          50% {
+            transform translateX(4px);
+            opacity 1;
+          }
+        }
+
+        .quanta-flow-node--alpha {
+          border-color rgba(94,234,212,0.8);
+          box-shadow 0 0 24px rgba(45,212,191,0.24);
+        }
+
+        .quanta-flow-node--competition {
+          border-color rgba(244,114,182,0.85);
+          box-shadow 0 0 24px rgba(236,72,153,0.34);
+        }
+
+        .quanta-flow-node--feedback {
+          border-color rgba(129,140,248,0.8);
+          box-shadow 0 0 26px rgba(59,130,246,0.33);
+        }
+
+        .quanta-flow-chip-row {
+          display flex;
+          flex-wrap wrap;
+          gap 0.45rem;
+          margin-top 0.5rem;
+        }
+
+        .quanta-flow-chip {
+          font-size 0.7rem;
+          padding 0.2rem 0.45rem;
+          border-radius 999px;
+          border 1px solid rgba(148,163,184,0.55);
+          color #e5e7eb;
+          background radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(17,24,39,0.98));
+        }
+
+        .quanta-flow-chip--hot {
+          border-color rgba(52,211,153,0.9);
+          color #bbf7d0;
+        }
+
+        .quanta-flow-loop-label {
+          margin-top 0.6rem;
+          padding-top 0.65rem;
+          border-top 1px dashed rgba(148,163,184,0.5);
+          font-size 0.75rem;
+          color #9ca3af;
+          display flex;
+          align-items center;
+          justify-content space-between;
+          gap 0.5rem;
+        }
+
+        .quanta-flow-loop-pulse {
+          display inline-flex;
+          align-items center;
+          gap 0.35rem;
+          font-size 0.7rem;
+          text-transform uppercase;
+          letter-spacing 0.16em;
+          color #a5b4fc;
+        }
+
+        .quanta-flow-loop-dot {
+          width 8px;
+          height 8px;
+          border-radius 999px;
+          background radial-gradient(circle, #a5b4fc, #4f46e5);
+          box-shadow 0 0 12px rgba(129,140,248,0.8);
+          animation quanta-dot-pulse 1.4s infinite ease-in-out;
+        }
+
+        @keyframes quanta-dot-pulse {
+          0%,100% {
+            transform scale(0.9);
+            opacity 0.75;
+          }
+          50% {
+            transform scale(1.1);
+            opacity 1;
+          }
+        }
+
+         right panel 
+
+        .quanta-flow-panel {
+          position relative;
+          border-radius 1.25rem;
+          padding 1.25rem 1.1rem;
+          background linear-gradient(145deg, rgba(15,23,42,0.97), rgba(17,24,39,0.97));
+          border 1px solid rgba(148,163,184,0.55);
+          box-shadow 0 0 0 1px rgba(15,23,42,0.9);
+          display flex;
+          flex-direction column;
+          gap 0.9rem;
+        }
+
+        .quanta-step-tabs {
+          display flex;
+          flex-wrap wrap;
+          gap 0.5rem;
+        }
+
+        .quanta-step-tab {
+          font-size 0.68rem;
+          border-radius 999px;
+          padding 0.22rem 0.8rem;
+          border 1px solid rgba(75,85,99,0.9);
+          color #9ca3af;
+          background rgba(15,23,42,0.7);
+          cursor pointer;
+          transition all 0.18s ease-out;
+          display flex;
+          align-items center;
+          gap 0.35rem;
+        }
+
+        .quanta-step-tab-bullet {
+          width 6px;
+          height 6px;
+          border-radius 999px;
+          background rgba(148,163,184,0.6);
+        }
+
+        .quanta-step-tab--active {
+          border-color rgba(129,140,248,0.9);
+          color #e5e7eb;
+          background radial-gradient(circle at top left, rgba(37,99,235,0.25), rgba(15,23,42,0.98));
+          box-shadow 0 0 18px rgba(59,130,246,0.55);
+        }
+
+        .quanta-step-tab--active .quanta-step-tab-bullet {
+          background linear-gradient(to right, #22c55e, #a855f7);
+        }
+
+        .quanta-step-header {
+          margin-top 0.4rem;
+        }
+
+        .quanta-step-eyebrow {
+          font-size 0.7rem;
+          text-transform uppercase;
+          letter-spacing 0.14em;
+          color #9ca3af;
+          margin-bottom 0.25rem;
+        }
+
+        .quanta-step-title {
+          font-size 1rem;
+          font-weight 600;
+        }
+
+        .quanta-step-title span {
+          color #a5b4fc;
+        }
+
+        .quanta-step-subtitle {
+          font-size 0.78rem;
+          color #9ca3af;
+        }
+
+        .quanta-step-body {
+          margin-top 0.6rem;
+          display flex;
+          flex-direction column;
+          gap 0.4rem;
+          font-size 0.8rem;
+          color #e5e7eb;
+        }
+
+        .quanta-step-bullet {
+          display flex;
+          gap 0.45rem;
+          align-items flex-start;
+        }
+
+        .quanta-step-bullet-icon {
+          margin-top 0.15rem;
+          font-size 0.7rem;
+          opacity 0.9;
+        }
+
+        .quanta-flow-metrics {
+          margin-top 0.7rem;
+          display grid;
+          grid-template-columns repeat(3, minmax(0, 1fr));
+          gap 0.5rem;
+        }
+
+        @media (max-width 900px) {
+          .quanta-flow-metrics {
+            grid-template-columns repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        .quanta-flow-metric {
+          border-radius 0.7rem;
+          padding 0.45rem 0.55rem;
+          background radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(15,23,42,0.9));
+          border 1px solid rgba(55,65,81,0.9);
+        }
+
+        .quanta-flow-metric-label {
+          font-size 0.65rem;
+          color #9ca3af;
+        }
+
+        .quanta-flow-metric-value {
+          font-size 0.85rem;
+          font-weight 600;
+        }
+
+        .quanta-flow-metric-tag {
+          font-size 0.65rem;
+          color #22c55e;
+        }
+      `}style
+
+      div className=quanta-flow-root
+        div className=quanta-flow-header
+          div className=quanta-flow-overline
+            spanQUANTA SUBNETspan
+            span className=quanta-flow-pilldTAO Emissions · α-Token Flywheelspan
+          div
+          div className=quanta-flow-title
+            spanEmissions & Rewardspan
+            span className=accentFlowspan
+          div
+          div className=quanta-flow-subtitle
+            How TAO emissions, α-token demand, and the QUANTA competition form a self-reinforcing loop.
+          div
+        div
+
+        div className=quanta-flow-inner
+          { LEFT diagram }
+          div className=quanta-flow-diagram
+            { Row 1 TAO → α }
+            div className=quanta-flow-step-row
+              div className=quanta-flow-node
+                div className=quanta-flow-node-labelLayer 1 · Inputdiv
+                div className=quanta-flow-node-titleTAO Staked into QUANTAdiv
+                div className=quanta-flow-node-secondary
+                  Capital flows from base TAO into the subnet.
+                div
+                div className=quanta-flow-chip-row
+                  div className=quanta-flow-chipRoot TAOdiv
+                  div className=quanta-flow-chip quanta-flow-chip--hotSubnet Stakediv
+                div
+              div
+              div className=quanta-flow-arrow
+                svg viewBox=0 0 60 60
+                  defs
+                    linearGradient id=quanta-arrow-grad x1=0 y1=0 x2=1 y2=0
+                      stop offset=0% stopColor=#22c55e 
+                      stop offset=50% stopColor=#22c55e 
+                      stop offset=100% stopColor=#a855f7 
+                    linearGradient
+                  defs
+                  path
+                    d=M10 30 H40
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                  
+                  polyline
+                    points=33,23 40,30 33,37
+                    fill=none
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                    strokeLinejoin=round
+                  
+                svg
+              div
+              div className=quanta-flow-node quanta-flow-node--alpha
+                div className=quanta-flow-node-labelLayer 2 · Assetdiv
+                div className=quanta-flow-node-titleα-Token Mintingdiv
+                div className=quanta-flow-node-metaTAO  α AMM Pooldiv
+                div className=quanta-flow-node-secondary
+                  TAO converts into QUANTA’s α-token; liquidity and price emerge.
+                div
+              div
+            div
+
+            { Row 2 Emissions → holders }
+            div className=quanta-flow-step-row
+              div className=quanta-flow-node
+                div className=quanta-flow-node-labelLayer 3 · Emissionsdiv
+                div className=quanta-flow-node-titleTAO Emissions to QUANTAdiv
+                div className=quanta-flow-node-secondary
+                  dTAO routes a share of global emissions to the subnet.
+                div
+                div className=quanta-flow-chip-row
+                  div className=quanta-flow-chip7,200 TAO  day (network)div
+                  div className=quanta-flow-chipSubnet share ∝ α demanddiv
+                div
+              div
+              div className=quanta-flow-arrow
+                svg viewBox=0 0 60 60
+                  path
+                    d=M10 30 H40
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                  
+                  polyline
+                    points=33,23 40,30 33,37
+                    fill=none
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                    strokeLinejoin=round
+                  
+                svg
+              div
+              div className=quanta-flow-node
+                div className=quanta-flow-node-labelLayer 4 · Holdersdiv
+                div className=quanta-flow-node-titleα-Holders & Validatorsdiv
+                div className=quanta-flow-node-secondary
+                  Validators, miners, pool operators and passive stakers earn TAO pro-rata.
+                div
+                div className=quanta-flow-chip-row
+                  div className=quanta-flow-chipPassive Yielddiv
+                  div className=quanta-flow-chipSecurity Budgetdiv
+                div
+              div
+            div
+
+            { Row 3 Competition & feedback }
+            div className=quanta-flow-step-row
+              div className=quanta-flow-node quanta-flow-node--competition
+                div className=quanta-flow-node-labelLayer 5 · Competitiondiv
+                div className=quanta-flow-node-titleSignal Game & Antediv
+                div className=quanta-flow-node-secondary
+                  Traders use α as ante to enter the QUANTA portfolio competition.
+                div
+                div className=quanta-flow-chip-row
+                  div className=quanta-flow-chipRisk-adjusted Scoringdiv
+                  div className=quanta-flow-chipBurn + Redistributediv
+                div
+              div
+              div className=quanta-flow-arrow
+                svg viewBox=0 0 60 60
+                  path
+                    d=M10 30 H40
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                  
+                  polyline
+                    points=33,23 40,30 33,37
+                    fill=none
+                    stroke=url(#quanta-arrow-grad)
+                    strokeWidth=2.5
+                    strokeLinecap=round
+                    strokeLinejoin=round
+                  
+                svg
+              div
+              div className=quanta-flow-node quanta-flow-node--feedback
+                div className=quanta-flow-node-labelLayer 6 · Feedbackdiv
+                div className=quanta-flow-node-titleα-Demand & Subnet Growthdiv
+                div className=quanta-flow-node-secondary
+                  More players → more ante → more burns → more α demand → stronger emissions share.
+                div
+                div className=quanta-flow-chip-row
+                  div className=quanta-flow-chipPrice Signaldiv
+                  div className=quanta-flow-chipSubnet Selectiondiv
+                div
+              div
+            div
+
+            div className=quanta-flow-loop-label
+              spanTopology passive emissions layer + active game layer, coupled through α-token price.span
+              span className=quanta-flow-loop-pulse
+                span className=quanta-flow-loop-dot 
+                Feedback Loop Live
+              span
+            div
+          div
+
+          { RIGHT interactive panel }
+          div className=quanta-flow-panel
+            div className=quanta-step-tabs
+              {steps.map((step) = (
+                button
+                  key={step.id}
+                  type=button
+                  className={
+                    quanta-step-tab +
+                    (activeId === step.id   quanta-step-tab--active  )
+                  }
+                  onClick={() = setActiveId(step.id)}
+                
+                  span className=quanta-step-tab-bullet 
+                  span{step.label}span
+                button
+              ))}
+            div
+
+            {(() = {
+              const step = steps.find((s) = s.id === activeId)  steps[0];
+              return (
+                
+                  div className=quanta-step-header
+                    div className=quanta-step-eyebrowFocused Stagediv
+                    div className=quanta-step-title
+                      {step.title.split( ).slice(0, -1).join( )}{ }
+                      span
+                        {step.title.split( ).slice(-1).join( )}
+                      span
+                    div
+                    div className=quanta-step-subtitle{step.subtitle}div
+                  div
+                  div className=quanta-step-body
+                    {step.body.map((line, idx) = (
+                      div key={idx} className=quanta-step-bullet
+                        div className=quanta-step-bullet-icon•div
+                        div{line}div
+                      div
+                    ))}
+                  div
+                
+              );
+            })()}
+
+            div className=quanta-flow-metrics
+              div className=quanta-flow-metric
+                div className=quanta-flow-metric-labelReward Layersdiv
+                div className=quanta-flow-metric-value2div
+                div className=quanta-flow-metric-tagEmissions + Gamediv
+              div
+              div className=quanta-flow-metric
+                div className=quanta-flow-metric-labelParticipant Rolesdiv
+                div className=quanta-flow-metric-value4div
+                div className=quanta-flow-metric-tagStakers · Validators · Miners · Poolsdiv
+              div
+              div className=quanta-flow-metric
+                div className=quanta-flow-metric-labelKey Couplingdiv
+                div className=quanta-flow-metric-valueα-Pricediv
+                div className=quanta-flow-metric-tagDrives dTAO routingdiv
+              div
+            div
+          div
+        div
+      div
+    
+  );
+};
+
+export default QuantaEmissionsFlow;

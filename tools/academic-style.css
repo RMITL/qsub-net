@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --primary: #1e3a5f;
+  --accent: #c9a227;
+  --text: #2c3e50;
+  --light: #ecf0f1;
+  --code-bg: #f8f9fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-size: 11pt;
+  line-height: 1.65;
+  color: var(--text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Title Page */
+h1:first-of-type {
+  font-family: 'Inter', sans-serif;
+  font-size: 28pt;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  border: none;
+  margin-top: 2in;
+  margin-bottom: 0.5rem;
+}
+
+/* Headers */
+h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: 22pt;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 16pt;
+  font-weight: 600;
+  color: var(--primary);
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 13pt;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 11pt;
+  font-weight: 600;
+  color: #34495e;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-size: 10pt;
+  font-weight: 600;
+  color: #5d6d7e;
+}
+
+/* Paragraphs */
+p {
+  text-align: justify;
+  margin-bottom: 0.8rem;
+  orphans: 3;
+  widows: 3;
+  hyphens: auto;
+}
+
+/* Lists */
+ul, ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.8rem;
+  padding-left: 0.5rem;
+}
+
+li {
+  margin-bottom: 0.3rem;
+}
+
+li > ul, li > ol {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Code */
+pre {
+  background: var(--code-bg);
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 9pt;
+  line-height: 1.5;
+  overflow-x: auto;
+  page-break-inside: avoid;
+  margin: 1rem 0;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 9pt;
+  background: var(--code-bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  color: #c7254e;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+
+th {
+  background: var(--primary);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 9pt;
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  border: 1px solid var(--primary);
+}
+
+td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid var(--accent);
+  background: #fefcf3;
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+  font-style: italic;
+  color: #5d4e37;
+  page-break-inside: avoid;
+}
+
+blockquote p {
+  margin-bottom: 0.4rem;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Horizontal Rules */
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2rem 0;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Strong/Bold */
+strong {
+  font-weight: 600;
+  color: #1a252f;
+}
+
+/* Emphasis */
+em {
+  font-style: italic;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
+/* Definition Lists (for notation) */
+dl {
+  margin: 1rem 0;
+}
+
+dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+dd {
+  margin-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Footnotes */
+.footnote {
+  font-size: 9pt;
+  color: #666;
+}
+
+/* Math formulas in code blocks */
+pre.math, code.math {
+  background: #f5f5dc;
+  border-color: var(--accent);
+}
+
+/* Section numbering simulation via bold text */
+p > strong:first-child {
+  color: var(--primary);
+}
+
+/* Table of Contents */
+nav#toc ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav#toc > ul > li {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+nav#toc ul ul {
+  padding-left: 1.5rem;
+  font-weight: 400;
+}
+
+nav#toc a {
+  color: var(--text);
+}
+
+/* Print optimizations */
+@media print {
+  body {
+    font-size: 10pt;
+  }
+
+  h1 {
+    page-break-before: always;
+  }
+
+  h1:first-of-type {
+    page-break-before: avoid;
+  }
+
+  pre, table, blockquote {
+    page-break-inside: avoid;
+  }
+
+  h2, h3, h4 {
+    page-break-after: avoid;
+  }
+}

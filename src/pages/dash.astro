@@ -1,0 +1,1385 @@
+---
+// QUANTA Network Dashboard - Live Stats
+---
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>QUANTA | Network Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style is:global>
+        :root {
+            --bg-primary: #f8f9fb;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border: #e5e7eb;
+            --border-light: #f0f1f3;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-tertiary: #a855f7;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 22px;
+            color: #0d0d14;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .network-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .network-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .timestamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1000px) {
+            .stats-bar { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-change {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--error); }
+        .stat-change.neutral { color: var(--text-muted); }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+            gap: 24px;
+        }
+
+        .main-content {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-badge {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success { background: #ecfdf5; color: var(--success); }
+        .badge-warning { background: #fef3c7; color: var(--warning); }
+        .badge-error { background: #fef2f2; color: var(--error); }
+
+        /* Node Grid */
+        .node-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .node-grid { grid-template-columns: 1fr; }
+        }
+
+        .node-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .node-card:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .node-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .node-role {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .role-validator { background: #eef2ff; color: var(--accent-primary); }
+        .role-miner { background: #fef3c7; color: var(--warning); }
+
+        .node-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--success); }
+        .status-offline { background: var(--error); }
+
+        .node-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .node-metric {
+            text-align: center;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .node-metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .node-metric-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Epoch Progress */
+        .epoch-progress {
+            margin-top: 16px;
+        }
+
+        .epoch-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .epoch-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .epoch-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .epoch-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .epoch-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Signal Pool Stats */
+        .pool-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 700px) {
+            .pool-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .pool-stat {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .pool-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .pool-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .service-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .service-running { background: var(--success); }
+        .service-stopped { background: var(--error); }
+
+        .service-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .service-status {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* Wallet */
+        .wallet-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wallet-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .wallet-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .wallet-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Activity */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .activity-icon.commit { background: #eef2ff; }
+        .activity-icon.reveal { background: #ecfdf5; }
+        .activity-icon.score { background: #fef3c7; }
+
+        .activity-type {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .activity-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .activity-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Strategy Leaderboard */
+        .leaderboard {
+            margin-top: 16px;
+            overflow-x: auto;
+        }
+
+        .leaderboard-inner {
+            min-width: 500px;
+        }
+
+        .leaderboard-header {
+            display: grid;
+            grid-template-columns: 44px minmax(100px, 1fr) 50px 65px 65px 65px 65px;
+            gap: 6px;
+            padding: 8px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            min-width: 0;
+        }
+
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 44px minmax(100px, 1fr) 50px 65px 65px 65px 65px;
+            gap: 6px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        @media (max-width: 900px) {
+            .leaderboard-header,
+            .leaderboard-row {
+                grid-template-columns: 36px minmax(80px, 1fr) 40px 55px 55px 55px 55px;
+                gap: 4px;
+                font-size: 11px;
+            }
+            .leaderboard-header { font-size: 9px; }
+        }
+
+        @media (max-width: 650px) {
+            .leaderboard-header { display: none; }
+            .leaderboard-inner { min-width: 0; }
+            .leaderboard-row {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                padding: 16px;
+                position: relative;
+            }
+            .leaderboard-row .rank-cell {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+            }
+            .leaderboard-row .strategy-cell {
+                padding-right: 50px;
+                margin-bottom: 12px;
+            }
+            .leaderboard-row .uid-cell {
+                display: none;
+            }
+            .leaderboard-row .metric-cell {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-direction: row;
+                padding: 8px 0;
+                border-top: 1px solid var(--border-light);
+            }
+            .leaderboard-row .metric-cell::before {
+                content: attr(data-label);
+                font-size: 11px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                font-weight: 500;
+            }
+            .leaderboard-row .metric-cell .metric-value {
+                font-size: 14px;
+            }
+        }
+
+        .leaderboard-row:hover {
+            background: var(--bg-primary);
+        }
+
+        .leaderboard-row.winner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .leaderboard-row.winner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--gradient-primary);
+        }
+
+        .rank-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4); }
+        .rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
+        .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: white; }
+        .rank-other { background: var(--bg-primary); color: var(--text-secondary); }
+
+        .strategy-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .strategy-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .strategy-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .strategy-tier {
+            font-size: 10px;
+        }
+
+        .strategy-uid {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            display: none;
+        }
+
+        @media (max-width: 650px) {
+            .strategy-uid {
+                display: inline;
+            }
+        }
+
+        .uid-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .uid-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+
+        .tier-elite { color: #6366f1; }
+        .tier-profitable { color: var(--success); }
+        .tier-neutral { color: var(--warning); }
+        .tier-underperforming { color: var(--error); }
+
+        .metric-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .metric-value.positive { color: var(--success); }
+        .metric-value.negative { color: var(--error); }
+        .metric-value.neutral { color: var(--text-primary); }
+
+        .metric-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Winner highlight card */
+        .winner-card {
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .winner-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .winner-trophy {
+            font-size: 28px;
+        }
+
+        .winner-title {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .winner-name {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .winner-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .winner-stat {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+        }
+
+        .winner-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .winner-stat-label {
+            font-size: 9px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* UID Chips */
+        .uid-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .uid-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 11px;
+        }
+
+        .uid-chip.active {
+            border-color: var(--accent-primary);
+            background: #eef2ff;
+        }
+
+        .uid-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .uid-role {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        .uid-role.validator { background: #eef2ff; color: var(--accent-primary); }
+        .uid-role.miner { background: #fef3c7; color: var(--warning); }
+        .uid-role.owner { background: #f3e8ff; color: #7c3aed; }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .connection-status.connected .dot { background: var(--success); }
+        .connection-status.disconnected .dot { background: var(--error); }
+        .connection-status.connecting .dot { background: var(--warning); animation: pulse 1s infinite; }
+
+        .connection-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="logo">Q</div>
+                <div class="brand-text">
+                    <h1>QUANTA</h1>
+                    <p>Network Dashboard</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="network-badge">
+                    <div class="dot"></div>
+                    <span id="network-name">Localnet</span>
+                </div>
+                <span class="timestamp" id="timestamp">--:--:--</span>
+            </div>
+        </header>
+
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Network Health</div>
+                <div class="stat-value" id="stat-health">--%</div>
+                <div class="stat-change neutral">Checking...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Nodes Online</div>
+                <div class="stat-value" id="stat-nodes">--/--</div>
+                <div class="stat-change neutral">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Epoch</div>
+                <div class="stat-value" id="stat-epoch">--</div>
+                <div class="stat-change neutral">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">TAO Balance</div>
+                <div class="stat-value" id="stat-balance">--</div>
+                <div class="stat-change neutral">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Signals</div>
+                <div class="stat-value" id="stat-signals">--</div>
+                <div class="stat-change neutral">--</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="main-content">
+                <!-- Nodes -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Cluster Nodes</span>
+                        <span class="card-badge badge-success" id="nodes-badge">Healthy</span>
+                    </div>
+                    <div class="node-grid" id="nodes-grid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Connecting to cluster...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategy Leaderboard -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Strategy Leaderboard</span>
+                        <span class="card-badge badge-success" id="strategies-badge">Live</span>
+                    </div>
+
+                    <!-- Winner Highlight -->
+                    <div class="winner-card" id="winner-card" style="display: none;">
+                        <div class="winner-header">
+                            <span class="winner-trophy">🏆</span>
+                            <div>
+                                <div class="winner-title">Epoch Winner</div>
+                                <div class="winner-name" id="winner-name">--</div>
+                            </div>
+                        </div>
+                        <div class="winner-stats" id="winner-stats">
+                            <div class="winner-stat">
+                                <div class="winner-stat-value" id="winner-quanta">--</div>
+                                <div class="winner-stat-label">QUANTA</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value" id="winner-sharpe">--</div>
+                                <div class="winner-stat-label">Sharpe</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value" id="winner-return">--</div>
+                                <div class="winner-stat-label">Return</div>
+                            </div>
+                            <div class="winner-stat">
+                                <div class="winner-stat-value" id="winner-drawdown">--</div>
+                                <div class="winner-stat-label">Max DD</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard Table -->
+                    <div class="leaderboard" id="leaderboard">
+                        <div class="leaderboard-inner">
+                            <div class="leaderboard-header">
+                                <div>Rank</div>
+                                <div>Strategy</div>
+                                <div style="text-align: center;">UID</div>
+                                <div style="text-align: right;">QUANTA</div>
+                                <div style="text-align: right;">Sharpe</div>
+                                <div style="text-align: right;">Return</div>
+                                <div style="text-align: right;">Max DD</div>
+                            </div>
+                            <div id="leaderboard-body">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    Loading strategies...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Epoch Progress -->
+                    <div class="epoch-progress" style="margin-top: 20px;">
+                        <div class="epoch-header">
+                            <span class="epoch-label">Epoch Progress</span>
+                            <span class="epoch-time" id="epoch-time">--</span>
+                        </div>
+                        <div class="epoch-bar">
+                            <div class="epoch-fill" id="epoch-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subnet UIDs -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Registered UIDs</span>
+                        <span class="card-badge badge-success" id="uid-count">0 UIDs</span>
+                    </div>
+                    <div class="uid-grid" id="uid-grid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Activity</span>
+                    </div>
+                    <div class="activity-list" id="activity-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading activity...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- Subnet Treasury -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Subnet Treasury</span>
+                    </div>
+                    <div class="wallet-info" id="treasury-info">
+                        <div class="wallet-row">
+                            <span class="wallet-label">TAO Pool</span>
+                            <span class="wallet-value" id="treasury-tao">-- TAO</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Alpha Pool</span>
+                            <span class="wallet-value" id="treasury-alpha">-- α</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Rate</span>
+                            <span class="wallet-value" id="treasury-rate">-- τ/α</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Emission</span>
+                            <span class="wallet-value" id="treasury-emission">-- τ</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Reg Cost</span>
+                            <span class="wallet-value" id="treasury-regcost">-- τ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Services</span>
+                    </div>
+                    <div class="services-grid" id="services-grid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Network</span>
+                    </div>
+                    <div class="wallet-info">
+                        <div class="wallet-row">
+                            <span class="wallet-label">Subnet</span>
+                            <span class="wallet-value" id="net-subnet">--</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Validators</span>
+                            <span class="wallet-value" id="net-validators">--</span>
+                        </div>
+                        <div class="wallet-row">
+                            <span class="wallet-label">Miners</span>
+                            <span class="wallet-value" id="net-miners">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connection-status connecting" id="connection-status">
+        <div class="dot"></div>
+        <span>Connecting...</span>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let ws = null;
+        let reconnectAttempts = 0;
+        let currentData = null;
+
+        function updateConnectionStatus(status) {
+            const el = document.getElementById('connection-status');
+            el.className = 'connection-status ' + status;
+            if (status === 'connected') {
+                el.innerHTML = '<div class="dot"></div><span>Connected</span>';
+            } else if (status === 'disconnected') {
+                el.innerHTML = '<div class="dot"></div><span>Disconnected</span>';
+            } else {
+                el.innerHTML = '<div class="dot"></div><span>Connecting...</span>';
+            }
+        }
+
+        function connectWebSocket() {
+            updateConnectionStatus('connecting');
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/dash`);
+
+            ws.onopen = () => {
+                reconnectAttempts = 0;
+                updateConnectionStatus('connected');
+                ws.send(JSON.stringify({type: 'subscribe'}));
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                currentData = data;
+                updateDashboard(data);
+            };
+
+            ws.onclose = () => {
+                updateConnectionStatus('disconnected');
+                if (reconnectAttempts < 10) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 2000 * reconnectAttempts);
+                }
+            };
+
+            ws.onerror = () => {
+                updateConnectionStatus('disconnected');
+            };
+        }
+
+        function refreshData() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({type: 'refresh'}));
+            } else {
+                fetch('/api/dash/status').then(r => r.json()).then(data => {
+                    currentData = data;
+                    updateDashboard(data);
+                }).catch(() => {
+                    updateConnectionStatus('disconnected');
+                });
+            }
+        }
+
+        function formatStrategyName(name) {
+            return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function getTierLabel(tier) {
+            const labels = {
+                'elite': 'Elite',
+                'profitable': 'Profitable',
+                'neutral': 'Neutral',
+                'underperforming': 'Underperforming'
+            };
+            return labels[tier] || tier;
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+
+            // Network name
+            document.getElementById('network-name').textContent =
+                data.network === 'local' ? 'Localnet' :
+                data.network === 'test' ? 'Testnet' : 'Mainnet';
+
+            // Stats bar
+            const onlineNodes = data.nodes ? data.nodes.filter(n => n.is_online).length : 0;
+            const totalNodes = data.nodes ? data.nodes.length : 0;
+            const healthPercent = totalNodes > 0 ? Math.round((onlineNodes / totalNodes) * 100) : 0;
+
+            document.getElementById('stat-health').textContent = healthPercent + '%';
+            document.getElementById('stat-nodes').textContent = `${onlineNodes}/${totalNodes}`;
+            document.getElementById('stat-epoch').textContent = data.epoch || '--';
+            document.getElementById('stat-balance').textContent = data.wallet ? data.wallet.total_tao.toFixed(2) : '--';
+            document.getElementById('stat-signals').textContent = data.strategies ? data.strategies.length : '0';
+
+            // Nodes badge
+            const nodesBadge = document.getElementById('nodes-badge');
+            if (onlineNodes === totalNodes && totalNodes > 0) {
+                nodesBadge.textContent = 'Healthy';
+                nodesBadge.className = 'card-badge badge-success';
+            } else if (onlineNodes > 0) {
+                nodesBadge.textContent = 'Degraded';
+                nodesBadge.className = 'card-badge badge-warning';
+            } else {
+                nodesBadge.textContent = 'Offline';
+                nodesBadge.className = 'card-badge badge-error';
+            }
+
+            // Nodes grid
+            const nodesGrid = document.getElementById('nodes-grid');
+            if (data.nodes && data.nodes.length > 0) {
+                nodesGrid.innerHTML = data.nodes.map(node => `
+                    <div class="node-card">
+                        <div class="node-header">
+                            <span class="node-name">${node.hostname || node.name}</span>
+                            <span class="node-role ${node.role === 'validator' ? 'role-validator' : 'role-miner'}">${node.role}</span>
+                        </div>
+                        <div class="node-status">
+                            <div class="status-dot ${node.is_online ? 'status-online' : 'status-offline'}"></div>
+                            ${node.is_online ? 'Online' : 'Offline'} ${node.uptime ? '· ' + node.uptime : ''}
+                        </div>
+                        <div class="node-metrics">
+                            <div class="node-metric">
+                                <div class="node-metric-value">${node.cpu_usage !== null ? node.cpu_usage.toFixed(0) + '%' : '--'}</div>
+                                <div class="node-metric-label">CPU</div>
+                            </div>
+                            <div class="node-metric">
+                                <div class="node-metric-value">${node.memory_usage !== null ? node.memory_usage.toFixed(0) + '%' : '--'}</div>
+                                <div class="node-metric-label">MEM</div>
+                            </div>
+                            <div class="node-metric">
+                                <div class="node-metric-value">${node.disk_usage !== null ? node.disk_usage.toFixed(0) + '%' : '--'}</div>
+                                <div class="node-metric-label">DISK</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                nodesGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px; grid-column: span 2;">No nodes configured</div>';
+            }
+
+            // Strategy Leaderboard
+            const strategies = data.strategies || [];
+            const winner = data.winner;
+            const leaderboardBody = document.getElementById('leaderboard-body');
+
+            if (strategies.length > 0) {
+                // Update winner card
+                const winnerCard = document.getElementById('winner-card');
+                const winningStrategy = strategies.find(s => s.name === winner?.name) || strategies[0];
+
+                if (winningStrategy) {
+                    winnerCard.style.display = 'block';
+                    document.getElementById('winner-name').textContent = formatStrategyName(winningStrategy.name);
+                    document.getElementById('winner-quanta').textContent = winningStrategy.quanta_score.toFixed(2);
+                    document.getElementById('winner-sharpe').textContent = winningStrategy.sharpe.toFixed(2);
+                    document.getElementById('winner-return').textContent = (winningStrategy.return_pct >= 0 ? '+' : '') + winningStrategy.return_pct.toFixed(1) + '%';
+                    document.getElementById('winner-drawdown').textContent = winningStrategy.drawdown_pct.toFixed(1) + '%';
+                }
+
+                // Render leaderboard rows
+                // For now, assign UIDs based on strategy (strategy_miner = UID 4)
+                const strategyUidMap = {
+                    'momentum': 4, 'value': 4, 'diversified_10_stock': 4, 'sector_rotation': 4,
+                    'cash_equity_50_50': 4, 'global_diversified': 4, 'leveraged_tqqq_tmf': 4,
+                    'market_neutral': 4, 'spy_buy_hold': 4
+                };
+
+                leaderboardBody.innerHTML = strategies.map(s => {
+                    const isWinner = s.name === winner?.name;
+                    const rankClass = s.rank === 1 ? 'rank-1' : s.rank === 2 ? 'rank-2' : s.rank === 3 ? 'rank-3' : 'rank-other';
+                    const returnClass = s.return_pct >= 0 ? 'positive' : 'negative';
+                    const quantaClass = s.quanta_score >= 1 ? 'positive' : s.quanta_score >= 0 ? 'neutral' : 'negative';
+                    const sharpeClass = s.sharpe >= 1 ? 'positive' : s.sharpe >= 0 ? 'neutral' : 'negative';
+                    const uid = s.uid !== undefined ? s.uid : (strategyUidMap[s.name] || '--');
+
+                    return `
+                        <div class="leaderboard-row ${isWinner ? 'winner' : ''}">
+                            <div class="rank-cell">
+                                <div class="rank-badge ${rankClass}">${s.rank}</div>
+                            </div>
+                            <div class="strategy-cell">
+                                <div class="strategy-name">${formatStrategyName(s.name)}</div>
+                                <div class="strategy-meta">
+                                    <span class="strategy-tier tier-${s.tier}">${getTierLabel(s.tier)}</span>
+                                    <span class="strategy-uid">UID ${uid}</span>
+                                </div>
+                            </div>
+                            <div class="uid-cell" data-label="UID">
+                                <div class="uid-badge">${uid}</div>
+                            </div>
+                            <div class="metric-cell" data-label="QUANTA">
+                                <div class="metric-value ${quantaClass}">${s.quanta_score.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-cell" data-label="Sharpe">
+                                <div class="metric-value ${sharpeClass}">${s.sharpe.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-cell" data-label="Return">
+                                <div class="metric-value ${returnClass}">${s.return_pct >= 0 ? '+' : ''}${s.return_pct.toFixed(1)}%</div>
+                            </div>
+                            <div class="metric-cell" data-label="Max DD">
+                                <div class="metric-value negative">${s.drawdown_pct.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                document.getElementById('winner-card').style.display = 'none';
+                leaderboardBody.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No strategies running</div>';
+            }
+
+            // UID Grid
+            const metagraph = data.metagraph || { uids: [] };
+            const uidGrid = document.getElementById('uid-grid');
+            document.getElementById('uid-count').textContent = `${metagraph.uids?.length || 0} UIDs`;
+
+            if (metagraph.uids && metagraph.uids.length > 0) {
+                uidGrid.innerHTML = metagraph.uids.map(u => {
+                    const isActive = u.axon_port > 0;
+                    const role = u.stake > 0 ? 'validator' : (u.axon_port > 0 ? 'miner' : (u.uid === 0 ? 'owner' : 'inactive'));
+                    return `
+                        <div class="uid-chip ${isActive ? 'active' : ''}">
+                            <span class="uid-num">UID ${u.uid}</span>
+                            <span class="uid-role ${role}">${role}</span>
+                            ${isActive ? `<span style="font-size: 9px; color: var(--text-muted);">:${u.axon_port}</span>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                uidGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 10px; width: 100%;">No UIDs registered</div>';
+            }
+
+            // Epoch progress
+            const epochProgress = data.epoch_progress || 0;
+            document.getElementById('epoch-fill').style.width = epochProgress + '%';
+            document.getElementById('epoch-time').textContent = data.epoch_remaining || '--';
+
+            // Treasury
+            if (data.treasury) {
+                document.getElementById('treasury-tao').textContent = data.treasury.tao_pool.toFixed(2) + ' τ';
+                document.getElementById('treasury-alpha').textContent = data.treasury.alpha_pool.toFixed(2) + ' α';
+                document.getElementById('treasury-rate').textContent = data.treasury.rate.toFixed(4) + ' τ/α';
+                document.getElementById('treasury-emission').textContent = data.treasury.emission.toFixed(4) + ' τ';
+                document.getElementById('treasury-regcost').textContent = data.treasury.registration_cost.toFixed(4) + ' τ';
+            }
+
+            // Services
+            const servicesGrid = document.getElementById('services-grid');
+            if (data.services && Object.keys(data.services).length > 0) {
+                servicesGrid.innerHTML = Object.entries(data.services).map(([name, info]) => `
+                    <div class="service-item">
+                        <div class="service-dot ${info.status === 'online' ? 'service-running' : 'service-stopped'}"></div>
+                        <span class="service-name">${name}</span>
+                        <span class="service-status">${info.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                servicesGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 10px; grid-column: span 2;">No services</div>';
+            }
+
+            // Network info
+            document.getElementById('net-subnet').textContent = data.netuid !== undefined ? `SN${data.netuid}` : '--';
+            document.getElementById('net-validators').textContent = data.subnet?.validators_count || '0';
+            document.getElementById('net-miners').textContent = data.subnet?.miners_count || '0';
+
+            // Activity
+            const activityList = document.getElementById('activity-list');
+            if (data.activity && data.activity.length > 0) {
+                activityList.innerHTML = data.activity.slice(0, 5).map(item => `
+                    <div class="activity-item">
+                        <div class="activity-left">
+                            <div class="activity-icon ${item.type}">${item.type === 'commit' ? '📝' : item.type === 'reveal' ? '✓' : '⭐'}</div>
+                            <div>
+                                <div class="activity-type">${item.title}</div>
+                                <div class="activity-meta">${item.meta}</div>
+                            </div>
+                        </div>
+                        <span class="activity-time">${item.time}</span>
+                    </div>
+                `).join('');
+            } else {
+                activityList.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No recent activity</div>';
+            }
+        }
+
+        // Start
+        connectWebSocket();
+        setTimeout(refreshData, 1000);
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
