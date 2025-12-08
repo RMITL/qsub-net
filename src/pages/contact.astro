@@ -1,0 +1,32 @@
+---
+import ContactForm from '../components/ContactForm.jsx';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>QUANTA - Contact Us</title>
+    <meta name="description" content="Contact the QUANTA team - Get in touch about investment, partnerships, or general inquiries" />
+  </head>
+  <body>
+    <ContactForm client:load />
+  </body>
+</html>
+
+<style is:global>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    min-height: 100%;
+  }
+</style>
