@@ -223,22 +223,6 @@ const QuantaPitchDeckLite = () => {
         <p className="hero-tagline">Where the crowd beats Wall Street—and gets paid for it</p>
       </div>
       <div className="fade-in" style={{animationDelay: '0.4s'}}>
-        <div className="stats-row">
-          <div className="stat-item">
-            <div className="stat-value">$45T</div>
-            <div className="stat-label">U.S. Stock Market</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">∞</div>
-            <div className="stat-label">Participants</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">$550M</div>
-            <div className="stat-label">Numerai AUM</div>
-          </div>
-        </div>
-      </div>
-      <div className="fade-in" style={{animationDelay: '0.5s'}}>
         <div className="bittensor-badge">
           <span>Built on Bittensor</span>
           <span className="separator">|</span>

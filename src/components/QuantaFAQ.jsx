@@ -213,25 +213,17 @@ const QuantaFAQ = () => {
           <span className="brand-page">FAQ</span>
         </div>
         <nav className="faq-nav">
+          <a href="#faq-intro" onClick={(e) => { e.preventDefault(); scrollToSection('faq-intro'); }}>FAQ</a>
+          <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); }}>Concepts</a>
+          <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); }}>Glossary</a>
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
         </nav>
       </header>
 
-      <nav className="faq-section-nav">
-        <button onClick={() => scrollToSection('overview')}>Overview</button>
-        <button onClick={() => scrollToSection('participation')}>Participation</button>
-        <button onClick={() => scrollToSection('signal-pool')}>Signal Pool</button>
-        <button onClick={() => scrollToSection('scoring')}>Scoring</button>
-        <button onClick={() => scrollToSection('economics')}>Economics</button>
-        <button onClick={() => scrollToSection('network')}>Network</button>
-        <button onClick={() => scrollToSection('regulatory')}>Regulatory</button>
-        <button onClick={() => scrollToSection('getting-started')}>Getting Started</button>
-        <button onClick={() => scrollToSection('glossary')}>Glossary</button>
-      </nav>
 
       <main className="faq-main">
-        <div className="faq-intro">
+        <div id="faq-intro" className="faq-intro">
           <h1>Frequently Asked Questions</h1>
           <p>Everything you need to know about QUANTA, the decentralized stock picking competition on Bittensor.</p>
         </div>
@@ -270,7 +262,7 @@ const QuantaFAQ = () => {
         </div>
 
         {/* Visual Diagrams Section */}
-        <div className="faq-diagrams">
+        <div id="concepts" className="faq-diagrams">
           <h2>Key Concepts</h2>
 
           <div className="diagram-card">
@@ -685,36 +677,6 @@ const QuantaFAQ = () => {
           color: #d4af37;
         }
 
-        .faq-section-nav {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: rgba(26, 26, 46, 0.8);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-          position: sticky;
-          top: 52px;
-          z-index: 99;
-        }
-
-        .faq-section-nav button {
-          background: transparent;
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          color: rgba(232, 230, 227, 0.8);
-          padding: 0.35rem 0.75rem;
-          border-radius: 4px;
-          font-size: 0.75rem;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .faq-section-nav button:hover {
-          background: rgba(212, 175, 55, 0.15);
-          border-color: #d4af37;
-          color: #d4af37;
-        }
-
         .faq-main {
           max-width: 900px;
           margin: 0 auto;
@@ -751,11 +713,19 @@ const QuantaFAQ = () => {
           border-radius: 8px;
           overflow: hidden;
           transition: border-color 0.2s;
-          scroll-margin-top: 120px;
+          scroll-margin-top: 70px;
+        }
+
+        .faq-intro {
+          scroll-margin-top: 70px;
+        }
+
+        .faq-diagrams {
+          scroll-margin-top: 70px;
         }
 
         .faq-glossary {
-          scroll-margin-top: 120px;
+          scroll-margin-top: 70px;
         }
 
         .faq-section:hover {

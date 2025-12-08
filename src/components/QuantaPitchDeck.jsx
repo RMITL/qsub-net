@@ -62,14 +62,14 @@ const QuantaPitchDeckFinal = () => {
     'signalPool', 'participationTiers', 'minerTaxonomy', 'rewardFlow', 'howItWorks',
     'networkDiagram', 'epochLifecycle', 'scoring', 'tokenomics',
     'rewardMechanics', 'interactiveModel', 'deflationary', 'dualRevenue', 'compliance',
-    'revenue', 'architecture', 'financialModel', 'roadmap', 'summary'
+    'revenue', 'competitions', 'architecture', 'financialModel', 'roadmap', 'summary'
   ];
 
   const slideNames = [
     'Intro', 'Problem', 'Solution', 'Precedent', 'Scalability',
     'Signal Pool', 'Tiers', 'Taxonomy', 'Rewards', 'How It Works', 'Network',
     'Epoch', 'Scoring', 'Tokenomics', 'Mechanics', 'Model',
-    'Deflationary', 'Dual Revenue', 'Compliance', 'Revenue', 'Architecture', 'Financial', 'Roadmap', 'Summary'
+    'Deflationary', 'Dual Revenue', 'Compliance', 'Revenue', 'Competitions', 'Architecture', 'Financial', 'Roadmap', 'Summary'
   ];
 
   const [isAnimating, setIsAnimating] = useState(false);
@@ -555,26 +555,6 @@ const QuantaPitchDeckFinal = () => {
         <p className="hero-tagline">Decentralized Quantitative Intelligence for U.S. Equities</p>
       </div>
       <div className="fade-in" style={{animationDelay: '0.4s'}}>
-        <div className="stats-row">
-          <div className="stat-item">
-            <div className="stat-value">$45T</div>
-            <div className="stat-label">U.S. Market Cap</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">∞</div>
-            <div className="stat-label">Signal Pool Capacity</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">$550M</div>
-            <div className="stat-label">Numerai AUM Precedent</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">25%</div>
-            <div className="stat-label">2024 Net Returns</div>
-          </div>
-        </div>
-      </div>
-      <div className="fade-in" style={{animationDelay: '0.5s'}}>
         <div className="bittensor-badge">
           <span>Built on Bittensor</span>
           <span className="separator">|</span>
@@ -2189,6 +2169,80 @@ const QuantaPitchDeckFinal = () => {
     );
   };
 
+  const CompetitionsSlide = () => (
+    <div className="slide-content">
+      <div className="slide-header">
+        <div className="overline">ECOSYSTEM GROWTH</div>
+        <h2 className="section-title">Competitions & <span className="gold">Community</span></h2>
+        <p className="slide-subtitle">Building talent pipelines and brand awareness</p>
+      </div>
+      <div className="competitions-layout fade-in" style={{animationDelay: '0.1s'}}>
+        <div className="comp-section">
+          <h3>🏆 Biannual Championships</h3>
+          <p className="comp-desc">Major tournaments at regional, national, and international levels creating recurring engagement cycles.</p>
+          <div className="comp-levels">
+            <div className="comp-level">
+              <span className="comp-badge">🏫</span>
+              <div className="comp-level-info">
+                <h4>High School & College</h4>
+                <p>University partnerships, student clubs, academic credit integration</p>
+              </div>
+            </div>
+            <div className="comp-level">
+              <span className="comp-badge">🌆</span>
+              <div className="comp-level-info">
+                <h4>Regional Leagues</h4>
+                <p>City and state-level competitions with local sponsorships</p>
+              </div>
+            </div>
+            <div className="comp-level">
+              <span className="comp-badge">🌍</span>
+              <div className="comp-level-info">
+                <h4>National/International</h4>
+                <p>Grand championship events with major sponsors and media coverage</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="comp-section">
+          <h3>🎁 Rewards & Incentives</h3>
+          <div className="comp-rewards">
+            <div className="comp-reward">
+              <span className="reward-icon">💵</span>
+              <span>Cash prizes & TAO rewards</span>
+            </div>
+            <div className="comp-reward">
+              <span className="reward-icon">🎤</span>
+              <span>Coveted interviews at sponsored firms</span>
+            </div>
+            <div className="comp-reward">
+              <span className="reward-icon">📜</span>
+              <span>Certifications & verified credentials</span>
+            </div>
+            <div className="comp-reward">
+              <span className="reward-icon">🏅</span>
+              <span>Exclusive badges & leaderboard recognition</span>
+            </div>
+            <div className="comp-reward">
+              <span className="reward-icon">🎓</span>
+              <span>Scholarships & educational grants</span>
+            </div>
+          </div>
+        </div>
+        <div className="comp-section">
+          <h3>🤝 Sponsorship Opportunities</h3>
+          <p className="comp-desc">Premium brand placement for financial services, trading platforms, and fintech companies seeking access to engaged trading talent.</p>
+          <div className="comp-sponsor-types">
+            <span>Title Sponsors</span>
+            <span>Prize Sponsors</span>
+            <span>Platform Partners</span>
+            <span>Media Partners</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const ArchitectureSlide = () => (
     <div className="slide-content">
       <div className="slide-header">
@@ -2897,6 +2951,7 @@ const QuantaPitchDeckFinal = () => {
     dualRevenue: DualRevenueSlide,
     compliance: ComplianceSlide,
     revenue: RevenueSlide,
+    competitions: CompetitionsSlide,
     architecture: ArchitectureSlide,
     financialModel: FinancialModelSlide,
     roadmap: RoadmapSlide,
@@ -4119,6 +4174,22 @@ const QuantaPitchDeckFinal = () => {
         .arch-list li { font-size: 0.75rem; color: rgba(255,255,255,0.7); padding: 0.25rem 0; padding-left: 0.9rem; position: relative; }
         .arch-list li::before { content: '→'; position: absolute; left: 0; color: var(--arch-color, #d4af37); font-size: 0.7rem; }
 
+        /* Competitions Slide */
+        .competitions-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .comp-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; }
+        .comp-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #d4af37; }
+        .comp-desc { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 1rem; }
+        .comp-levels { display: flex; flex-direction: column; gap: 0.75rem; }
+        .comp-level { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px; }
+        .comp-badge { font-size: 1.5rem; }
+        .comp-level-info h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; color: rgba(255,255,255,0.9); }
+        .comp-level-info p { font-size: 0.75rem; color: rgba(255,255,255,0.6); line-height: 1.4; }
+        .comp-rewards { display: flex; flex-direction: column; gap: 0.5rem; }
+        .comp-reward { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border-radius: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+        .reward-icon { font-size: 1.1rem; }
+        .comp-sponsor-types { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .comp-sponsor-types span { padding: 0.4rem 0.75rem; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); border-radius: 20px; font-size: 0.75rem; color: #d4af37; }
+
 
 
         /* Financial Model - Enhanced */
@@ -4511,6 +4582,7 @@ const QuantaPitchDeckFinal = () => {
           .market-context { flex-direction: column; gap: 1rem; }
           .revenue-grid { grid-template-columns: 1fr; }
           .revenue-flip-card { height: 200px; }
+          .competitions-layout { grid-template-columns: 1fr; }
           .roi-grid { grid-template-columns: 1fr; }
           .tv-bar { height: 20px; }
           .tv-legend { flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
