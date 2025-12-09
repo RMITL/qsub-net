@@ -3,8 +3,8 @@ const { mdToPdf } = require('md-to-pdf');
 const path = require('path');
 
 async function generatePDF() {
-  const inputPath = path.join(__dirname, 'QUANTA_Technical_Specification_v3.md');
-  const outputPath = path.join(__dirname, 'QUANTA_Technical_Specification_v3.pdf');
+  const inputPath = path.join(__dirname, 'QUANTA_Technical_Specification_v4.md');
+  const outputPath = path.join(__dirname, 'QUANTA_Technical_Specification_v4.pdf');
   const stylesheetPath = path.join(__dirname, 'academic-style.css');
 
   console.log('Generating PDF...');
@@ -28,7 +28,7 @@ async function generatePDF() {
           },
           printBackground: true,
           displayHeaderFooter: true,
-          headerTemplate: '<div style="font-size: 8pt; font-family: sans-serif; color: #888; width: 100%; padding: 0 0.5in; display: flex; justify-content: space-between;"><span>QUANTA Technical Specification v3.0</span><span style="color: #c9a227;">CONFIDENTIAL</span></div>',
+          headerTemplate: '<div style="font-size: 8pt; font-family: sans-serif; color: #888; width: 100%; padding: 0 0.5in; display: flex; justify-content: space-between;"><span>QUANTA Technical Specification v4.0</span><span style="color: #c9a227;">CONFIDENTIAL</span></div>',
           footerTemplate: '<div style="font-size: 8pt; font-family: sans-serif; color: #888; width: 100%; text-align: center; padding: 0 0.5in;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
         },
         launch_options: {
