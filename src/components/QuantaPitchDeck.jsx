@@ -2914,7 +2914,7 @@ const QuantaPitchDeckFinal = () => {
       <div className="fade-in" style={{animationDelay: '0.4s'}}>
         <div className="cta-section">
           <a href="/litepaper" className="cta-primary">Interactive Litepaper</a>
-          <a href="/docs/QUANTA_Technical_Specification_v3.pdf" className="cta-secondary" target="_blank">Technical Spec</a>
+          <a href="/docs/QUANTA_Technical_Specification_v4.pdf" className="cta-secondary" target="_blank">Technical Spec (v4)</a>
         </div>
         <div className="cta-links">
           <a href="/contact" className="cta-text-link">Contact Us</a>

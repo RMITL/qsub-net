@@ -7,7 +7,7 @@ import {
 
 // ============================================================================
 // QUANTA INTERACTIVE LITEPAPER
-// Based on Technical Specification v3.0
+// Based on Technical Specification v4.0
 // A scrollable, SN8-style document with interactive elements
 // ============================================================================
 
@@ -124,7 +124,7 @@ const QuantaLitepaper = () => {
   const CoverSection = () => (
     <section id="cover" className="lp-section lp-cover">
       <div className="lp-cover-content">
-        <div className="lp-doc-badge">TECHNICAL SPECIFICATION v3.0</div>
+        <div className="lp-doc-badge">TECHNICAL SPECIFICATION v4.0</div>
         <h1 className="lp-doc-title">QUANTA</h1>
         <p className="lp-doc-subtitle">Quantitative Autonomous Network for Trading Alpha</p>
         <div className="lp-cover-divider"></div>
@@ -150,7 +150,7 @@ const QuantaLitepaper = () => {
           <button onClick={() => scrollTo('abstract')} className="lp-btn-primary">
             Read Specification →
           </button>
-          <a href="/docs/QUANTA_Technical_Specification_v3.pdf" className="lp-btn-secondary" target="_blank">
+          <a href="/docs/QUANTA_Technical_Specification_v4.pdf" className="lp-btn-secondary" target="_blank">
             Download Full PDF
           </a>
         </div>
@@ -264,7 +264,7 @@ const QuantaLitepaper = () => {
             <ul>
               <li><strong>Signal Pool:</strong> Decouples submissions from UIDs</li>
               <li><strong>Multi-Horizon:</strong> 7/30/90 day windows (20%/30%/50%)</li>
-              <li><strong>Risk-Adjusted:</strong> Sharpe (primary), P/L %, DD, Sortino/Calmar</li>
+              <li><strong>Risk-Adjusted:</strong> Sharpe (primary), P/L %, DD, Sortino, Calmar, Turnover (tunable weights)</li>
               <li><strong>dTAO:</strong> 18%/41%/41% emission split</li>
             </ul>
           </div>
@@ -716,29 +716,29 @@ const QuantaLitepaper = () => {
               <span className="lp-horizon-days">7</span>
               <span className="lp-horizon-unit">Days</span>
             </div>
-            <div className="lp-horizon-weight">30%</div>
+            <div className="lp-horizon-weight">20%</div>
             <div className="lp-horizon-emphasis">Short-term alpha capture</div>
           </div>
-          <div className="lp-horizon-card lp-horizon-primary">
+          <div className="lp-horizon-card">
             <div className="lp-horizon-header">
               <span className="lp-horizon-days">30</span>
               <span className="lp-horizon-unit">Days</span>
             </div>
-            <div className="lp-horizon-weight">45%</div>
+            <div className="lp-horizon-weight">30%</div>
             <div className="lp-horizon-emphasis">Medium-term consistency</div>
           </div>
-          <div className="lp-horizon-card">
+          <div className="lp-horizon-card lp-horizon-primary">
             <div className="lp-horizon-header">
               <span className="lp-horizon-days">90</span>
               <span className="lp-horizon-unit">Days</span>
             </div>
-            <div className="lp-horizon-weight">25%</div>
-            <div className="lp-horizon-emphasis">Long-term robustness</div>
+            <div className="lp-horizon-weight">50%</div>
+            <div className="lp-horizon-emphasis">Long-term robustness (PRIMARY)</div>
           </div>
         </div>
 
         <h2>Interactive Scoring Engine</h2>
-        <p>Adjust the metrics below to see how your QUANTA Score is calculated:</p>
+        <p>Adjust the metrics below to see how your QUANTA Score is calculated. Metric weights shown are reference values—actual weights are governance-tunable:</p>
 
         <div className="lp-scoring-interactive">
           <div className="lp-scoring-inputs">
@@ -1189,7 +1189,7 @@ const QuantaLitepaper = () => {
 
           <div className="lp-final-cta">
             <div className="lp-cta-buttons">
-              <a href="/docs/QUANTA_Technical_Specification_v3.pdf" className="lp-btn-primary" target="_blank">
+              <a href="/docs/QUANTA_Technical_Specification_v4.pdf" className="lp-btn-primary" target="_blank">
                 Download Full Technical Spec
               </a>
               <a href="https://discord.gg/quanta" className="lp-btn-secondary" target="_blank" rel="noopener noreferrer">
