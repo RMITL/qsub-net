@@ -758,18 +758,9 @@ Top decile miners receive 3× base α-token emissions.
 
 ---
 
-**END OF FRONT MATTER**
+## Section 1: Introduction & Background
 
-*Main document sections begin on the next page*
-
----# QUANTA Technical Specification
-## Sections 1-2: Introduction & Architecture
-
----
-
-# Section 1: Introduction & Background
-
-## 1.1 Problem Statement
+### 1.1 Problem Statement
 
 The global financial markets present a paradox of scale and inefficiency. The United States equity market alone represents approximately $45 trillion in market capitalization, with foreign holdings accounting for $16.8 trillion (18% of total market cap). Despite the market's magnitude and the democratization of retail trading access, fundamental structural problems persist that prevent efficient capital allocation and equitable value capture.
 
@@ -1143,9 +1134,9 @@ If QUANTA captures:
 
 ---
 
-# Section 2: System Architecture
+## Section 2: System Architecture
 
-## 2.1 High-Level Architecture Overview
+### 2.1 High-Level Architecture Overview
 
 QUANTA operates as a three-layer system integrating off-chain computation, on-chain consensus, and cross-chain liquidity:
 
@@ -2110,11 +2101,6 @@ Price_α stable when:
 
 ---
 
-**End of Sections 1-2**
-
-*Prepared for QUANTA Technical Specification Document*
-*Version 1.0 | November 2025*# QUANTA Technical Specification: Signal Format & Scoring Engine
-
 ## Section 3: Signal Format & Submission Protocol
 
 ### 3.1 Portfolio Signal JSON Schema
@@ -2180,29 +2166,40 @@ The QUANTA protocol accepts portfolio signals in a standardized JSON format that
 
 ### 3.2 Signal Constraints & Validation Rules
 
+All signal constraints are **governance-tunable parameters** that can be adjusted through the on-chain governance process (see Section 10). The values shown below represent the **default configuration** for QUANTA v1.0.
+
 #### 3.2.1 Portfolio Construction Constraints
 
-| Constraint | Specification | Rationale |
-|------------|---------------|-----------|
-| **Portfolio Size** | 5-30 tickers | Prevents over-concentration (min) and over-diversification (max) |
-| **Weight Sum** | 1.0 (±0.001) | Ensures full capital allocation |
-| **Eligible Universe** | U.S. equities and ETFs only | Liquidity, data availability, regulatory clarity |
-| **Max Single Position** | 20% (0.20) | Risk management, prevents single-stock dependency |
-| **Min Single Position** | 0.5% (0.005) | Prevents dust positions that add complexity |
-| **Minimum Ante** | 10 α-tokens | Spam prevention, meaningful skin-in-the-game |
-| **Maximum Ante** | 1,000 α-tokens per signal | Prevents whale dominance |
-| **Short Positions** | Not allowed (v1.0) | Simplified scoring, positive-only weights |
+| Parameter | Default Value | Governance | Rationale |
+|-----------|---------------|------------|-----------|
+| `PORTFOLIO_SIZE_MIN` | 5 tickers | Tunable | Prevents over-concentration |
+| `PORTFOLIO_SIZE_MAX` | 30 tickers | Tunable | Prevents over-diversification |
+| `WEIGHT_SUM_TARGET` | 1.0 (±0.001) | Fixed | Ensures full capital allocation |
+| `ELIGIBLE_UNIVERSE` | U.S. equities and ETFs | Tunable | Liquidity, data availability, regulatory clarity |
+| `MAX_SINGLE_POSITION` | 20% (0.20) | Tunable | Risk management, prevents single-stock dependency |
+| `MIN_SINGLE_POSITION` | 0.5% (0.005) | Tunable | Prevents dust positions that add complexity |
+| `MIN_ANTE` | 10 α-tokens | Tunable | Spam prevention, meaningful skin-in-the-game |
+| `MAX_ANTE` | 1,000 α-tokens | Tunable | Prevents whale dominance |
+| `ALLOW_SHORT_POSITIONS` | false (v1.0) | Tunable | Simplified scoring; short positions planned for v2.0 |
+
+**Example Configuration**: The defaults above create a balanced system suitable for diversified long-only equity strategies while maintaining meaningful economic commitment through the ante mechanism.
 
 #### 3.2.2 Ticker Eligibility Requirements
 
-Eligible tickers must satisfy ALL of the following criteria:
+Eligible tickers must satisfy the criteria defined by governance-tunable eligibility parameters. The default configuration requires:
 
-1. **Exchange Listing**: NYSE, NASDAQ, or ARCA (for ETFs)
-2. **Market Capitalization**: ≥ $500M (rolling 30-day average)
-3. **Average Daily Volume**: ≥ 500,000 shares (rolling 30-day average)
-4. **Price Range**: $5.00 ≤ price ≤ $10,000 (prevents penny stocks and extreme outliers)
-5. **Data Availability**: Continuous price history for past 90 days minimum
-6. **Exclusions**: No OTC stocks, no foreign ADRs trading <$1M daily volume
+| Parameter | Default Value | Governance | Purpose |
+|-----------|---------------|------------|---------|
+| `ELIGIBLE_EXCHANGES` | NYSE, NASDAQ, ARCA | Tunable | Primary listing exchanges |
+| `MIN_MARKET_CAP` | $500M (30-day avg) | Tunable | Ensures institutional-grade liquidity |
+| `MIN_DAILY_VOLUME` | 500,000 shares (30-day avg) | Tunable | Ensures executable positions |
+| `MIN_PRICE` | $5.00 | Tunable | Excludes penny stocks |
+| `MAX_PRICE` | $10,000 | Tunable | Excludes extreme outliers |
+| `MIN_PRICE_HISTORY` | 90 days continuous | Tunable | Ensures sufficient scoring history |
+| `EXCLUDE_OTC` | true | Tunable | Excludes over-the-counter securities |
+| `ADR_MIN_VOLUME` | $1M daily | Tunable | Minimum volume for foreign ADRs |
+
+**Example**: With defaults, approximately 2,500+ U.S. equities and 500+ ETFs qualify for the eligible universe.
 
 **Validation Endpoint**: Validators maintain a daily-updated whitelist available at:
 ```
@@ -2211,13 +2208,16 @@ https://quanta.subnet8.io/api/v1/eligible-tickers
 
 #### 3.2.3 Temporal Constraints
 
-| Constraint | Specification | Enforcement |
-|------------|---------------|-------------|
-| **Submission Window** | 00:00 UTC Monday - 16:00 UTC Friday (weekly epoch) | Hard cutoff at 16:00 UTC |
-| **Commitment Period** | 6-48 hours before reveal | Recommended: 14+ hours |
-| **Reveal Window** | 48 hours after commitment | After 48h: signal invalidated |
-| **Scoring Lag** | T+1 (next day after reveal) | Prevents lookahead bias |
-| **Resubmission Cooldown** | 1 epoch (7 days) for same portfolio | Hash collision check |
+| Parameter | Default Value | Governance | Purpose |
+|-----------|---------------|------------|---------|
+| `EPOCH_START` | 00:00 UTC Monday | Tunable | Epoch boundary alignment |
+| `EPOCH_END` | 16:00 UTC Friday | Tunable | Aligns with U.S. market close |
+| `COMMIT_MIN_DELAY` | 6 hours | Tunable | Minimum commitment period |
+| `COMMIT_MAX_DELAY` | 48 hours | Tunable | Maximum commitment period |
+| `COMMIT_RECOMMENDED` | 14+ hours | Advisory | Optimal security vs. flexibility |
+| `REVEAL_WINDOW` | 48 hours | Tunable | Time to reveal after commitment |
+| `SCORING_LAG` | T+1 | Fixed | Prevents lookahead bias |
+| `RESUBMIT_COOLDOWN` | 1 epoch (7 days) | Tunable | Prevents hash collision gaming |
 
 ### 3.3 Commit-Reveal Protocol
 
@@ -2359,56 +2359,82 @@ def verify_commitment(reveal_data, original_commitment):
 
 #### 3.4.1 Pre-Commitment Validation (Client-Side)
 
-Before submitting commitment, miners SHOULD validate:
+Before submitting commitment, miners SHOULD validate against the current governance parameters:
 
 ```python
-def validate_signal_pre_commitment(signal):
+def validate_signal_pre_commitment(signal, params=None):
+    """
+    Validate signal against governance-tunable parameters.
+    params: Dict of governance parameters (fetched from chain or API)
+    """
+    # Load governance parameters with defaults
+    if params is None:
+        params = fetch_governance_params()  # From chain or validator API
+
+    PORTFOLIO_SIZE_MIN = params.get('PORTFOLIO_SIZE_MIN', 5)
+    PORTFOLIO_SIZE_MAX = params.get('PORTFOLIO_SIZE_MAX', 30)
+    MAX_SINGLE_POSITION = params.get('MAX_SINGLE_POSITION', 0.20)
+    MIN_SINGLE_POSITION = params.get('MIN_SINGLE_POSITION', 0.005)
+    MIN_ANTE = params.get('MIN_ANTE', 10.0)
+    MAX_ANTE = params.get('MAX_ANTE', 1000.0)
+
     errors = []
 
-    # 1. Portfolio size
-    if not (5 <= len(signal['tickers']) <= 30):
-        errors.append("Portfolio must contain 5-30 tickers")
+    # 1. Portfolio size (governance-tunable)
+    if not (PORTFOLIO_SIZE_MIN <= len(signal['tickers']) <= PORTFOLIO_SIZE_MAX):
+        errors.append(f"Portfolio must contain {PORTFOLIO_SIZE_MIN}-{PORTFOLIO_SIZE_MAX} tickers")
 
-    # 2. Weight sum
+    # 2. Weight sum (fixed constraint)
     weight_sum = sum(signal['weights'])
     if abs(weight_sum - 1.0) > 0.001:
         errors.append(f"Weights sum to {weight_sum}, must be 1.0 ±0.001")
 
-    # 3. Single position limits
+    # 3. Single position limits (governance-tunable)
     for i, weight in enumerate(signal['weights']):
-        if weight > 0.20:
-            errors.append(f"{signal['tickers'][i]} weight {weight} exceeds 20% max")
-        if weight < 0.005:
-            errors.append(f"{signal['tickers'][i]} weight {weight} below 0.5% min")
+        if weight > MAX_SINGLE_POSITION:
+            errors.append(f"{signal['tickers'][i]} weight {weight} exceeds {MAX_SINGLE_POSITION*100:.0f}% max")
+        if weight < MIN_SINGLE_POSITION:
+            errors.append(f"{signal['tickers'][i]} weight {weight} below {MIN_SINGLE_POSITION*100:.1f}% min")
 
-    # 4. Ticker format
+    # 4. Ticker format (fixed constraint)
     for ticker in signal['tickers']:
         if not ticker.isupper() or not ticker.isalpha():
             errors.append(f"Invalid ticker format: {ticker}")
 
-    # 5. No duplicates
+    # 5. No duplicates (fixed constraint)
     if len(signal['tickers']) != len(set(signal['tickers'])):
         errors.append("Duplicate tickers detected")
 
-    # 6. Ante constraints
-    if signal['ante_amount'] < 10.0:
-        errors.append("Ante must be ≥10 α-tokens")
-    if signal['ante_amount'] > 1000.0:
-        errors.append("Ante must be ≤1000 α-tokens")
+    # 6. Ante constraints (governance-tunable)
+    if signal['ante_amount'] < MIN_ANTE:
+        errors.append(f"Ante must be ≥{MIN_ANTE} α-tokens")
+    if signal['ante_amount'] > MAX_ANTE:
+        errors.append(f"Ante must be ≤{MAX_ANTE} α-tokens")
 
     return len(errors) == 0, errors
 ```
 
 #### 3.4.2 Post-Reveal Validation (Validator-Side)
 
-After reveal, validators perform comprehensive validation:
+After reveal, validators perform comprehensive validation against current governance parameters:
 
 ```python
-def validate_signal_post_reveal(signal, eligible_tickers_db):
+def validate_signal_post_reveal(signal, eligible_tickers_db, params=None):
+    """
+    Validate signal against governance-tunable eligibility parameters.
+    """
+    if params is None:
+        params = fetch_governance_params()
+
+    MIN_DAILY_VOLUME = params.get('MIN_DAILY_VOLUME', 500000)
+    MIN_MARKET_CAP = params.get('MIN_MARKET_CAP', 500_000_000)
+    MIN_PRICE_HISTORY = params.get('MIN_PRICE_HISTORY', 90)
+    ALLOWED_MISSING_DAYS = params.get('ALLOWED_MISSING_DAYS', 5)
+
     errors = []
 
-    # 1. All pre-commitment checks
-    valid, pre_errors = validate_signal_pre_commitment(signal)
+    # 1. All pre-commitment checks (with same params)
+    valid, pre_errors = validate_signal_pre_commitment(signal, params)
     errors.extend(pre_errors)
 
     # 2. Ticker eligibility (against whitelist)
@@ -2416,17 +2442,17 @@ def validate_signal_post_reveal(signal, eligible_tickers_db):
         if ticker not in eligible_tickers_db:
             errors.append(f"{ticker} not in eligible universe")
         else:
-            # Check liquidity requirements
+            # Check liquidity requirements (governance-tunable)
             ticker_data = eligible_tickers_db[ticker]
-            if ticker_data['avg_daily_volume_30d'] < 500000:
-                errors.append(f"{ticker} fails volume requirement")
-            if ticker_data['market_cap'] < 500_000_000:
-                errors.append(f"{ticker} fails market cap requirement")
+            if ticker_data['avg_daily_volume_30d'] < MIN_DAILY_VOLUME:
+                errors.append(f"{ticker} fails volume requirement (need ≥{MIN_DAILY_VOLUME:,} shares/day)")
+            if ticker_data['market_cap'] < MIN_MARKET_CAP:
+                errors.append(f"{ticker} fails market cap requirement (need ≥${MIN_MARKET_CAP:,})")
 
-    # 3. Data availability check
+    # 3. Data availability check (governance-tunable)
     for ticker in signal['tickers']:
-        price_history = fetch_price_history(ticker, days=90)
-        if len(price_history) < 85:  # Allow 5 missing days
+        price_history = fetch_price_history(ticker, days=MIN_PRICE_HISTORY)
+        if len(price_history) < (MIN_PRICE_HISTORY - ALLOWED_MISSING_DAYS):
             errors.append(f"{ticker} insufficient price history")
 
     # 4. Epoch timing validation
@@ -2621,29 +2647,29 @@ Response (200 OK):
 
 ### 4.1 Multi-Horizon Framework
 
-The QUANTA scoring engine evaluates portfolio performance across three distinct time horizons to balance short-term alpha generation with long-term robustness and consistency.
+The QUANTA scoring engine evaluates portfolio performance across three distinct time horizons to balance short-term alpha generation with long-term robustness and consistency. All scoring weights and metric parameters are **governance-tunable**, allowing the community to adapt the system as market conditions evolve.
 
 #### 4.1.1 Time Horizon Specifications
 
-| Window | Weight ($w_t$) | Emphasis | Evaluation Period | Update Frequency |
-|--------|----------------|----------|-------------------|------------------|
-| **7-Day** | 30% (0.30) | Short-term alpha capture | Rolling 7 calendar days | Daily at 16:05 ET |
-| **30-Day** | 45% (0.45) | Medium-term consistency | Rolling 30 calendar days | Daily at 16:05 ET |
-| **90-Day** | 25% (0.25) | Long-term robustness | Rolling 90 calendar days | Daily at 16:05 ET |
+| Parameter | Default Weight | Governance | Emphasis | Evaluation Period |
+|-----------|----------------|------------|----------|-------------------|
+| `WEIGHT_7D` | 30% (0.30) | Tunable | Short-term alpha capture | Rolling 7 calendar days |
+| `WEIGHT_30D` | 45% (0.45) | Tunable | Medium-term consistency | Rolling 30 calendar days |
+| `WEIGHT_90D` | 25% (0.25) | Tunable | Long-term robustness | Rolling 90 calendar days |
+
+**Constraint**: w_7d + w_30d + w_90d = 1.0 (weights must sum to unity)
 
 **Equation 4.1: Composite Time-Weighted Score**
 
-$$
-QS_{\text{total}} = w_{7d} \cdot QS_{7d} + w_{30d} \cdot QS_{30d} + w_{90d} \cdot QS_{90d}
-$$
+**QS_total = w_7d × QS_7d + w_30d × QS_30d + w_90d × QS_90d**
 
-$$
-QS_{\text{total}} = 0.30 \cdot QS_{7d} + 0.45 \cdot QS_{30d} + 0.25 \cdot QS_{90d}
-$$
+**Example with default weights**:
+
+**QS_total = 0.30 × QS_7d + 0.45 × QS_30d + 0.25 × QS_90d**
 
 Where:
-- $QS_{\text{total}}$ = Final composite QUANTA Score
-- $QS_{7d}$, $QS_{30d}$, $QS_{90d}$ = Normalized scores for each time horizon
+- QS_total = Final composite QUANTA Score
+- QS_7d, QS_30d, QS_90d = Normalized scores for each time horizon
 - Weights sum to 1.0 for interpretability
 
 #### 4.1.2 Rationale for Multi-Horizon Approach
@@ -2718,27 +2744,23 @@ The Sortino Ratio measures excess return per unit of downside risk, focusing onl
 
 **Equation 4.2: Sortino Ratio**
 
-$$
-\text{Sortino} = \frac{R_p - MAR}{\sigma_d}
-$$
+**Sortino = (R_p - MAR) / σ_d**
 
-Where:
+Where downside deviation is calculated as:
 
-$$
-\sigma_d = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \min(R_i - MAR, 0)^2}
-$$
+**σ_d = √[ (1/n) × Σ min(R_i - MAR, 0)² ]**
 
 **Parameter Definitions**:
-- $R_p$ = Annualized portfolio return (arithmetic mean)
-- $MAR$ = Minimum Acceptable Return (set to 0% for QUANTA v1.0)
-- $\sigma_d$ = Downside deviation (only negative returns contribute)
-- $R_i$ = Daily portfolio return for day $i$
-- $n$ = Number of trading days in window
+- R_p = Annualized portfolio return (arithmetic mean)
+- MAR = Minimum Acceptable Return (default: 0% for QUANTA v1.0, governance-tunable)
+- σ_d = Downside deviation (only negative returns contribute)
+- R_i = Daily portfolio return for day i
+- n = Number of trading days in window
 
 **Annualization Factors**:
-- 7-day window: Multiply by $\sqrt{252/5} = 7.11$ (5 trading days)
-- 30-day window: Multiply by $\sqrt{252/21} = 3.47$ (21 trading days)
-- 90-day window: Multiply by $\sqrt{252/63} = 2.00$ (63 trading days)
+- 7-day window: Multiply by √(252/5) = 7.11 (5 trading days)
+- 30-day window: Multiply by √(252/21) = 3.47 (21 trading days)
+- 90-day window: Multiply by √(252/63) = 2.00 (63 trading days)
 
 **Calculation Example** (7-day window):
 
@@ -2788,21 +2810,17 @@ The Calmar Ratio measures annualized return per unit of maximum drawdown, emphas
 
 **Equation 4.3: Calmar Ratio**
 
-$$
-\text{Calmar} = \frac{R_{\text{annualized}}}{\text{MaxDD}}
-$$
+**Calmar = R_annualized / MaxDD**
 
-Where:
+Where maximum drawdown is calculated as:
 
-$$
-\text{MaxDD} = \max_{t \in [0, T]} \left( \frac{\text{Peak}_t - \text{Trough}_t}{\text{Peak}_t} \right)
-$$
+**MaxDD = max over t ∈ [0,T] of [ (Peak_t - Trough_t) / Peak_t ]**
 
 **Parameter Definitions**:
-- $R_{\text{annualized}}$ = Annualized portfolio return
-- $\text{MaxDD}$ = Maximum drawdown (decimal, e.g., 0.10 for 10%)
-- $\text{Peak}_t$ = Highest cumulative return up to time $t$
-- $\text{Trough}_t$ = Lowest subsequent cumulative return after $\text{Peak}_t$
+- R_annualized = Annualized portfolio return
+- MaxDD = Maximum drawdown (decimal, e.g., 0.10 for 10%)
+- Peak_t = Highest cumulative return up to time t
+- Trough_t = Lowest subsequent cumulative return after Peak_t
 
 **Calculation Example**:
 
@@ -2854,13 +2872,11 @@ The Drawdown Score directly penalizes excessive drawdowns beyond a threshold, in
 
 **Equation 4.4: Drawdown Score**
 
-$$
-\text{DD}_{\text{score}} = 1 - \frac{\text{MaxDD}}{\text{DD}_{\text{threshold}}}
-$$
+**DD_score = 1 - (MaxDD / DD_threshold)**
 
 **Parameters**:
-- $\text{DD}_{\text{threshold}}$ = 10% (0.10) for all windows
-- Clamp: $\text{DD}_{\text{score}} \in [0, 1]$ (no negative scores)
+- DD_threshold = 10% (0.10) default for all windows (governance-tunable)
+- Clamp: DD_score ∈ [0, 1] (no negative scores)
 
 **Rationale**:
 - Provides absolute risk constraint (not just relative to returns)
@@ -2898,27 +2914,23 @@ The Turnover Score penalizes excessive portfolio rebalancing, which incurs trans
 
 **Equation 4.5: Turnover Calculation**
 
-$$
-\text{Turnover} = \sum_{t=1}^{T} \sum_{i=1}^{N} \left| w_{i,t} - w_{i,t-1} \right|
-$$
+**Turnover = Σ (over t=1 to T) Σ (over i=1 to N) |w_i,t - w_i,t-1|**
 
 Where:
-- $w_{i,t}$ = Weight of asset $i$ at time $t$ (after rebalancing)
-- $N$ = Number of assets in portfolio
-- $T$ = Number of rebalancing events in window
+- w_i,t = Weight of asset i at time t (after rebalancing)
+- N = Number of assets in portfolio
+- T = Number of rebalancing events in window
 
 **Equation 4.6: Turnover Score**
 
-$$
-\text{Turnover}_{\text{score}} = 1 - \frac{\text{Turnover}}{\text{Turnover}_{\text{max}}}
-$$
+**Turnover_score = 1 - (Turnover / Turnover_max)**
 
-**Parameters**:
-- $\text{Turnover}_{\text{max}}$ = 100% (1.0) per 7-day period
+**Parameters** (governance-tunable):
+- Turnover_max = 100% (1.0) per 7-day period (default)
 - Scale to window:
-  - 30-day max = $1.0 \times \frac{30}{7} = 4.29$
-  - 90-day max = $1.0 \times \frac{90}{7} = 12.86$
-- Clamp: $\text{Turnover}_{\text{score}} \in [0, 1]$
+  - 30-day max = 1.0 × (30/7) = 4.29
+  - 90-day max = 1.0 × (90/7) = 12.86
+- Clamp: Turnover_score ∈ [0, 1]
 
 **Calculation Example**:
 
@@ -2975,26 +2987,37 @@ def calculate_turnover_score(portfolio_history, window_days):
 
 #### 4.3.1 Intra-Window Score Aggregation
 
-For each time window (7d, 30d, 90d), calculate the composite score:
+For each time window (7d, 30d, 90d), calculate the composite score using governance-tunable metric weights:
+
+| Parameter | Default Weight | Governance | Purpose |
+|-----------|----------------|------------|---------|
+| `WEIGHT_SORTINO` | 35% (0.35) | Tunable | Primary alpha generation metric |
+| `WEIGHT_CALMAR` | 25% (0.25) | Tunable | Risk-adjusted return metric |
+| `WEIGHT_DRAWDOWN` | 25% (0.25) | Tunable | Absolute risk constraint |
+| `WEIGHT_TURNOVER` | 15% (0.15) | Tunable | Practicality / transaction cost constraint |
+
+**Constraint**: Metric weights must sum to 1.0
 
 **Equation 4.7: Window-Specific QUANTA Score**
 
-$$
-QS_t = 0.35 \cdot S_{\text{Sortino}}(t) + 0.25 \cdot S_{\text{Calmar}}(t) + 0.25 \cdot S_{\text{DD}}(t) + 0.15 \cdot S_{\text{Turnover}}(t)
-$$
+**QS_t = w_Sortino × S_Sortino(t) + w_Calmar × S_Calmar(t) + w_DD × S_DD(t) + w_Turnover × S_Turnover(t)**
+
+**Example with default weights**:
+
+**QS_t = 0.35 × S_Sortino(t) + 0.25 × S_Calmar(t) + 0.25 × S_DD(t) + 0.15 × S_Turnover(t)**
 
 Where:
-- $t \in \{7d, 30d, 90d\}$ = Time window
-- $S_{\text{Sortino}}(t)$ = Normalized Sortino score (see Section 4.4)
-- $S_{\text{Calmar}}(t)$ = Normalized Calmar score
-- $S_{\text{DD}}(t)$ = Drawdown score (already 0-1 scale)
-- $S_{\text{Turnover}}(t)$ = Turnover score (already 0-1 scale)
+- t ∈ {7d, 30d, 90d} = Time window
+- S_Sortino(t) = Normalized Sortino score (see Section 4.4)
+- S_Calmar(t) = Normalized Calmar score
+- S_DD(t) = Drawdown score (already 0-1 scale)
+- S_Turnover(t) = Turnover score (already 0-1 scale)
 
-**Metric Weights Rationale**:
-- **Sortino (35%)**: Primary driver, measures core alpha generation
-- **Calmar (25%)**: Secondary risk-adjusted return metric
-- **Drawdown (25%)**: Absolute risk constraint, prevents reckless strategies
-- **Turnover (15%)**: Practicality constraint, ensures real-world viability
+**Metric Weights Rationale** (default configuration):
+- **Sortino (35%)**: Primary driver, measures core alpha generation with downside risk focus
+- **Calmar (25%)**: Secondary risk-adjusted return metric emphasizing drawdown recovery
+- **Drawdown (25%)**: Absolute risk constraint, prevents reckless high-volatility strategies
+- **Turnover (15%)**: Practicality constraint, ensures real-world execution viability
 
 #### 4.3.2 Final Composite Score
 
@@ -3002,15 +3025,13 @@ Combine window scores using time-horizon weights (from Equation 4.1):
 
 **Equation 4.8: Final QUANTA Score**
 
-$$
-QS_{\text{final}} = \sum_{t \in \{7d, 30d, 90d\}} w_t \cdot QS_t
-$$
+**QS_final = Σ (over t ∈ {7d, 30d, 90d}) w_t × QS_t**
 
-$$
-QS_{\text{final}} = 0.30 \cdot QS_{7d} + 0.45 \cdot QS_{30d} + 0.25 \cdot QS_{90d}
-$$
+With default weights:
 
-**Score Range**: $QS_{\text{final}} \in [0, 100]$ after normalization (Section 4.4)
+**QS_final = 0.30 × QS_7d + 0.45 × QS_30d + 0.25 × QS_90d**
+
+**Score Range**: QS_final ∈ [0, 100] after normalization (Section 4.4)
 
 **Full Calculation Pipeline**:
 
@@ -3081,13 +3102,11 @@ Raw Sortino and Calmar ratios have unbounded ranges, requiring normalization to 
 
 **Equation 4.9: Min-Max Scaling**
 
-$$
-S_{\text{norm}} = \frac{S_{\text{raw}} - S_{\text{min}}}{S_{\text{max}} - S_{\text{min}}}
-$$
+**S_norm = (S_raw - S_min) / (S_max - S_min)**
 
-**Parameters** (determined empirically from historical data):
+**Parameters** (determined empirically from historical data, governance-tunable):
 
-| Metric | Window | $S_{\text{min}}$ | $S_{\text{max}}$ | Rationale |
+| Metric | Window | S_min | S_max | Rationale |
 |--------|--------|------------------|------------------|-----------|
 | Sortino | 7d | -2.0 | 5.0 | High volatility in short windows |
 | Sortino | 30d | -1.5 | 4.0 | More stable medium-term |
@@ -3131,13 +3150,10 @@ For QUANTA v2.0+, bounds will update quarterly based on miner population statist
 
 **Equation 4.10: Adaptive Bounds**
 
-$$
-S_{\text{min}}^{(t)} = P_{5}(S_{\text{raw}}^{(t-1)}) \quad \text{(5th percentile)}
-$$
+At each period *t*, bounds are updated based on the previous period's score distribution:
 
-$$
-S_{\text{max}}^{(t)} = P_{95}(S_{\text{raw}}^{(t-1)}) \quad \text{(95th percentile)}
-$$
+- **Minimum bound**: S_min(t) = 5th percentile of S_raw(t-1)
+- **Maximum bound**: S_max(t) = 95th percentile of S_raw(t-1)
 
 This prevents bound gaming while allowing the system to adapt to improving miner quality.
 
@@ -3151,13 +3167,13 @@ To ensure scoring robustness and prevent overfitting to specific market conditio
 
 **Equation 4.11: Bootstrap Confidence Interval**
 
-$$
-\text{CI}_{95\%} = \left[ P_{2.5}(QS^*), P_{97.5}(QS^*) \right]
-$$
+The 95% confidence interval is defined as:
+
+**CI_95% = [ P_2.5(QS*), P_97.5(QS*) ]**
 
 Where:
-- $QS^*$ = QUANTA Score calculated on $k$-th bootstrap sample
-- $P_{2.5}$, $P_{97.5}$ = 2.5th and 97.5th percentiles of bootstrap distribution
+- QS* = QUANTA Score calculated on the k-th bootstrap sample
+- P_2.5, P_97.5 = 2.5th and 97.5th percentiles of the bootstrap distribution
 - 1000 iterations with replacement sampling
 
 **Algorithm**:
@@ -3200,9 +3216,7 @@ def bootstrap_quanta_score(miner_id, window, n_iterations=1000):
 
 Two miners' scores are considered **statistically different** if their bootstrap confidence intervals do not overlap:
 
-$$
-\text{Significant} \iff \text{CI}_{\text{miner1}} \cap \text{CI}_{\text{miner2}} = \emptyset
-$$
+**Significant ⟺ CI_miner1 ∩ CI_miner2 = ∅**
 
 **Application**: Used for tie-breaking in leaderboard rankings and reward distribution.
 
@@ -3224,13 +3238,11 @@ $$
 
 **Equation 4.13: Adversarial Robustness Score**
 
-$$
-\text{ARS} = 1 - \frac{\sigma_{\text{bootstrap}}(QS)}{QS_{\text{mean}}}
-$$
+**ARS = 1 - (σ_bootstrap / QS_mean)**
 
 Where:
-- $\sigma_{\text{bootstrap}}(QS)$ = Standard deviation of bootstrap scores
-- $QS_{\text{mean}}$ = Mean bootstrap score
+- σ_bootstrap = Standard deviation of bootstrap scores
+- QS_mean = Mean bootstrap score
 
 **Interpretation**:
 - ARS > 0.90: Highly robust (low coefficient of variation)
@@ -3249,13 +3261,11 @@ Where:
 
 **Equation 4.14: Causal Return Calculation**
 
-$$
-R_t = \frac{P_{t}^{\text{close}} - P_{t-1}^{\text{close}}}{P_{t-1}^{\text{close}}}
-$$
+**R_t = (P_close(t) - P_close(t-1)) / P_close(t-1)**
 
 Where:
-- $P_{t-1}^{\text{close}}$ = Previous day's closing price (known at portfolio submission)
-- $P_{t}^{\text{close}}$ = Current day's closing price (unknown at submission)
+- P_close(t-1) = Previous day's closing price (known at portfolio submission)
+- P_close(t) = Current day's closing price (unknown at submission)
 
 **Implementation**:
 
@@ -3289,9 +3299,7 @@ All price data MUST include:
 
 **Equation 4.15: Lookahead Check**
 
-$$
-\text{Valid} \iff T_{\text{signal}} < T_{\text{data\_source}} < T_{\text{eval}}
-$$
+**Valid ⟺ T_signal < T_data_source < T_eval**
 
 **Violation Penalty**: Automatic zero score for that window.
 
@@ -3402,12 +3410,6 @@ QS_final_scaled = 0.613 * 100 = 61.3
   "percentile": 68.2
 }
 ```
-
----
-
-**End of Section 4**
-# QUANTA Technical Specification
-## Sections 5-6: Consensus Mechanisms & Economic Model
 
 ---
 
@@ -4539,14 +4541,6 @@ Cumulative annual revenue by year:
 | 6.30 | Education revenue | 6.8.1 |
 | 6.31 | Talent scouting revenue | 6.8.1 |
 | 6.32 | Strategy licensing revenue | 6.8.1 |
-
----
-
-*Document Version: 1.0*
-*Last Updated: 2025-11-26*
-*Next Sections: 7 (Signal Evaluation), 8 (Risk Management)*
-# QUANTA Technical Specification
-## Sections 7-8: Anti-Gaming & Security Architecture
 
 ---
 
@@ -6926,19 +6920,7 @@ These mechanisms collectively ensure QUANTA operates as a robust, trustless, and
 
 ---
 
-**Document Status:** Sections 7-8 Complete
-**Next Sections:** 9 (Tokenomics & Governance), 10 (Implementation Roadmap)
-**Total Pages:** 24 (as specified: 8-10 pages per section × 2 sections + tables/equations)
-**Equations:** 8.1 through 8.43 (all numbered)
-**Theorems:** 7.1-7.3, 8.1-8.7 (with proof sketches)
-**Algorithms:** 7.1-7.3, 8.1-8.9
-**Tables:** 7.1-7.3, 8.1-8.4
-# QUANTA Technical Specification
-## Sections 9-10: Regulatory Compliance & Implementation
-
----
-
-# Section 9: Regulatory Compliance Framework
+## Section 9: Regulatory Compliance Framework
 
 ## 9.1 Skill-Based Competition Classification
 
@@ -8130,9 +8112,9 @@ Many top signal generators may not meet accredited investor thresholds (young qu
 
 ---
 
-# Section 10: Implementation & Operations
+## Section 10: Implementation & Operations
 
-## 10.1 Technical Stack Specifications
+### 10.1 Technical Stack Specifications
 
 ### 10.1.1 Core Dependencies
 
@@ -9107,16 +9089,6 @@ Mitigation:
 
 ---
 
-**End of Sections 9-10**
-
-*Prepared for QUANTA Technical Specification Document*
-*Version 1.0 | November 2025*
-# QUANTA Technical Specification: Appendices
-
-## Appendices
-
----
-
 ## Appendix A: Complete JSON Schemas
 
 ### A.1 Portfolio Signal Schema
@@ -9654,6 +9626,14 @@ Schema for validator consensus score submissions to Yuma mechanism.
 
 ## Appendix B: Mathematical Proofs
 
+This appendix provides formal proofs of QUANTA's key security and incentive properties. All numerical parameters used in examples (e.g., detection probabilities, stake thresholds, price assumptions) represent **illustrative values** based on empirical estimates or reasonable assumptions. Actual deployed parameters are governance-tunable and will be calibrated based on testnet results and mainnet conditions.
+
+**Notation Conventions**:
+- $P(\cdot)$ denotes probability
+- $E[\cdot]$ denotes expected value
+- $\approx$ indicates empirically estimated values
+- $=$ indicates exact definitions or calculated results
+
 ### B.1 Incentive Compatibility Proof
 
 **Theorem B.1**: Under the QUANTA scoring mechanism, honest signal submission is a dominant strategy for rational miners.
@@ -9707,7 +9687,7 @@ $$
 E[R_i(\text{overfit})] = R_{\text{initial}} \cdot e^{-\lambda \tau}
 $$
 
-Where $\lambda$ is decay rate, $\tau$ is time since optimization. For $\lambda=0.1$, half-life = 7 days.
+Where $\lambda$ is the decay rate parameter (governance-tunable), and $\tau$ is time since optimization. **Example**: For illustrative $\lambda = 0.1$, half-life $\approx 7$ days.
 
 **Case 3: Wash Trading / Sybil Signals**
 
@@ -9718,14 +9698,14 @@ $$
 \rho(s_i, s_j) = \frac{\text{Cov}(R_i, R_j)}{\sigma_i \sigma_j}
 $$
 
-If $\rho > 0.90$ for multiple pairs, validators flag as Sybil cluster.
+If $\rho > \rho_{\text{threshold}}$ for multiple pairs, validators flag as Sybil cluster. The correlation threshold $\rho_{\text{threshold}}$ is governance-tunable (default: 0.85).
 
 **Expected Penalty**:
 $$
-P_i(\text{Sybil}) = N \cdot \text{Ante} \cdot P(\text{detection})
+E[P_i(\text{Sybil})] = N \cdot \text{Ante} \cdot P(\text{detection})
 $$
 
-For $P(\text{detection}) \approx 0.85$ (based on empirical detection rates), expected loss >> expected gain.
+For empirically estimated $P(\text{detection}) \approx 0.85$, expected loss exceeds expected gain.
 
 **Case 4: Lookahead Bias Exploitation**
 
@@ -9754,7 +9734,9 @@ $$
 
 ### B.2 Sybil Attack Cost-Benefit Analysis
 
-**Theorem B.2**: For minimum ante $S_{\min} \geq k \cdot E[R] / P_{\text{attack}}$, Sybil attacks are unprofitable in expectation.
+**Theorem B.2**: For minimum ante $S_{\min} \geq \frac{E[R_{\text{attack}}]}{P(\text{detect})}$, Sybil attacks are unprofitable in expectation.
+
+Here $E[R_{\text{attack}}]$ is the expected reward from a successful attack, and $P(\text{detect})$ is the detection probability.
 
 **Setup**:
 - Attacker creates $N$ fake identities (Sybils)
@@ -9780,7 +9762,7 @@ $$
 \text{Corr}_{ij} = \frac{\sum_{t=1}^{T} (R_{i,t} - \bar{R}_i)(R_{j,t} - \bar{R}_j)}{\sqrt{\sum_{t}(R_{i,t} - \bar{R}_i)^2} \sqrt{\sum_{t}(R_{j,t} - \bar{R}_j)^2}}
 $$
 
-**Sybil Cluster Detection**: If $\exists$ subset $S \subset M$ with $|S| \geq 3$ and $\min_{i,j \in S} \text{Corr}_{ij} > 0.85$, flag as Sybil cluster.
+**Sybil Cluster Detection**: If $\exists$ subset $S \subset M$ with $|S| \geq 3$ and $\min_{i,j \in S} \text{Corr}_{ij} > \rho_{\text{threshold}}$, flag as Sybil cluster. Default $\rho_{\text{threshold}} = 0.85$ (governance-tunable).
 
 **False Positive Rate**:
 Using Bonferroni correction for multiple comparisons:
@@ -9976,6 +9958,8 @@ $$
 
 ### B.4 Economic Security Analysis
 
+> **Note**: All price assumptions in this section are illustrative. TAO price volatility means attack cost calculations should be recalculated with current market data. The key insight is the **structural relationship** between stake requirements and attack profitability, not specific dollar amounts.
+
 #### B.4.1 Cost of 51% Attack
 
 **Attack Definition**: Attacker controls >50% of validator stake to manipulate consensus.
@@ -9985,12 +9969,17 @@ $$
 S_{\text{attack}} > \frac{1}{2} S_{\text{total}}
 $$
 
-**Current Validator Stake** (estimated):
-- $S_{\text{total}} \approx 200,000$ TAO
-- Price: $500/TAO
-- **Total market cap**: $100M
+**Illustrative Scenario** (parameters for demonstration):
+- Let $S_{\text{total}} = 200,000$ TAO (validator stake)
+- Let $P_{\text{TAO}} = \$500$ (TAO price—highly variable)
+- Implied stake market cap: $S_{\text{total}} \cdot P_{\text{TAO}}$
 
-**Attack cost**:
+**Attack cost** (parameterized):
+$$
+\text{Cost}_{51\%} > \frac{1}{2} \cdot S_{\text{total}} \cdot P_{\text{TAO}}
+$$
+
+**Example calculation** with illustrative values:
 $$
 \text{Cost}_{51\%} > \frac{1}{2} \cdot 200,000 \cdot \$500 = \$50M
 $$
