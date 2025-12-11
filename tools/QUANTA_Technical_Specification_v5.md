@@ -10310,10 +10310,10 @@ Schema for validator consensus score submissions to Yuma mechanism.
 This appendix provides formal proofs of QUANTA's key security and incentive properties. All numerical parameters used in examples (e.g., detection probabilities, stake thresholds, price assumptions) represent **illustrative values** based on empirical estimates or reasonable assumptions. Actual deployed parameters are governance-tunable and will be calibrated based on testnet results and mainnet conditions.
 
 **Notation Conventions**:
-- $P(\cdot)$ denotes probability
-- $E[\cdot]$ denotes expected value
-- $\approx$ indicates empirically estimated values
-- $=$ indicates exact definitions or calculated results
+- P(·) denotes probability
+- E[·] denotes expected value
+- ≈ indicates empirically estimated values
+- = indicates exact definitions or calculated results
 
 ### B.1 Incentive Compatibility Proof
 
@@ -10321,93 +10321,102 @@ This appendix provides formal proofs of QUANTA's key security and incentive prop
 
 **Proof Sketch**:
 
-Let $U_i$ be the utility function for miner $i$:
+Let Uᵢ be the utility function for miner i:
 
-$$
-U_i(s_i, s_{-i}) = R_i(s_i, s_{-i}) - C_i(s_i) - P_i(\text{penalty})
-$$
+```
+Uᵢ(sᵢ, s₋ᵢ) = Rᵢ(sᵢ, s₋ᵢ) - Cᵢ(sᵢ) - Pᵢ(penalty)
+```
 
 Where:
-- $s_i$ = miner $i$'s submitted signal
-- $s_{-i}$ = all other miners' signals
-- $R_i$ = expected rewards (proportional to QUANTA Score)
-- $C_i$ = cost of signal generation
-- $P_i$ = expected penalty for gaming/manipulation
+- sᵢ = miner i's submitted signal
+- s₋ᵢ = all other miners' signals
+- Rᵢ = expected rewards (proportional to QUANTA Score)
+- Cᵢ = cost of signal generation
+- Pᵢ = expected penalty for gaming/manipulation
 
-**Claim**: For any deviating strategy $s_i'$ (dishonest), $U_i(s_i^*, s_{-i}) > U_i(s_i', s_{-i})$ where $s_i^*$ is the honest strategy.
+**Claim**: For any deviating strategy sᵢ' (dishonest), Uᵢ(sᵢ*, s₋ᵢ) > Uᵢ(sᵢ', s₋ᵢ) where sᵢ* is the honest strategy.
 
 **Case 1: Front-Running Other Miners' Signals**
 
-Attempt to copy high-performing signal $s_j$ from miner $j$.
+Attempt to copy high-performing signal sⱼ from miner j.
 
 **Failure Mechanism**: Commit-reveal protocol with `msg.sender` binding ensures:
-$$
-H_{\text{commit}}(s_j, \text{salt}_j, \text{addr}_j) \neq H_{\text{commit}}(s_j, \text{salt}_i, \text{addr}_i)
-$$
 
-Miner $i$ cannot produce valid commitment hash for miner $j$'s signal.
+```
+H_commit(sⱼ, saltⱼ, addrⱼ) ≠ H_commit(sⱼ, saltᵢ, addrᵢ)
+```
+
+Miner i cannot produce valid commitment hash for miner j's signal.
 
 **Expected Utility**:
-$$
-U_i(\text{copy}) = 0 - C_i(\text{monitoring}) - P_i(\text{detection}) < 0
-$$
+
+```
+Uᵢ(copy) = 0 - Cᵢ(monitoring) - Pᵢ(detection) < 0
+```
 
 **Case 2: Overfitting to Scoring Windows**
 
 Attempt to optimize portfolio for exact 7/30/90-day boundaries.
 
 **Failure Mechanism**: Rolling daily evaluation means:
-$$
-\text{Score}_i(t) = f(\text{returns}_{[t-90, t]})
-$$
 
-Optimization for fixed $t$ becomes stale within 1 day as window rolls forward.
+```
+Scoreᵢ(t) = f(returns[t-90, t])
+```
+
+Optimization for fixed t becomes stale within 1 day as window rolls forward.
 
 **Expected Return**:
-$$
-E[R_i(\text{overfit})] = R_{\text{initial}} \cdot e^{-\lambda \tau}
-$$
 
-Where $\lambda$ is the decay rate parameter (governance-tunable), and $\tau$ is time since optimization. **Example**: For illustrative $\lambda = 0.1$, half-life $\approx 7$ days.
+```
+E[Rᵢ(overfit)] = R_initial × e^(-λτ)
+```
+
+Where λ is the decay rate parameter (governance-tunable), and τ is time since optimization. **Example**: For illustrative λ = 0.1, half-life ≈ 7 days.
 
 **Case 3: Wash Trading / Sybil Signals**
 
-Submit $N$ correlated signals from different identities to manipulate pool.
+Submit N correlated signals from different identities to manipulate pool.
 
 **Failure Mechanism**: Statistical correlation detection:
-$$
-\rho(s_i, s_j) = \frac{\text{Cov}(R_i, R_j)}{\sigma_i \sigma_j}
-$$
 
-If $\rho > \rho_{\text{threshold}}$ for multiple pairs, validators flag as Sybil cluster. The correlation threshold $\rho_{\text{threshold}}$ is governance-tunable (default: 0.85).
+```
+ρ(sᵢ, sⱼ) = Cov(Rᵢ, Rⱼ) / (σᵢ × σⱼ)
+```
+
+If ρ > ρ_threshold for multiple pairs, validators flag as Sybil cluster. The correlation threshold ρ_threshold is governance-tunable (default: 0.85).
 
 **Expected Penalty**:
-$$
-E[P_i(\text{Sybil})] = N \cdot \text{Ante} \cdot P(\text{detection})
-$$
 
-For empirically estimated $P(\text{detection}) \approx 0.85$, expected loss exceeds expected gain.
+```
+E[Pᵢ(Sybil)] = N × Ante × P(detection)
+```
+
+For empirically estimated P(detection) ≈ 0.85, expected loss exceeds expected gain.
 
 **Case 4: Lookahead Bias Exploitation**
 
 Use future price information to construct signal.
 
 **Failure Mechanism**: T+1 evaluation protocol enforces:
-$$
-\forall t: \text{Data}_{\text{available}}(t) \cap \text{Data}_{\text{future}}(t+1) = \emptyset
-$$
 
-Validators independently verify timestamps. Probability of collusion across $v$ validators:
-$$
-P(\text{collusion}) = p_{\text{corrupt}}^v
-$$
+```
+∀t: Data_available(t) ∩ Data_future(t+1) = ∅
+```
 
-For $v=64$ validators, $p_{\text{corrupt}}=0.10$ → $P(\text{collusion}) \approx 10^{-64}$ (negligible).
+Validators independently verify timestamps. Probability of collusion across v validators:
+
+```
+P(collusion) = p_corrupt^v
+```
+
+For v=64 validators, p_corrupt=0.10 → P(collusion) ≈ 10⁻⁶⁴ (negligible).
 
 **Conclusion**: Under all examined deviation strategies, honest submission dominates:
-$$
-U_i(s_i^*, s_{-i}) > U_i(s_i', s_{-i}) \quad \forall s_i' \neq s_i^*
-$$
+
+```
+Uᵢ(sᵢ*, s₋ᵢ) > Uᵢ(sᵢ', s₋ᵢ)  ∀sᵢ' ≠ sᵢ*
+```
 
 **QED**
 
@@ -10415,83 +10424,91 @@ $$
 
 ### B.2 Sybil Attack Cost-Benefit Analysis
 
-**Theorem B.2**: For minimum ante $S_{\min} \geq \frac{E[R_{\text{attack}}]}{P(\text{detect})}$, Sybil attacks are unprofitable in expectation.
+**Theorem B.2**: For minimum ante S_min ≥ E[R_attack] / P(detect), Sybil attacks are unprofitable in expectation.
 
-Here $E[R_{\text{attack}}]$ is the expected reward from a successful attack, and $P(\text{detect})$ is the detection probability.
+Here E[R_attack] is the expected reward from a successful attack, and P(detect) is the detection probability.
 
 **Setup**:
-- Attacker creates $N$ fake identities (Sybils)
-- Each Sybil submits correlated signal with ante $S_{\min}$
-- Total capital requirement: $N \cdot S_{\min}$
+- Attacker creates N fake identities (Sybils)
+- Each Sybil submits correlated signal with ante S_min
+- Total capital requirement: N × S_min
 
 **Attack Objective**: Capture disproportionate share of emissions by overwhelming pool with correlated high-performing signals.
 
 **Expected Reward** (if successful):
-$$
-E[R_{\text{attack}}] = N \cdot \frac{E[\text{Score}_{\text{sybil}}]}{E[\text{Score}_{\text{total}}]} \cdot E_{\text{total}}
-$$
+
+```
+E[R_attack] = N × (E[Score_sybil] / E[Score_total]) × E_total
+```
 
 Where:
-- $E[\text{Score}_{\text{sybil}}]$ = average score of Sybil signals
-- $E[\text{Score}_{\text{total}}]$ = network-wide average score
-- $E_{\text{total}}$ = total epoch emissions
+- E[Score_sybil] = average score of Sybil signals
+- E[Score_total] = network-wide average score
+- E_total = total epoch emissions
 
 **Detection Probability**:
 
-Validators compute pairwise correlation matrix for all $M$ miners:
-$$
-\text{Corr}_{ij} = \frac{\sum_{t=1}^{T} (R_{i,t} - \bar{R}_i)(R_{j,t} - \bar{R}_j)}{\sqrt{\sum_{t}(R_{i,t} - \bar{R}_i)^2} \sqrt{\sum_{t}(R_{j,t} - \bar{R}_j)^2}}
-$$
+Validators compute pairwise correlation matrix for all M miners:
 
-**Sybil Cluster Detection**: If $\exists$ subset $S \subset M$ with $|S| \geq 3$ and $\min_{i,j \in S} \text{Corr}_{ij} > \rho_{\text{threshold}}$, flag as Sybil cluster. Default $\rho_{\text{threshold}} = 0.85$ (governance-tunable).
+```
+Corrᵢⱼ = Σₜ(Rᵢₜ - R̄ᵢ)(Rⱼₜ - R̄ⱼ) / √[Σₜ(Rᵢₜ - R̄ᵢ)² × Σₜ(Rⱼₜ - R̄ⱼ)²]
+```
+
+**Sybil Cluster Detection**: If ∃ subset S ⊂ M with |S| ≥ 3 and min(Corrᵢⱼ) > ρ_threshold for all i,j ∈ S, flag as Sybil cluster. Default ρ_threshold = 0.85 (governance-tunable).
 
 **False Positive Rate**:
 Using Bonferroni correction for multiple comparisons:
-$$
-P(\text{false positive}) \approx \frac{\alpha}{\binom{M}{2}} \approx \frac{0.05}{M^2/2}
-$$
 
-For $M=150$ miners, $P(\text{false positive}) \approx 0.0004$ (negligible).
+```
+P(false positive) ≈ α / C(M,2) ≈ 0.05 / (M²/2)
+```
+
+For M=150 miners, P(false positive) ≈ 0.0004 (negligible).
 
 **Detection Probability** (empirical):
-$$
-P(\text{detect} \mid N \geq 3, \rho \geq 0.85) \approx 0.92
-$$
+
+```
+P(detect | N ≥ 3, ρ ≥ 0.85) ≈ 0.92
+```
 
 Based on simulation with 10,000 synthetic Sybil attacks.
 
 **Expected Penalty**:
-$$
-E[P_{\text{attack}}] = P(\text{detect}) \cdot N \cdot S_{\min} = 0.92 \cdot N \cdot S_{\min}
-$$
+
+```
+E[P_attack] = P(detect) × N × S_min = 0.92 × N × S_min
+```
 
 **Cost-Benefit Analysis**:
 
 Attack is unprofitable when:
-$$
-E[R_{\text{attack}}] < E[P_{\text{attack}}]
-$$
+
+```
+E[R_attack] < E[P_attack]
+```
 
 Substituting:
-$$
-N \cdot \frac{E[\text{Score}_{\text{sybil}}]}{E[\text{Score}_{\text{total}}]} \cdot E_{\text{total}} < 0.92 \cdot N \cdot S_{\min}
-$$
 
-Simplifying (canceling $N$):
-$$
-S_{\min} > \frac{E[\text{Score}_{\text{sybil}}]}{0.92 \cdot E[\text{Score}_{\text{total}}]} \cdot E_{\text{total}}
-$$
+```
+N × (E[Score_sybil] / E[Score_total]) × E_total < 0.92 × N × S_min
+```
+
+Simplifying (canceling N):
+
+```
+S_min > (E[Score_sybil] / (0.92 × E[Score_total])) × E_total
+```
 
 **Numerical Example**:
-- $E[\text{Score}_{\text{sybil}}] / E[\text{Score}_{\text{total}}] \approx 0.8$ (Sybils slightly above average)
-- $E_{\text{total}} = 10,000$ α-tokens per epoch
-- $P(\text{detect}) = 0.92$
+- E[Score_sybil] / E[Score_total] ≈ 0.8 (Sybils slightly above average)
+- E_total = 10,000 α-tokens per epoch
+- P(detect) = 0.92
 
-$$
-S_{\min} > \frac{0.8}{0.92} \cdot 10,000 = 8,696 \text{ α-tokens}
-$$
+```
+S_min > (0.8 / 0.92) × 10,000 = 8,696 α-tokens
+```
 
-**QUANTA Setting**: $S_{\min} = 10$ α-tokens (conservative, allows broad participation)
+**QUANTA Setting**: S_min = 100 α-tokens (conservative, allows broad participation)
 
 **Implication**: Current ante is **insufficient** to prevent Sybil attacks via cost alone. However, combining:
 1. Detection penalties (100% ante forfeiture + epoch ban)
@@ -10500,11 +10517,12 @@ $$
 4. Exponentially increasing ante for repeat offenders
 
 Creates effective deterrence. Attacker expected utility:
-$$
-U_{\text{attack}} = \sum_{k=1}^{\infty} P(\text{undetected})^k \cdot E[R_k] - \sum_{k=1}^{\infty} P(\text{detected})_k \cdot C_k
-$$
 
-For $P(\text{undetected}) \approx 0.08$ per epoch, geometric series converges to negative value after $k \approx 3$ epochs.
+```
+U_attack = Σₖ P(undetected)ᵏ × E[Rₖ] - Σₖ P(detected)ₖ × Cₖ
+```
+
+For P(undetected) ≈ 0.08 per epoch, geometric series converges to negative value after k ≈ 3 epochs.
 
 **QED**
 
@@ -10512,124 +10530,134 @@ For $P(\text{undetected}) \approx 0.08$ per epoch, geometric series converges to
 
 ### B.3 Byzantine Fault Tolerance Bounds
 
-**Theorem B.3**: The QUANTA Yuma consensus mechanism tolerates up to $f < n/3$ Byzantine validators, where $n$ is the total number of validators.
+**Theorem B.3**: The QUANTA Yuma consensus mechanism tolerates up to f < n/3 Byzantine validators, where n is the total number of validators.
 
 **Byzantine Fault Model**:
 - Byzantine validator may:
   1. Submit arbitrary scores (not reflecting true performance)
   2. Collude with other Byzantine validators
   3. Attempt to manipulate consensus output
-- Byzantine validators control total stake $S_{\text{byz}} < S_{\text{total}}/3$
+- Byzantine validators control total stake S_byz < S_total/3
 
 **Yuma Consensus Recap**:
 
-For each miner $j$, consensus score is:
-$$
-W_j^* = \max \left\{ w \mid \sum_{i: W_{ij} \geq w} S_i \geq \kappa \cdot S_{\text{total}} \right\}
-$$
+For each miner j, consensus score is:
+
+```
+Wⱼ* = max{ w | Σᵢ:Wᵢⱼ≥w Sᵢ ≥ κ × S_total }
+```
 
 Where:
-- $W_{ij}$ = score submitted by validator $i$ for miner $j$
-- $S_i$ = stake of validator $i$
-- $\kappa = 0.67$ (consensus threshold)
+- Wᵢⱼ = score submitted by validator i for miner j
+- Sᵢ = stake of validator i
+- κ = 0.67 (consensus threshold)
 
 **Safety Property**: Byzantine validators cannot force consensus to accept false score.
 
 **Proof of Safety**:
 
-Assume $f$ Byzantine validators with total stake $S_{\text{byz}}$.
+Assume f Byzantine validators with total stake S_byz.
 
-**Case 1: Byzantine Minority** ($S_{\text{byz}} < S_{\text{total}}/3$)
+**Case 1: Byzantine Minority** (S_byz < S_total/3)
 
-For consensus threshold $\kappa = 2/3$:
-$$
-\text{Honest stake required} = \kappa \cdot S_{\text{total}} = \frac{2}{3} S_{\text{total}}
-$$
+For consensus threshold κ = 2/3:
 
-$$
-\text{Honest stake available} = S_{\text{total}} - S_{\text{byz}} > S_{\text{total}} - \frac{1}{3}S_{\text{total}} = \frac{2}{3}S_{\text{total}}
-$$
+```
+Honest stake required = κ × S_total = (2/3) × S_total
+```
 
-Since honest validators submit true scores $W_{ij}^{\text{true}}$, and honest stake exceeds threshold, consensus converges to:
-$$
-W_j^* = W_j^{\text{true}} \quad \text{(Byzantine votes ignored)}
-$$
+```
+Honest stake available = S_total - S_byz > S_total - (1/3)×S_total = (2/3)×S_total
+```
 
-**Case 2: Byzantine Majority** ($S_{\text{byz}} \geq S_{\text{total}}/3$)
+Since honest validators submit true scores Wᵢⱼ_true, and honest stake exceeds threshold, consensus converges to:
+
+```
+Wⱼ* = Wⱼ_true  (Byzantine votes ignored)
+```
+
+**Case 2: Byzantine Majority** (S_byz ≥ S_total/3)
 
 Byzantine validators can prevent consensus (liveness violation) but cannot force false consensus (safety preserved).
 
-**Worst-case scenario**: Byzantine validators submit $W_{ij} = 0$ for all miners.
+**Worst-case scenario**: Byzantine validators submit Wᵢⱼ = 0 for all miners.
 
-$$
-\sum_{i \in \text{honest}} S_i = S_{\text{total}} - S_{\text{byz}} < \frac{2}{3}S_{\text{total}}
-$$
+```
+Σᵢ∈honest Sᵢ = S_total - S_byz < (2/3)×S_total
+```
 
 Consensus fails (no score reaches threshold). Fallback mechanism:
 1. Extend consensus window by +6 hours
-2. Require supermajority $\kappa' = 0.75$ from honest validators
+2. Require supermajority κ' = 0.75 from honest validators
 3. If still failing, freeze emissions for that epoch
 
 **Key Result**: No false consensus possible, only liveness impact.
 
-**Liveness Property**: Consensus succeeds if $S_{\text{honest}} > \kappa \cdot S_{\text{total}}$.
+**Liveness Property**: Consensus succeeds if S_honest > κ × S_total.
 
 **Proof of Liveness**:
 
 Honest validators agree on true scores (verified independently via open-source code and public data).
 
-$$
-\forall i, i' \in \text{honest}: |W_{ij} - W_{i'j}| < \epsilon
-$$
+```
+∀i, i' ∈ honest: |Wᵢⱼ - Wᵢ'ⱼ| < ε
+```
 
-For $\epsilon = 0.01$ (1% tolerance due to floating-point precision).
+For ε = 0.01 (1% tolerance due to floating-point precision).
 
 Taking median honest score:
-$$
-W_j^{\text{median}} = \text{median}\{W_{ij} \mid i \in \text{honest}\}
-$$
 
-All honest validators submit scores within $[\text{median} - \epsilon, \text{median} + \epsilon]$.
+```
+Wⱼ_median = median{Wᵢⱼ | i ∈ honest}
+```
 
-Stake supporting $w \geq \text{median} - \epsilon$:
-$$
-S_{\text{support}} = \sum_{i \in \text{honest}} S_i > \kappa \cdot S_{\text{total}} = \frac{2}{3}S_{\text{total}}
-$$
+All honest validators submit scores within [median - ε, median + ε].
 
-Therefore, consensus converges within $\epsilon$ of true score.
+Stake supporting w ≥ median - ε:
+
+```
+S_support = Σᵢ∈honest Sᵢ > κ × S_total = (2/3)×S_total
+```
+
+Therefore, consensus converges within ε of true score.
 
 **Numerical Example**:
 
-- $n = 64$ validators
-- $S_{\text{total}} = 100,000$ TAO
-- $\kappa = 0.67$ (2/3 threshold)
+- n = 64 validators
+- S_total = 100,000 TAO
+- κ = 0.67 (2/3 threshold)
 
 **Maximum tolerable Byzantine stake**:
-$$
-S_{\text{byz}}^{\max} < \frac{1}{3} \cdot 100,000 = 33,333 \text{ TAO}
-$$
+
+```
+S_byz_max < (1/3) × 100,000 = 33,333 TAO
+```
 
 **Equivalent to**:
-$$
-f < \frac{n}{3} = \frac{64}{3} \approx 21 \text{ validators}
-$$
 
-**Actual Security Margin**: If Byzantine validators uniformly distributed (unlikely), each holds $\approx 1,562$ TAO. Coordinating 21+ validators for sustained attack (multi-epoch) is economically prohibitive.
+```
+f < n/3 = 64/3 ≈ 21 validators
+```
+
+**Actual Security Margin**: If Byzantine validators uniformly distributed (unlikely), each holds ≈1,562 TAO. Coordinating 21+ validators for sustained attack (multi-epoch) is economically prohibitive.
 
 **Attack Cost Analysis**:
-$$
-\text{Cost} = S_{\text{byz}}^{\max} \cdot \text{Price}_{\text{TAO}} = 33,333 \cdot \$500 = \$16.7M
-$$
+
+```
+Cost = S_byz_max × Price_TAO = 33,333 × $500 = $16.7M
+```
 
 **Expected Gain** (optimistic for attacker):
-$$
-\text{Gain} = \sum_{k=1}^{K} E[\text{Emissions}_k] - P(\text{detection}) \cdot \text{Stake Slash}
-$$
 
-For $K=10$ epochs before detection, $E[\text{Emissions}] \approx 100$ TAO/epoch:
-$$
-\text{Gain} = 10 \cdot 100 \cdot \$500 - 0.75 \cdot 33,333 \cdot \$500 = \$500K - \$12.5M < 0
-$$
+```
+Gain = Σₖ E[Emissionsₖ] - P(detection) × Stake_Slash
+```
+
+For K=10 epochs before detection, E[Emissions] ≈ 100 TAO/epoch:
+
+```
+Gain = 10 × 100 × $500 - 0.75 × 33,333 × $500 = $500K - $12.5M < 0
+```
 
 **Conclusion**: Attack is unprofitable under realistic assumptions.
 
@@ -10646,34 +10674,38 @@ $$
 **Attack Definition**: Attacker controls >50% of validator stake to manipulate consensus.
 
 **Required Stake**:
-$$
-S_{\text{attack}} > \frac{1}{2} S_{\text{total}}
-$$
+
+```
+S_attack > (1/2) × S_total
+```
 
 **Illustrative Scenario** (parameters for demonstration):
-- Let $S_{\text{total}} = 200,000$ TAO (validator stake)
-- Let $P_{\text{TAO}} = \$500$ (TAO price—highly variable)
-- Implied stake market cap: $S_{\text{total}} \cdot P_{\text{TAO}}$
+- Let S_total = 200,000 TAO (validator stake)
+- Let P_TAO = $500 (TAO price—highly variable)
+- Implied stake market cap: S_total × P_TAO
 
 **Attack cost** (parameterized):
-$$
-\text{Cost}_{51\%} > \frac{1}{2} \cdot S_{\text{total}} \cdot P_{\text{TAO}}
-$$
+
+```
+Cost_51% > (1/2) × S_total × P_TAO
+```
 
 **Example calculation** with illustrative values:
-$$
-\text{Cost}_{51\%} > \frac{1}{2} \cdot 200,000 \cdot \$500 = \$50M
-$$
+
+```
+Cost_51% > (1/2) × 200,000 × $500 = $50M
+```
 
 **Expected Return** (before detection):
-- Control of $E_{\text{total}} = 1,000$ α-tokens/epoch
+- Control of E_total = 1,000 α-tokens/epoch
 - Price: $10/α
 - **Per-epoch gain**: $10K
 
 **Break-even time** (ignoring detection):
-$$
-T_{\text{breakeven}} = \frac{\$50M}{\$10K/\text{epoch}} = 5,000 \text{ epochs} \approx 1.9 \text{ years}
-$$
+
+```
+T_breakeven = $50M / $10K/epoch = 5,000 epochs ≈ 1.9 years
+```
 
 **Detection Time** (empirical):
 - Automated anomaly detection: 1-3 epochs
@@ -10681,14 +10713,16 @@ $$
 - Hard fork to slash attacker: 14-30 days
 
 **Net Expected Value**:
-$$
-\text{NEV} = \sum_{k=1}^{K} \text{Gain}_k - P(\text{detection}) \cdot S_{\text{attack}} - \text{Reputation Loss}
-$$
 
-For $K \approx 10$ epochs before slashing:
-$$
-\text{NEV} \approx 10 \cdot \$10K - 0.95 \cdot \$50M - \text{Unbounded Reputation Damage} < -\$47.4M
-$$
+```
+NEV = Σₖ Gainₖ - P(detection) × S_attack - Reputation_Loss
+```
+
+For K ≈ 10 epochs before slashing:
+
+```
+NEV ≈ 10 × $10K - 0.95 × $50M - Unbounded_Reputation_Damage < -$47.4M
+```
 
 **Conclusion**: 51% attack is economically irrational.
 
@@ -10705,14 +10739,16 @@ $$
 - **Total**: $2.8M
 
 **Required Attack Cost**:
-$$
-\text{Cost}_{\text{attack}} > 100 \cdot \$2.8M = \$280M
-$$
+
+```
+Cost_attack > 100 × $2.8M = $280M
+```
 
 **Current Security**:
-$$
-\frac{\text{Current Cost}_{51\%}}{\text{Target}} = \frac{\$50M}{\$280M} \approx 0.18
-$$
+
+```
+Current_Cost_51% / Target = $50M / $280M ≈ 0.18
+```
 
 **Shortfall**: 5.6x increase needed in validator stake.
 
@@ -10724,10 +10760,10 @@ $$
 
 **Projected Security (Year 2)**:
 - Validator stake growth: +300% (empirical from other Bittensor subnets)
-- $S_{\text{total}} \approx 800,000$ TAO
-- Cost of 51% attack: $\approx \$200M$
+- S_total ≈ 800,000 TAO
+- Cost of 51% attack: ≈$200M
 
-**Target achieved**: $200M / $280M \approx 0.71$ (acceptable for early-stage protocol).
+**Target achieved**: $200M / $280M ≈ 0.71 (acceptable for early-stage protocol).
 
 ---
 
@@ -10745,21 +10781,21 @@ $$
 #### B.5.2 Formal Model
 
 Let:
-- $V = \{v_1, v_2, ..., v_n\}$ be the set of validators
-- $S_i$ = stake held by validator $i$
-- $C \subseteq V$ = colluding coalition
-- $|C|_S = \sum_{i \in C} S_i$ = total stake in coalition
+- V = {v₁, v₂, ..., vₙ} be the set of validators
+- Sᵢ = stake held by validator i
+- C ⊆ V = colluding coalition
+- |C|ₛ = Σᵢ∈C Sᵢ = total stake in coalition
 
 **Coalition Formation Cost:**
 
-$$
-\text{Cost}_{\text{coalition}} = \sum_{i \in C} \text{Opportunity}_i + \text{Coordination}_C + \text{Detection}_C
-$$
+```
+Cost_coalition = Σᵢ∈C Opportunityᵢ + Coordination_C + Detection_C
+```
 
 Where:
-- $\text{Opportunity}_i$ = foregone honest rewards for validator $i$
-- $\text{Coordination}_C$ = cost of maintaining secret agreement
-- $\text{Detection}_C$ = expected slashing if detected
+- Opportunityᵢ = foregone honest rewards for validator i
+- Coordination_C = cost of maintaining secret agreement
+- Detection_C = expected slashing if detected
 
 #### B.5.3 Detection Mechanisms
 
@@ -10767,31 +10803,31 @@ Where:
 
 QUANTA monitors validator score submissions for statistical anomalies:
 
-$$
-\text{Deviation}_i = \frac{|\text{Score}_{i,m} - \text{Median}_m|}{\sigma_m}
-$$
+```
+Deviationᵢ = |Score_{i,m} - Median_m| / σ_m
+```
 
-If $\text{Deviation}_i > 3$ for >10% of miners, validator $i$ is flagged.
+If Deviationᵢ > 3 for >10% of miners, validator i is flagged.
 
 **Coalition Detection:**
 
-For validators $i, j$, compute pairwise score correlation:
+For validators i, j, compute pairwise score correlation:
 
-$$
-\rho_{ij} = \text{Corr}(\text{Scores}_i, \text{Scores}_j)
-$$
+```
+ρᵢⱼ = Corr(Scoresᵢ, Scoresⱼ)
+```
 
-If $\rho_{ij} > 0.95$ for subset $C$ where $|C| \geq 3$, flag as potential collusion.
+If ρᵢⱼ > 0.95 for subset C where |C| ≥ 3, flag as potential collusion.
 
 **Temporal Pattern Analysis:**
 
-Validators submitting scores within $\epsilon$ seconds of each other:
+Validators submitting scores within ε seconds of each other:
 
-$$
-\text{Temporal}_C = |\{(i,j) \in C \times C : |t_i - t_j| < \epsilon\}|
-$$
+```
+Temporal_C = |{(i,j) ∈ C × C : |tᵢ - tⱼ| < ε}|
+```
 
-High $\text{Temporal}_C$ indicates coordination.
+High Temporal_C indicates coordination.
 
 #### B.5.4 Economic Infeasibility Proof
 
@@ -10803,38 +10839,41 @@ High $\text{Temporal}_C$ indicates coordination.
 
 Maximum extractable value from collusion:
 - Manipulate miner rankings to benefit confederate miner
-- Confederate miner receives additional rewards: $\Delta R$
+- Confederate miner receives additional rewards: ΔR
 
 With 41% miner emissions and pool of 100 miners:
-$$
-\Delta R_{\max} \approx 0.41 \times \text{Total}_{\text{emissions}} \times 0.052 \approx 0.021 \times \text{Total}_{\text{emissions}}
-$$
 
-At $\$1M$ annual emissions: $\Delta R_{\max} \approx \$21,000$ per year
+```
+ΔR_max ≈ 0.41 × Total_emissions × 0.052 ≈ 0.021 × Total_emissions
+```
+
+At $1M annual emissions: ΔR_max ≈ $21,000 per year
 
 **Step 2: Coalition Costs**
 
-*Detection Probability*: With QUANTA's anomaly detection (Section 7.4), estimated $p_{\text{detect}} = 0.85$ within 30 days.
+*Detection Probability*: With QUANTA's anomaly detection (Section 7.4), estimated p_detect = 0.85 within 30 days.
 
 *Slashing Penalty*: 50% of staked TAO for provable collusion.
 
-For coalition controlling 51% stake ($S_C = 0.51 \times 200,000 = 102,000$ TAO):
-$$
-\text{Penalty}_{\text{expected}} = p_{\text{detect}} \times 0.50 \times S_C \times P_{\text{TAO}}
-$$
+For coalition controlling 51% stake (S_C = 0.51 × 200,000 = 102,000 TAO):
 
-At $P_{\text{TAO}} = \$500$:
-$$
-\text{Penalty}_{\text{expected}} = 0.85 \times 0.50 \times 102,000 \times \$500 = \$21.675M
-$$
+```
+Penalty_expected = p_detect × 0.50 × S_C × P_TAO
+```
+
+At P_TAO = $500:
+
+```
+Penalty_expected = 0.85 × 0.50 × 102,000 × $500 = $21.675M
+```
 
 **Step 3: Net Economic Value**
 
-$$
-\text{NEV}_{\text{collusion}} = \Delta R_{\max} - \text{Penalty}_{\text{expected}} = \$21K - \$21.675M \approx -\$21.65M
-$$
+```
+NEV_collusion = ΔR_max - Penalty_expected = $21K - $21.675M ≈ -$21.65M
+```
 
-**Conclusion**: $\text{NEV}_{\text{collusion}} << 0$ $\Rightarrow$ Collusion is economically irrational. $\square$
+**Conclusion**: NEV_collusion << 0 ⇒ Collusion is economically irrational. ∎
 
 #### B.5.5 Coalition Stability Analysis
 
@@ -10843,38 +10882,42 @@ Even if detection were imperfect, coalition stability is undermined by:
 **1. Whistleblower Incentive:**
 
 Any coalition member can report collusion and receive 10% of slashed funds:
-$$
-\text{Whistleblower}_{\text{reward}} = 0.10 \times \text{Slashed}_{\text{funds}} \approx \$2.17M
-$$
+
+```
+Whistleblower_reward = 0.10 × Slashed_funds ≈ $2.17M
+```
 
 This exceeds their share of collusion profits, creating defection incentive.
 
 **2. Repeated Game Dynamics:**
 
-In iterated games, deviation in round $t$ triggers punishment in $t+1, t+2, ...$
+In iterated games, deviation in round t triggers punishment in t+1, t+2, ...
 
 Present value of honest play:
-$$
-\text{PV}_{\text{honest}} = \sum_{t=0}^{\infty} \delta^t \times R_{\text{honest}} = \frac{R_{\text{honest}}}{1-\delta}
-$$
 
-Where $\delta \approx 0.95$ (5% discount rate).
+```
+PV_honest = Σₜ₌₀^∞ δᵗ × R_honest = R_honest / (1 - δ)
+```
 
-For validator with $\$50K$ annual honest rewards:
-$$
-\text{PV}_{\text{honest}} = \frac{\$50K}{0.05} = \$1M
-$$
+Where δ ≈ 0.95 (5% discount rate).
+
+For validator with $50K annual honest rewards:
+
+```
+PV_honest = $50K / 0.05 = $1M
+```
 
 This exceeds any plausible one-time collusion benefit.
 
 **3. Coordination Complexity:**
 
-Information entropy of maintaining secret agreement among $k$ validators:
-$$
-H(C) = k \times \log_2(k!) \approx k^2 \log_2(k)
-$$
+Information entropy of maintaining secret agreement among k validators:
 
-For $k = 10$ validators: $H \approx 330$ bits of shared secret state.
+```
+H(C) = k × log₂(k!) ≈ k² × log₂(k)
+```
+
+For k = 10 validators: H ≈ 330 bits of shared secret state.
 
 Practical implication: Large coalitions are inherently unstable.
 
