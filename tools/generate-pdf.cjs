@@ -3,7 +3,7 @@ const { mdToPdf } = require('md-to-pdf');
 const path = require('path');
 
 // Extract version from filename or use default
-const VERSION = '4.0';
+const VERSION = '5.0';
 const DOCUMENT_TITLE = `QUANTA Technical Specification v${VERSION}`;
 
 async function generatePDF() {

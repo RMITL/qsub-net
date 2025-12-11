@@ -7,7 +7,7 @@ import {
 
 // ============================================================================
 // QUANTA INTERACTIVE LITEPAPER
-// Based on Technical Specification v4.0
+// Based on Technical Specification v5.0
 // A scrollable, SN8-style document with interactive elements
 // ============================================================================
 
@@ -15,8 +15,9 @@ const QuantaLitepaper = () => {
   const [activeSection, setActiveSection] = useState('cover');
 
   // ========== INTERACTIVE SCORING CALCULATOR ==========
-  const [scoringInputs, setScoringScoringInputs] = useState({
+  const [scoringInputs, setScoringInputs] = useState({
     sharpeRatio: 2.0,
+    totalPnL: 15.0,
     sortinoRatio: 1.8,
     calmarRatio: 2.5,
     maxDrawdown: 6,
@@ -32,25 +33,28 @@ const QuantaLitepaper = () => {
     powerLawGamma: 1.5,
   });
 
-  // Calculate QUANTA Score based on tech spec formula
+  // Calculate QUANTA Score based on pitch deck formula (6 metrics)
   const calculateQS = useCallback(() => {
-    const { sharpeRatio, sortinoRatio, calmarRatio, maxDrawdown, turnoverPercent } = scoringInputs;
+    const { sharpeRatio, totalPnL, sortinoRatio, calmarRatio, maxDrawdown, turnoverPercent } = scoringInputs;
 
-    // Normalize using bounds from tech spec - Sharpe PRIMARY
-    const sharpeNorm = Math.min(1, Math.max(0, (sharpeRatio + 1) / 4)); // Range: -1 to 3 (PRIMARY)
+    // Normalize using bounds - Sharpe PRIMARY (40%)
+    const sharpeNorm = Math.min(1, Math.max(0, (sharpeRatio + 1) / 4)); // Range: -1 to 3
+    const pnlNorm = Math.min(1, Math.max(0, (totalPnL + 20) / 60)); // Range: -20% to 40%
+    const ddScore = Math.max(0, 1 - (maxDrawdown / 25)); // 25% threshold
     const sortinoNorm = Math.min(1, Math.max(0, (sortinoRatio + 1) / 4)); // Range: -1 to 3
     const calmarNorm = Math.min(1, Math.max(0, calmarRatio / 5)); // Range: 0 to 5
-    const ddScore = Math.max(0, 1 - (maxDrawdown / 10)); // 10% threshold
     const turnoverScore = Math.max(0, 1 - (turnoverPercent / 100)); // 100% max
 
-    // Weighted composite - Sharpe PRIMARY (40%), DD (20%), Sortino (15%), Calmar (15%), Turnover (10%)
-    const qs = (0.40 * sharpeNorm) + (0.20 * ddScore) + (0.15 * sortinoNorm) + (0.15 * calmarNorm) + (0.10 * turnoverScore);
+    // Weighted composite matching pitch deck:
+    // Sharpe (40%), Total P/L (20%), MaxDD (15%), Sortino (10%), Calmar (10%), Turnover (5%)
+    const qs = (0.40 * sharpeNorm) + (0.20 * pnlNorm) + (0.15 * ddScore) + (0.10 * sortinoNorm) + (0.10 * calmarNorm) + (0.05 * turnoverScore);
 
     return {
       sharpeNorm: (sharpeNorm * 100).toFixed(1),
+      pnlNorm: (pnlNorm * 100).toFixed(1),
+      ddScore: (ddScore * 100).toFixed(1),
       sortinoNorm: (sortinoNorm * 100).toFixed(1),
       calmarNorm: (calmarNorm * 100).toFixed(1),
-      ddScore: (ddScore * 100).toFixed(1),
       turnoverScore: (turnoverScore * 100).toFixed(1),
       compositeQS: (qs * 100).toFixed(1),
       percentile: qs > 0.75 ? 'Top 10%' : qs > 0.55 ? 'Top 45%' : qs > 0.35 ? 'Top 70%' : 'Bottom 30%',
@@ -124,7 +128,7 @@ const QuantaLitepaper = () => {
   const CoverSection = () => (
     <section id="cover" className="lp-section lp-cover">
       <div className="lp-cover-content">
-        <div className="lp-doc-badge">TECHNICAL SPECIFICATION v4.0</div>
+        <div className="lp-doc-badge">TECHNICAL SPECIFICATION v5.0</div>
         <h1 className="lp-doc-title">QUANTA</h1>
         <p className="lp-doc-subtitle">Quantitative Autonomous Network for Trading Alpha</p>
         <div className="lp-cover-divider"></div>
@@ -150,7 +154,7 @@ const QuantaLitepaper = () => {
           <button onClick={() => scrollTo('abstract')} className="lp-btn-primary">
             Read Specification →
           </button>
-          <a href="/docs/QUANTA_Technical_Specification_v4.pdf" className="lp-btn-secondary" target="_blank">
+          <a href="/docs/QUANTA_Technical_Specification_v5.pdf" className="lp-btn-secondary" target="_blank">
             Download Full PDF
           </a>
         </div>
@@ -263,7 +267,7 @@ const QuantaLitepaper = () => {
             <h4>Core Architecture</h4>
             <ul>
               <li><strong>Signal Pool:</strong> Decouples submissions from UIDs</li>
-              <li><strong>Multi-Horizon:</strong> 7/30/90 day windows (20%/30%/50%)</li>
+              <li><strong>Multi-Horizon:</strong> 7/30/90 day windows (30%/40%/30%)</li>
               <li><strong>Risk-Adjusted:</strong> Sharpe (primary), P/L %, DD, Sortino, Calmar, Turnover (tunable weights)</li>
               <li><strong>dTAO:</strong> 18%/41%/41% emission split</li>
             </ul>
@@ -645,15 +649,19 @@ const QuantaLitepaper = () => {
             <tr>
               <th>Parameter</th>
               <th>Specification</th>
+              <th>Governance</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>Portfolio Size</td><td>5-30 tickers per portfolio</td></tr>
-            <tr><td>Weight Sum</td><td>Must equal 1.0 (±0.001 tolerance)</td></tr>
-            <tr><td>Eligible Securities</td><td>U.S.-listed equities and ETFs only</td></tr>
-            <tr><td>Max Single Position</td><td>20% maximum weight per ticker</td></tr>
-            <tr><td>Minimum Ante</td><td>10 α-token (~$50 USD at launch)</td></tr>
-            <tr><td>Persistence</td><td>Portfolios persist until updated; churn penalties apply</td></tr>
+            <tr><td>Portfolio Size</td><td>5-30 tickers</td><td>Tunable</td></tr>
+            <tr><td>Weight Sum</td><td>Must equal 1.0 (±0.001)</td><td>Fixed</td></tr>
+            <tr><td>Eligible Universe</td><td>U.S. equities &amp; ETFs (NYSE, NASDAQ)</td><td>Tunable</td></tr>
+            <tr><td>Max Position</td><td>20% per ticker</td><td>Tunable</td></tr>
+            <tr><td>Min Position</td><td>0.5% per ticker</td><td>Tunable</td></tr>
+            <tr><td>Min Market Cap</td><td>$2B (30-day avg)</td><td>Tunable</td></tr>
+            <tr><td>Min Daily Volume</td><td>$100M value (30-day avg)</td><td>Tunable</td></tr>
+            <tr><td>Min/Max Ante</td><td>100-10,000 α-tokens</td><td>Tunable</td></tr>
+            <tr><td>Short Positions</td><td>Disabled in v1.0 (planned v2.0)</td><td>Tunable</td></tr>
           </tbody>
         </table>
 
@@ -663,25 +671,26 @@ const QuantaLitepaper = () => {
             <div className="lp-cr-phase">COMMIT</div>
             <div className="lp-cr-content">
               <div className="lp-formula-small">
-                commitment = keccak256(signal || secret || msg.sender || chainId)
+                H_commit = keccak256(H_portfolio || salt || miner_addr || chain_id || epoch_id)
               </div>
-              <p>Submit cryptographic hash of signal</p>
+              <p>Submit cryptographic hash of portfolio signal</p>
             </div>
           </div>
           <div className="lp-cr-arrow">→</div>
           <div className="lp-cr-step">
             <div className="lp-cr-phase">DELAY</div>
             <div className="lp-cr-content">
-              <p><strong>6-48 hours</strong> between commit and reveal</p>
-              <p>Recommended: 14+ hours</p>
+              <p><strong>Minimum:</strong> 6 hours</p>
+              <p><strong>Maximum:</strong> 48 hours</p>
+              <p><strong>Recommended:</strong> 14+ hours</p>
             </div>
           </div>
           <div className="lp-cr-arrow">→</div>
           <div className="lp-cr-step">
             <div className="lp-cr-phase">REVEAL</div>
             <div className="lp-cr-content">
-              <p>Submit plaintext signal</p>
-              <p>Contract verifies against commitment hash</p>
+              <p>Submit plaintext portfolio signal</p>
+              <p>Validators verify hash matches commitment</p>
             </div>
           </div>
         </div>
@@ -689,10 +698,12 @@ const QuantaLitepaper = () => {
         <div className="lp-security-notes">
           <h4>Security Requirements</h4>
           <ul>
-            <li>Include <code>msg.sender</code> in hash to prevent commitment copying</li>
-            <li>Use <code>block.number</code> not <code>block.timestamp</code> (timestamps manipulable)</li>
-            <li>Include <code>chainId</code> for cross-chain replay protection</li>
-            <li>Commitment expires after 48-hour window</li>
+            <li><strong>MUST use <code>block.number</code></strong> — not <code>block.timestamp</code> (miners can manipulate timestamps)</li>
+            <li><strong>MUST include <code>msg.sender</code></strong> — prevents commitment copying by other miners</li>
+            <li><strong>MUST include <code>chainId</code></strong> — prevents cross-chain replay attacks</li>
+            <li><strong>Secret salt MUST be cryptographically random</strong> — not pseudo-random</li>
+            <li>Commitment expires after 48-hour reveal window</li>
+            <li>Late reveals forfeit ante stake</li>
           </ul>
         </div>
       </div>
@@ -717,23 +728,23 @@ const QuantaLitepaper = () => {
               <span className="lp-horizon-unit">Days</span>
             </div>
             <div className="lp-horizon-weight">20%</div>
-            <div className="lp-horizon-emphasis">Short-term alpha capture</div>
+            <div className="lp-horizon-emphasis">Short-term momentum</div>
           </div>
           <div className="lp-horizon-card">
             <div className="lp-horizon-header">
               <span className="lp-horizon-days">30</span>
               <span className="lp-horizon-unit">Days</span>
             </div>
-            <div className="lp-horizon-weight">30%</div>
-            <div className="lp-horizon-emphasis">Medium-term consistency</div>
+            <div className="lp-horizon-weight">35%</div>
+            <div className="lp-horizon-emphasis">Monthly consistency</div>
           </div>
           <div className="lp-horizon-card lp-horizon-primary">
             <div className="lp-horizon-header">
               <span className="lp-horizon-days">90</span>
               <span className="lp-horizon-unit">Days</span>
             </div>
-            <div className="lp-horizon-weight">50%</div>
-            <div className="lp-horizon-emphasis">Long-term robustness (PRIMARY)</div>
+            <div className="lp-horizon-weight">45%</div>
+            <div className="lp-horizon-emphasis">Quarterly persistence (PRIMARY)</div>
           </div>
         </div>
 
@@ -754,7 +765,7 @@ const QuantaLitepaper = () => {
                   max="3"
                   step="0.1"
                   value={scoringInputs.sharpeRatio}
-                  onChange={(e) => setScoringScoringInputs(prev => ({...prev, sharpeRatio: parseFloat(e.target.value)}))}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, sharpeRatio: parseFloat(e.target.value)}))}
                 />
                 <span className="lp-slider-value">{scoringInputs.sharpeRatio.toFixed(1)}</span>
               </div>
@@ -763,8 +774,65 @@ const QuantaLitepaper = () => {
 
             <div className="lp-input-group">
               <label>
-                <span className="lp-input-label">Calmar Ratio</span>
+                <span className="lp-input-label">Total P/L %</span>
                 <span className="lp-input-weight">(20% weight)</span>
+              </label>
+              <div className="lp-slider-row">
+                <input
+                  type="range"
+                  min="-20"
+                  max="40"
+                  step="1"
+                  value={scoringInputs.totalPnL}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, totalPnL: parseFloat(e.target.value)}))}
+                />
+                <span className="lp-slider-value">{scoringInputs.totalPnL.toFixed(0)}%</span>
+              </div>
+              <div className="lp-input-formula">P/L = (V<sub>n</sub> - V<sub>0</sub>) / V<sub>0</sub></div>
+            </div>
+
+            <div className="lp-input-group">
+              <label>
+                <span className="lp-input-label">Max Drawdown %</span>
+                <span className="lp-input-weight">(15% weight)</span>
+              </label>
+              <div className="lp-slider-row">
+                <input
+                  type="range"
+                  min="0"
+                  max="25"
+                  step="0.5"
+                  value={scoringInputs.maxDrawdown}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, maxDrawdown: parseFloat(e.target.value)}))}
+                />
+                <span className="lp-slider-value">{scoringInputs.maxDrawdown.toFixed(1)}%</span>
+              </div>
+              <div className="lp-input-formula">DD_Score = 1 - (MaxDD / 25%)</div>
+            </div>
+
+            <div className="lp-input-group">
+              <label>
+                <span className="lp-input-label">Sortino Ratio</span>
+                <span className="lp-input-weight">(10% weight)</span>
+              </label>
+              <div className="lp-slider-row">
+                <input
+                  type="range"
+                  min="-1"
+                  max="3"
+                  step="0.1"
+                  value={scoringInputs.sortinoRatio}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, sortinoRatio: parseFloat(e.target.value)}))}
+                />
+                <span className="lp-slider-value">{scoringInputs.sortinoRatio.toFixed(1)}</span>
+              </div>
+              <div className="lp-input-formula">Sortino = (R<sub>p</sub> - R<sub>f</sub>) / σ<sub>d</sub></div>
+            </div>
+
+            <div className="lp-input-group">
+              <label>
+                <span className="lp-input-label">Calmar Ratio</span>
+                <span className="lp-input-weight">(10% weight)</span>
               </label>
               <div className="lp-slider-row">
                 <input
@@ -773,36 +841,17 @@ const QuantaLitepaper = () => {
                   max="5"
                   step="0.1"
                   value={scoringInputs.calmarRatio}
-                  onChange={(e) => setScoringScoringInputs(prev => ({...prev, calmarRatio: parseFloat(e.target.value)}))}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, calmarRatio: parseFloat(e.target.value)}))}
                 />
                 <span className="lp-slider-value">{scoringInputs.calmarRatio.toFixed(1)}</span>
               </div>
-              <div className="lp-input-formula">Calmar = Annualized Return / MaxDD</div>
-            </div>
-
-            <div className="lp-input-group">
-              <label>
-                <span className="lp-input-label">Max Drawdown %</span>
-                <span className="lp-input-weight">(20% weight)</span>
-              </label>
-              <div className="lp-slider-row">
-                <input
-                  type="range"
-                  min="0"
-                  max="20"
-                  step="0.5"
-                  value={scoringInputs.maxDrawdown}
-                  onChange={(e) => setScoringScoringInputs(prev => ({...prev, maxDrawdown: parseFloat(e.target.value)}))}
-                />
-                <span className="lp-slider-value">{scoringInputs.maxDrawdown.toFixed(1)}%</span>
-              </div>
-              <div className="lp-input-formula">DD_Score = 1 - (MaxDD / 10%)</div>
+              <div className="lp-input-formula">Calmar = Annual Return / MaxDD</div>
             </div>
 
             <div className="lp-input-group">
               <label>
                 <span className="lp-input-label">Turnover %</span>
-                <span className="lp-input-weight">(10% weight)</span>
+                <span className="lp-input-weight">(5% weight)</span>
               </label>
               <div className="lp-slider-row">
                 <input
@@ -811,7 +860,7 @@ const QuantaLitepaper = () => {
                   max="100"
                   step="5"
                   value={scoringInputs.turnoverPercent}
-                  onChange={(e) => setScoringScoringInputs(prev => ({...prev, turnoverPercent: parseFloat(e.target.value)}))}
+                  onChange={(e) => setScoringInputs(prev => ({...prev, turnoverPercent: parseFloat(e.target.value)}))}
                 />
                 <span className="lp-slider-value">{scoringInputs.turnoverPercent}%</span>
               </div>
@@ -822,22 +871,32 @@ const QuantaLitepaper = () => {
           <div className="lp-scoring-output">
             <div className="lp-score-breakdown">
               <div className="lp-score-bar">
-                <span className="lp-bar-label">Sortino</span>
-                <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.sortinoNorm}%`}}></div></div>
-                <span className="lp-bar-value">{qsResults.sortinoNorm}%</span>
+                <span className="lp-bar-label">Sharpe (40%)</span>
+                <div className="lp-bar-track"><div className="lp-bar-fill lp-bar-primary" style={{width: `${qsResults.sharpeNorm}%`}}></div></div>
+                <span className="lp-bar-value">{qsResults.sharpeNorm}%</span>
               </div>
               <div className="lp-score-bar">
-                <span className="lp-bar-label">Calmar</span>
-                <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.calmarNorm}%`}}></div></div>
-                <span className="lp-bar-value">{qsResults.calmarNorm}%</span>
+                <span className="lp-bar-label">P/L (20%)</span>
+                <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.pnlNorm}%`}}></div></div>
+                <span className="lp-bar-value">{qsResults.pnlNorm}%</span>
               </div>
               <div className="lp-score-bar">
-                <span className="lp-bar-label">Drawdown</span>
+                <span className="lp-bar-label">MaxDD (15%)</span>
                 <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.ddScore}%`}}></div></div>
                 <span className="lp-bar-value">{qsResults.ddScore}%</span>
               </div>
               <div className="lp-score-bar">
-                <span className="lp-bar-label">Turnover</span>
+                <span className="lp-bar-label">Sortino (10%)</span>
+                <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.sortinoNorm}%`}}></div></div>
+                <span className="lp-bar-value">{qsResults.sortinoNorm}%</span>
+              </div>
+              <div className="lp-score-bar">
+                <span className="lp-bar-label">Calmar (10%)</span>
+                <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.calmarNorm}%`}}></div></div>
+                <span className="lp-bar-value">{qsResults.calmarNorm}%</span>
+              </div>
+              <div className="lp-score-bar">
+                <span className="lp-bar-label">Turnover (5%)</span>
                 <div className="lp-bar-track"><div className="lp-bar-fill" style={{width: `${qsResults.turnoverScore}%`}}></div></div>
                 <span className="lp-bar-value">{qsResults.turnoverScore}%</span>
               </div>
@@ -850,7 +909,7 @@ const QuantaLitepaper = () => {
             </div>
 
             <div className="lp-formula-box">
-              <code>QS = 0.35×Sortino + 0.25×Calmar + 0.25×DD + 0.15×Turnover</code>
+              <code>QS = 0.40×Sharpe + 0.20×P/L + 0.15×DD + 0.10×Sortino + 0.10×Calmar + 0.05×Turn</code>
             </div>
           </div>
         </div>
@@ -1189,7 +1248,7 @@ const QuantaLitepaper = () => {
 
           <div className="lp-final-cta">
             <div className="lp-cta-buttons">
-              <a href="/docs/QUANTA_Technical_Specification_v4.pdf" className="lp-btn-primary" target="_blank">
+              <a href="/docs/QUANTA_Technical_Specification_v5.pdf" className="lp-btn-primary" target="_blank">
                 Download Full Technical Spec
               </a>
               <a href="https://discord.gg/quanta" className="lp-btn-secondary" target="_blank" rel="noopener noreferrer">
