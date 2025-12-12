@@ -1,0 +1,294 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about QUANTA"
+---
+
+# Frequently Asked Questions
+
+## General
+
+<AccordionGroup>
+  <Accordion title="What is QUANTA?">
+    QUANTA (Quantitative Autonomous Network for Trading Alpha) is a decentralized network for generating and validating stock market signals. It's built on Bittensor and rewards participants for submitting high-quality, risk-adjusted trading signals.
+
+    Think of it as a global competition where anyone can submit trading strategies and earn rewards based on actual performance.
+  </Accordion>
+
+  <Accordion title="How is QUANTA different from other prediction markets?">
+    Key differences:
+
+    | Feature | QUANTA | Prediction Markets |
+    |---------|--------|-------------------|
+    | Output | Full portfolios (100s of positions) | Single binary outcomes |
+    | Evaluation | Risk-adjusted metrics (Sortino, Calmar) | Win/lose |
+    | Time horizon | 7/30/90 day rolling | Fixed event dates |
+    | Skin in game | Proportional staking | Fixed bet sizes |
+    | Infrastructure | Decentralized on Bittensor | Various |
+  </Accordion>
+
+  <Accordion title="Who can participate?">
+    Anyone! QUANTA is permissionless:
+
+    - **Signal Generators (Miners)**: Submit portfolio signals
+    - **Validators**: Run infrastructure and evaluate signals
+    - **Token Holders**: Participate in governance
+
+    No credentials, minimums, or approvals required.
+  </Accordion>
+
+  <Accordion title="What markets does QUANTA cover?">
+    Currently: **Any U.S. equity or ETF** with a validator price feed.
+
+    Future roadmap includes:
+    - International equities
+    - Cryptocurrency
+    - Commodities
+    - Options
+  </Accordion>
+</AccordionGroup>
+
+## Getting Started
+
+<AccordionGroup>
+  <Accordion title="How do I start submitting signals?">
+    1. Install the QUANTA CLI: `pip install quanta-cli`
+    2. Create a wallet: `quanta wallet create --name mywallet`
+    3. Get testnet tokens: `quanta faucet request --wallet mywallet`
+    4. Submit your first signal
+
+    See the [Quickstart Guide](/guides/quickstart) for detailed steps.
+  </Accordion>
+
+  <Accordion title="Do I need to run a server?">
+    **No** — You can participate as a Pool Participant with just a wallet.
+
+    **Yes** — If you want to run as a Direct Miner (holds your own UID) or Validator.
+  </Accordion>
+
+  <Accordion title="How much does it cost to participate?">
+    | Role | Cost |
+    |------|------|
+    | Pool Participant | α-token stake only (e.g., 10-20 α per signal) |
+    | Direct Miner | TAO for UID registration + α-token stakes |
+    | Validator | TAO stake (1,000+) + α-token stake (10,000+) + server costs |
+  </Accordion>
+
+  <Accordion title="What's the difference between testnet and mainnet?">
+    | Aspect | Testnet | Mainnet |
+    |--------|---------|---------|
+    | Tokens | Fake (from faucet) | Real value |
+    | Data | May use synthetic data | Real market data |
+    | Purpose | Learning/testing | Real rewards |
+
+    Always test on testnet first!
+  </Accordion>
+</AccordionGroup>
+
+## Signals & Scoring
+
+<AccordionGroup>
+  <Accordion title="What format should my signal be in?">
+    A JSON object mapping tickers to weights:
+
+    ```json
+    {
+      "AAPL": 0.10,
+      "MSFT": 0.08,
+      "TSLA": -0.05
+    }
+    ```
+
+    Positive = long, negative = short. See [Signal Format](/reference/signal-format) for details.
+  </Accordion>
+
+  <Accordion title="How are signals scored?">
+    Six metrics, weighted:
+
+    | Metric | Weight | Measures |
+    |--------|--------|----------|
+    | Sharpe | 40% | Risk-adjusted returns (primary) |
+    | Total P/L | 20% | Absolute return performance |
+    | Max Drawdown | 15% | Worst peak-to-trough loss |
+    | Sortino | 10% | Return per downside risk |
+    | Calmar | 10% | Return vs max drawdown |
+    | Turnover | 5% | Trading frequency penalty |
+
+    See [Scoring Methodology](/concepts/scoring) for formulas.
+  </Accordion>
+
+  <Accordion title="Why is Sharpe the primary metric?">
+    Sharpe ratio is the industry standard for comparing risk-adjusted returns across strategies:
+
+    - Used by every major hedge fund and asset manager
+    - Enables apples-to-apples comparison
+    - Captures the fundamental risk-reward tradeoff
+
+    Sortino and Calmar provide refinements (downside-only volatility, drawdown focus) as secondary metrics.
+  </Accordion>
+
+  <Accordion title="How often can I update my signal?">
+    - **Minimum interval**: 1 hour between updates
+    - **Recommended**: Daily or weekly (lower turnover = better score)
+
+    High-frequency updates incur turnover penalties.
+  </Accordion>
+
+  <Accordion title="What happens if my signal performs poorly?">
+    - **Bottom 30%**: Forfeit your stake (50% burned, 50% to winners)
+    - **Break-even tier (25%)**: Get your stake back
+    - **Profitable (35%)**: Stake back + bonus
+    - **Top 10%**: Stake back + premium bonus
+
+    You can always withdraw and try again with a new strategy.
+  </Accordion>
+</AccordionGroup>
+
+## Tokens & Economics
+
+<AccordionGroup>
+  <Accordion title="What's the difference between TAO and α-tokens?">
+    | Token | Purpose |
+    |-------|---------|
+    | **TAO** | Bittensor native token; emissions flow from network |
+    | **α-token** | QUANTA native token; staking, governance, competition |
+
+    You earn both as a signal generator. Validators primarily earn TAO + α-token staking rewards.
+  </Accordion>
+
+  <Accordion title="How do I get α-tokens?">
+    1. **Earn through mining**: Submit signals and earn rewards
+    2. **Buy on DEX**: α/TAO pair on supported exchanges
+    3. **Ecosystem grants**: Apply for validator/developer grants
+  </Accordion>
+
+  <Accordion title="What determines my rewards?">
+    Your rewards depend on:
+    1. **Your score** relative to other signals
+    2. **Your stake** (higher stake = higher conviction = bigger potential win/loss)
+    3. **Your rank** (top performers get multipliers)
+    4. **Total network emissions** (varies based on Bittensor allocation)
+  </Accordion>
+
+  <Accordion title="Is the α-token deflationary?">
+    Yes, through burns:
+    - 50% of forfeited antes are permanently burned
+    - With 30% of signals forfeiting each epoch, this creates steady deflation
+
+    Total supply is fixed at 100M; circulating supply decreases over time.
+  </Accordion>
+</AccordionGroup>
+
+## Technical
+
+<AccordionGroup>
+  <Accordion title="What is the Signal Pool?">
+    The Signal Pool is QUANTA's innovation to overcome Bittensor's 256 UID limit. It allows unlimited signal generators to submit portfolios by separating signal submission from miner identity.
+
+    See [Signal Pool](/concepts/signal-pool) for the full explanation.
+  </Accordion>
+
+  <Accordion title="How does commit-reveal work?">
+    1. **Commit**: Submit a hash of your portfolio (hides positions)
+    2. **Wait**: Commit window closes (prevents front-running)
+    3. **Reveal**: Submit actual portfolio (must match hash)
+
+    This prevents others from copying your signal before it's evaluated.
+  </Accordion>
+
+  <Accordion title="What data sources are used?">
+    Validators use approved data sources:
+    - **Primary**: Polygon.io
+    - **Backup**: Alpha Vantage, Yahoo Finance
+
+    All validators use the same source to ensure consistent scoring.
+  </Accordion>
+
+  <Accordion title="How is consensus reached?">
+    QUANTA uses Bittensor's Yuma consensus with κ=0.67:
+    1. Each validator submits scores independently
+    2. Scores are weighted by validator stake
+    3. Final score = stake-weighted median where agreement > 67%
+
+    Validators deviating significantly from consensus face penalties.
+  </Accordion>
+</AccordionGroup>
+
+## Validators
+
+<AccordionGroup>
+  <Accordion title="What do validators do?">
+    Validators:
+    1. Fetch market data from approved sources
+    2. Simulate portfolio performance
+    3. Calculate scoring metrics
+    4. Submit scores to consensus
+    5. Distribute rewards
+
+    They're the infrastructure backbone of the network.
+  </Accordion>
+
+  <Accordion title="How much can validators earn?">
+    Validators receive 41% of TAO emissions plus α-token staking rewards:
+    - **TAO APY**: Varies based on stake weight and network emissions
+    - **α APY**: Target 12-18% on staked α-tokens
+
+    Actual earnings depend on stake size and consensus alignment.
+  </Accordion>
+
+  <Accordion title="What are the hardware requirements?">
+    | Component | Minimum | Recommended |
+    |-----------|---------|-------------|
+    | CPU | 8 cores | 16+ cores |
+    | RAM | 32 GB | 64+ GB |
+    | Storage | 500 GB NVMe | 1 TB NVMe |
+    | Network | 1 Gbps | 10 Gbps |
+    | Uptime | 99% | 99.9%+ |
+  </Accordion>
+</AccordionGroup>
+
+## Risk & Safety
+
+<AccordionGroup>
+  <Accordion title="What are the risks of participating?">
+    **Signal Generators:**
+    - Stake loss if signals underperform
+    - Market risk (strategies may fail in certain conditions)
+
+    **Validators:**
+    - Slashing for consensus deviation or downtime
+    - Infrastructure costs
+
+    **All:**
+    - Smart contract risk (mitigated by audits)
+    - Token price volatility
+    - Regulatory uncertainty
+  </Accordion>
+
+  <Accordion title="How do I protect my wallet?">
+    - Use hardware wallet for coldkey
+    - Keep hotkey separate from coldkey
+    - Never share mnemonic/seed phrase
+    - Backup to multiple secure locations
+    - Use strong, unique passwords
+  </Accordion>
+
+  <Accordion title="Are the smart contracts audited?">
+    Audits are planned before mainnet launch. Current status:
+    - SignalPool: Planned
+    - AlphaToken: Planned
+    - RewardDistributor: Planned
+
+    Use testnet until audits are complete.
+  </Accordion>
+</AccordionGroup>
+
+## More Questions?
+
+<CardGroup cols={2}>
+  <Card title="Discord" icon="discord" href="https://discord.com/users/qsubnet">
+    Join our community for support
+  </Card>
+  <Card title="Telegram" icon="telegram" href="https://t.me/qsubnet">
+    Chat with the team
+  </Card>
+</CardGroup>

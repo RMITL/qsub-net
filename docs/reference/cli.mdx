@@ -1,0 +1,491 @@
+---
+title: "CLI Reference"
+description: "QUANTA command-line interface documentation"
+---
+
+# CLI Reference
+
+The QUANTA CLI provides command-line access to all network operations.
+
+## Installation
+
+```bash
+pip install quanta-cli
+```
+
+Verify installation:
+
+```bash
+quanta --version
+```
+
+## Global Options
+
+| Option | Description |
+|--------|-------------|
+| `--network` | Network to use: mainnet, testnet (default: mainnet) |
+| `--wallet` | Wallet name to use |
+| `--config` | Path to config file |
+| `--verbose`, `-v` | Enable verbose output |
+| `--json` | Output in JSON format |
+| `--help`, `-h` | Show help |
+
+## Commands
+
+### wallet
+
+Wallet management commands.
+
+#### wallet create
+
+Create a new wallet.
+
+```bash
+quanta wallet create --name my_wallet
+```
+
+**Options:**
+- `--name` (required): Wallet name
+
+**Output:**
+```
+Creating new wallet...
+Wallet created successfully!
+
+Address: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+Mnemonic: word1 word2 word3 ... word24
+
+⚠️  Write down your mnemonic phrase and store it safely!
+```
+
+#### wallet list
+
+List all wallets.
+
+```bash
+quanta wallet list
+```
+
+**Output:**
+```
+Wallets:
+  my_wallet     5GrwvaEF...  (default)
+  test_wallet   5FHneW46...
+```
+
+#### wallet balance
+
+Check wallet balance.
+
+```bash
+quanta wallet balance --wallet my_wallet
+```
+
+**Output:**
+```
+Wallet: my_wallet (5GrwvaEF...)
+
+Balances:
+  TAO:           125.50
+  α-token:       5,000.00
+  α-token (staked): 3,000.00
+```
+
+#### wallet export
+
+Export wallet for backup.
+
+```bash
+quanta wallet export --wallet my_wallet --output backup.json
+```
+
+#### wallet import
+
+Import wallet from backup.
+
+```bash
+quanta wallet import --input backup.json
+```
+
+---
+
+### signal
+
+Signal management commands.
+
+#### signal submit
+
+Submit a new signal.
+
+```bash
+quanta signal submit \
+  --wallet my_wallet \
+  --file portfolio.json \
+  --stake 15 \
+  --tag "momentum_v1"
+```
+
+**Options:**
+- `--wallet` (required): Wallet to use
+- `--file` (required): Portfolio JSON file
+- `--stake` (required): α-tokens to stake
+- `--tag`: Strategy tag
+
+**Portfolio file format:**
+```json
+{
+  "AAPL": 0.10,
+  "MSFT": 0.08,
+  "NVDA": 0.12
+}
+```
+
+#### signal status
+
+Check signal status.
+
+```bash
+quanta signal status sig_abc123
+```
+
+**Output:**
+```
+Signal: sig_abc123
+Status: ACTIVE
+Wallet: 5GrwvaEF...
+Stake: 15.00 α
+
+Performance (7-day):
+  Return:       +2.3%
+  Sortino:      1.85
+  Calmar:       1.62
+  Max Drawdown: 3.2%
+  Rank:         45/230
+
+Rewards (pending):
+  TAO:     0.15
+  α-token: 2.30
+```
+
+#### signal list
+
+List your signals.
+
+```bash
+quanta signal list --wallet my_wallet
+```
+
+**Options:**
+- `--wallet`: Filter by wallet
+- `--status`: Filter by status (active, pending, closed)
+- `--limit`: Max results
+
+#### signal update
+
+Update signal portfolio.
+
+```bash
+quanta signal update sig_abc123 \
+  --file new_portfolio.json \
+  --wallet my_wallet
+```
+
+#### signal withdraw
+
+Withdraw signal and stake.
+
+```bash
+quanta signal withdraw sig_abc123 --wallet my_wallet
+```
+
+---
+
+### leaderboard
+
+View network leaderboard.
+
+```bash
+quanta leaderboard
+```
+
+**Options:**
+- `--window`: Time window (7d, 30d, 90d)
+- `--metric`: Sort by (composite, sortino, return, drawdown)
+- `--limit`: Number of entries
+
+**Output:**
+```
+QUANTA Leaderboard (7-day, sorted by composite)
+═══════════════════════════════════════════════════════════
+Rank │ Signal ID      │ Composite │ Sortino │ Return │ DD   │
+═══════════════════════════════════════════════════════════
+  1  │ sig_top001     │    0.95   │   3.42  │ +5.8%  │ 2.1% │
+  2  │ sig_pro002     │    0.92   │   3.15  │ +4.9%  │ 2.8% │
+  3  │ sig_alpha03    │    0.89   │   2.98  │ +4.2%  │ 3.0% │
+  ...
+═══════════════════════════════════════════════════════════
+```
+
+---
+
+### epoch
+
+Epoch information commands.
+
+#### epoch status
+
+Get current epoch status.
+
+```bash
+quanta epoch status
+```
+
+**Output:**
+```
+Epoch: 12345
+Phase: EVALUATION
+Started: 2025-01-15 16:00:00 UTC
+Ends: 2025-01-15 18:00:00 UTC
+Time remaining: 1h 23m
+
+Next commit window: 2025-01-15 17:00:00 UTC
+```
+
+#### epoch history
+
+View epoch history.
+
+```bash
+quanta epoch history --limit 10
+```
+
+---
+
+### universe
+
+Universe management commands.
+
+#### universe list
+
+List approved tickers.
+
+```bash
+quanta universe list
+```
+
+**Options:**
+- `--search`: Search for ticker
+- `--sector`: Filter by sector
+
+**Output:**
+```
+QUANTA Approved Universe (500 tickers)
+Version: 2025-Q1
+Updated: 2025-01-01
+
+AAPL   Apple Inc.                    Technology
+MSFT   Microsoft Corporation         Technology
+GOOGL  Alphabet Inc.                 Technology
+AMZN   Amazon.com Inc.               Consumer
+...
+```
+
+#### universe check
+
+Check if ticker is valid.
+
+```bash
+quanta universe check AAPL TSLA XYZ
+```
+
+**Output:**
+```
+AAPL:  ✓ Valid
+TSLA:  ✓ Valid
+XYZ:   ✗ Not in universe
+```
+
+---
+
+### validator
+
+Validator commands (for validators only).
+
+#### validator status
+
+Check validator status.
+
+```bash
+quanta validator status
+```
+
+**Output:**
+```
+Validator: 5HGjWAe...
+Status: ACTIVE
+Stake: 1,000 TAO + 10,000 α
+
+Metrics (24h):
+  Consensus Alignment: 98.5%
+  Signals Evaluated:   1,234
+  Uptime:             100%
+
+Rewards (24h):
+  TAO:     2.50
+  α-token: 45.00
+```
+
+#### validator claim
+
+Claim validator rewards.
+
+```bash
+quanta validator claim --wallet validator_wallet
+```
+
+---
+
+### faucet
+
+Testnet faucet commands.
+
+#### faucet request
+
+Request testnet tokens.
+
+```bash
+quanta faucet request --wallet my_wallet --network testnet
+```
+
+**Output:**
+```
+Requesting testnet tokens...
+✓ Received 100 α (testnet)
+✓ Received 10 TAO (testnet)
+
+New balance:
+  TAO:     10.00
+  α-token: 100.00
+```
+
+---
+
+### config
+
+Configuration management.
+
+#### config show
+
+Show current configuration.
+
+```bash
+quanta config show
+```
+
+#### config set
+
+Set configuration value.
+
+```bash
+quanta config set network testnet
+quanta config set default_wallet my_wallet
+```
+
+---
+
+## Configuration File
+
+Create `~/.quanta/config.yaml`:
+
+```yaml
+# Default network
+network: mainnet
+
+# Default wallet
+default_wallet: my_wallet
+
+# API settings
+api:
+  timeout: 30
+  retries: 3
+
+# Logging
+logging:
+  level: INFO
+  file: ~/.quanta/logs/cli.log
+
+# Submission settings
+submission:
+  auto_reveal: true
+  default_stake: 10
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `QUANTA_NETWORK` | Default network |
+| `QUANTA_WALLET` | Default wallet name |
+| `QUANTA_API_KEY` | API key for authenticated requests |
+| `QUANTA_CONFIG` | Path to config file |
+
+## Examples
+
+### Submit Signal Workflow
+
+```bash
+# 1. Check balance
+quanta wallet balance --wallet trading
+
+# 2. Check universe for tickers
+quanta universe check AAPL MSFT NVDA
+
+# 3. Submit signal
+quanta signal submit \
+  --wallet trading \
+  --file my_portfolio.json \
+  --stake 15 \
+  --tag "momentum_v2"
+
+# 4. Monitor performance
+quanta signal status sig_abc123
+
+# 5. Check leaderboard position
+quanta leaderboard | grep sig_abc123
+```
+
+### Automated Script
+
+```bash
+#!/bin/bash
+# daily_submission.sh
+
+# Generate portfolio (your logic)
+python generate_signal.py > /tmp/portfolio.json
+
+# Submit to QUANTA
+quanta signal submit \
+  --wallet trading \
+  --file /tmp/portfolio.json \
+  --stake 15 \
+  --tag "daily_momentum" \
+  --json > /tmp/result.json
+
+# Log result
+cat /tmp/result.json >> ~/quanta_submissions.log
+```
+
+## Troubleshooting
+
+### Common Issues
+
+```bash
+# Connection errors
+quanta --network testnet epoch status  # Test connectivity
+
+# Authentication errors
+quanta wallet list  # Verify wallet exists
+
+# Verbose debugging
+quanta -v signal submit ...
+```

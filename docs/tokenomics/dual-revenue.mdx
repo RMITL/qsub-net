@@ -1,0 +1,321 @@
+---
+title: "Dual Revenue Model"
+description: "How QUANTA combines competition pot and emissions"
+---
+
+# Dual Revenue Model
+
+QUANTA's economic model uniquely combines two revenue streams: a competition pot (ante redistribution) and TAO emissions. This dual approach solves problems that either mechanism alone cannot.
+
+## The Problem with Single Models
+
+<Tabs>
+  <Tab title="Prize Pool Only">
+    **Issues:**
+    - Winners take all → losers leave
+    - No infrastructure incentive (validators unpaid)
+    - Network thins over time
+    - Only top performers stay
+
+    **Example:** Poker tournaments without rake share
+  </Tab>
+  <Tab title="Emissions Only">
+    **Issues:**
+    - Participation trophy effect
+    - No skin in the game
+    - Sybil vulnerability (fake identities)
+    - Quality signals not rewarded enough
+
+    **Example:** Airdrops to inactive wallets
+  </Tab>
+</Tabs>
+
+## The QUANTA Solution
+
+| Component | Purpose | Solves |
+|-----------|---------|--------|
+| Competition Pot | Reward genuine alpha | Quality incentives |
+| TAO Emissions | Sustain participation | Infrastructure + long tail |
+| Combined | Performance + sustainability | Self-sustaining network |
+
+## Competition Pot (Ante System)
+
+### How It Works
+
+Every signal submission requires a proportional stake:
+
+```python
+# Stake calculation
+required_stake = gross_exposure × base_rate × conviction_multiplier
+
+# Examples:
+# 100% exposure, 1x conviction → 10 α
+# 150% exposure, 2x conviction → 30 α
+# 200% exposure, 1x conviction → 20 α
+```
+
+### Pot Distribution Flow
+
+```
+┌─────────────────────────────────────┐
+│     All Signal Generators Stake     │
+│        Total Pot: 1,500 α           │
+└─────────────────┬───────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────┐
+│      Network Rake (8% = 120 α)      │
+│      → Protocol Treasury            │
+└─────────────────┬───────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────┐
+│     Remaining: 1,380 α              │
+└─────────────────┬───────────────────┘
+                  │
+       ┌──────────┼──────────┬──────────┐
+       ▼          ▼          ▼          ▼
+   ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
+   │Bottom │  │Break  │  │Profit │  │ Top   │
+   │ 30%   │  │Even   │  │ able  │  │ 10%   │
+   │       │  │ 25%   │  │ 35%   │  │       │
+   └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘
+       │          │          │          │
+   Forfeit    Return     Return +   Return +
+   Ante       Ante       Bonus      Premium
+       │
+   ┌───┴───┐
+   │       │
+  50%     50%
+  Burn    Winners
+```
+
+### Distribution by Tier
+
+<AccordionGroup>
+  <Accordion title="Bottom 30% (Forfeit)" icon="arrow-trend-down">
+    **What happens:** Entire stake is forfeited
+
+    **Where it goes:**
+    - 50% permanently burned (deflationary)
+    - 50% added to winner pool
+
+    **Example:** 30 signals × 15 α avg = 450 α
+    - 225 α burned
+    - 225 α to winners
+  </Accordion>
+
+  <Accordion title="Break-even 25% (Return)" icon="equals">
+    **What happens:** Original stake returned
+
+    **No gain, no loss**
+
+    **Example:** 25 signals each receive their original stake back
+  </Accordion>
+
+  <Accordion title="Profitable 35% (Bonus)" icon="arrow-trend-up">
+    **What happens:** Original stake + share of winner pool
+
+    **Pool share:** 40% of winner pool ÷ 35 signals
+
+    **Example:**
+    - Winner pool: 225 α
+    - Profitable share: 90 α
+    - Per signal: 90 ÷ 35 = 2.6 α bonus
+  </Accordion>
+
+  <Accordion title="Top 10% (Premium)" icon="trophy">
+    **What happens:** Original stake + premium share + multipliers
+
+    **Pool share:** 50% of winner pool ÷ 10 signals
+
+    **Example:**
+    - Winner pool: 225 α
+    - Top tier share: 112.5 α
+    - Per signal: 11.25 α bonus (before multipliers)
+  </Accordion>
+</AccordionGroup>
+
+### Network Rake
+
+The 8% rake serves multiple purposes:
+
+| Use | Percentage | Purpose |
+|-----|------------|---------|
+| Protocol Treasury | 50% | Development funding |
+| Insurance Fund | 30% | Slashing coverage |
+| Buybacks | 20% | α-token value support |
+
+## TAO Emissions
+
+### Why Emissions Matter
+
+Emissions provide sustainable baseline rewards:
+
+```
+Without Emissions:
+- Only winners earn
+- Validators have no incentive
+- Long-tail generators leave
+- Network becomes whale competition
+
+With Emissions:
+- Everyone earns something
+- Validators are compensated
+- Long-tail stays engaged
+- Network remains diverse
+```
+
+### Emission Distribution
+
+| Recipient | Share | Purpose |
+|-----------|-------|---------|
+| Signal Generators | 41% | Performance rewards |
+| Validators | 41% | Infrastructure incentive |
+| Subnet Owner | 18% | Protocol development |
+
+### Performance-Weighted Distribution
+
+TAO to miners is weighted by performance score:
+
+```python
+def distribute_tao_to_miners(scores, miner_tao_pool):
+    total_score = sum(scores.values())
+
+    rewards = {}
+    for miner, score in scores.items():
+        weight = score / total_score
+        rewards[miner] = weight * miner_tao_pool
+
+    return rewards
+```
+
+## Combined Economics
+
+### Example: Full Epoch Calculation
+
+**Setup:**
+- 100 active signals
+- Average stake: 15 α (total pot: 1,500 α)
+- Daily TAO emission: 10 TAO
+
+**Step 1: Competition Pot**
+```
+Pot: 1,500 α
+Rake (8%): 120 α → treasury
+Net pot: 1,380 α
+
+Bottom 30% forfeit: 450 α
+  → Burned: 225 α
+  → Winners: 225 α
+
+Distribution:
+- Bottom 30 (30 signals): 0 α each
+- Break-even (25 signals): 15 α each (returned)
+- Profitable (35 signals): 15 + 2.6 = 17.6 α each
+- Top 10 (10 signals): 15 + 11.25 = 26.25 α each
+```
+
+**Step 2: TAO Emissions**
+```
+Total TAO: 10 TAO
+Miner pool: 4.1 TAO
+
+Top performer (score: 200/1000): 0.82 TAO
+Average performer (score: 100/1000): 0.41 TAO
+Below-average (score: 50/1000): 0.205 TAO
+```
+
+**Step 3: Combined Rewards (Top Performer)**
+```
+TAO: 0.82 TAO × $400 = $328
+α-token: 26.25 α × $1 = $26.25
+
+Total: $354.25 (from 15 α stake)
+ROI: 175% (for this epoch)
+```
+
+## Why This Works
+
+### For Signal Generators
+
+<CardGroup cols={2}>
+  <Card title="Upside Potential" icon="arrow-up">
+    Competition pot provides outsized returns for top performers
+  </Card>
+  <Card title="Downside Floor" icon="shield">
+    TAO emissions ensure even break-even performers earn something
+  </Card>
+</CardGroup>
+
+### For Validators
+
+<CardGroup cols={2}>
+  <Card title="Stable Income" icon="chart-line">
+    41% TAO emissions regardless of competition outcomes
+  </Card>
+  <Card title="α-Token Yield" icon="percent">
+    Staking rewards from protocol fees
+  </Card>
+</CardGroup>
+
+### For the Network
+
+<CardGroup cols={2}>
+  <Card title="Quality Signals" icon="star">
+    Ante system ensures skin in the game
+  </Card>
+  <Card title="Sustained Participation" icon="users">
+    Emissions keep long-tail engaged
+  </Card>
+</CardGroup>
+
+## Economic Simulations
+
+### Scenario: High Competition
+
+| Metric | Value |
+|--------|-------|
+| Active signals | 1,000 |
+| Average stake | 20 α |
+| Total pot | 20,000 α |
+| Bottom 30% forfeit | 6,000 α |
+| Daily burn | 3,000 α |
+| Annual burn | ~1M α (1% of supply) |
+
+### Scenario: Low Competition
+
+| Metric | Value |
+|--------|-------|
+| Active signals | 100 |
+| Average stake | 10 α |
+| Total pot | 1,000 α |
+| Bottom 30% forfeit | 300 α |
+| Daily burn | 150 α |
+| Annual burn | ~55K α (0.05% of supply) |
+
+<Info>
+Higher competition = more burn = stronger deflationary pressure. The system self-balances.
+</Info>
+
+## Revenue Summary
+
+| Source | Recipient | Amount |
+|--------|-----------|--------|
+| Network Rake (8%) | Protocol | Variable |
+| Forfeited Antes (50%) | Burned | Variable |
+| Forfeited Antes (50%) | Winners | Variable |
+| TAO Emissions (41%) | Miners | ~TAO/day × 0.41 |
+| TAO Emissions (41%) | Validators | ~TAO/day × 0.41 |
+| TAO Emissions (18%) | Owner | ~TAO/day × 0.18 |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="α-Token Details" icon="circle-dollar" href="/tokenomics/alpha-token">
+    Full token specification
+  </Card>
+  <Card title="Emission Schedule" icon="calendar" href="/tokenomics/emissions">
+    Token release timeline
+  </Card>
+</CardGroup>

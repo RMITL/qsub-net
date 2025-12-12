@@ -653,14 +653,11 @@ const QuantaLitepaper = () => {
             </tr>
           </thead>
           <tbody>
-            <tr><td>Portfolio Size</td><td>5-30 tickers</td><td>Tunable</td></tr>
+            <tr><td>Portfolio Size</td><td>1+ tickers (miner's choice)</td><td>Flexible</td></tr>
             <tr><td>Weight Sum</td><td>Must equal 1.0 (±0.001)</td><td>Fixed</td></tr>
-            <tr><td>Eligible Universe</td><td>U.S. equities &amp; ETFs (NYSE, NASDAQ)</td><td>Tunable</td></tr>
-            <tr><td>Max Position</td><td>20% per ticker</td><td>Tunable</td></tr>
-            <tr><td>Min Position</td><td>0.5% per ticker</td><td>Tunable</td></tr>
-            <tr><td>Min Market Cap</td><td>$2B (30-day avg)</td><td>Tunable</td></tr>
-            <tr><td>Min Daily Volume</td><td>$100M value (30-day avg)</td><td>Tunable</td></tr>
-            <tr><td>Min/Max Ante</td><td>100-10,000 α-tokens</td><td>Tunable</td></tr>
+            <tr><td>Eligible Universe</td><td>Any ticker with validator price feed</td><td>Validator-dependent</td></tr>
+            <tr><td>Position Concentration</td><td>0-100% per ticker (miner's choice)</td><td>Flexible</td></tr>
+            <tr><td>Ante Amount</td><td>Any amount &gt; 0 α-tokens</td><td>Flexible</td></tr>
             <tr><td>Short Positions</td><td>Disabled in v1.0 (planned v2.0)</td><td>Tunable</td></tr>
           </tbody>
         </table>

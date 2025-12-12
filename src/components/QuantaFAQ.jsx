@@ -81,7 +81,7 @@ const QuantaFAQ = () => {
         {
           id: 'what-submit',
           q: 'What do I submit as a miner?',
-          a: 'A simple JSON payload containing U.S. equity/ETF tickers and weights that sum to 100%. Example: {"AAPL": 25, "GOOGL": 20, "MSFT": 15, "AMZN": 15, "NVDA": 10, "META": 10, "TSLA": 5}. No code execution, ML models, or GPUs required.'
+          a: 'A simple JSON payload containing U.S. equity/ETF tickers and weights that sum to 100%. Example: {"AAPL": 100} (single stock) or {"AAPL": 25, "GOOGL": 20, "MSFT": 15, "AMZN": 15, "NVDA": 10, "META": 10, "TSLA": 5} (diversified). Any strategy is valid—single stock conviction, broad ETF, concentrated sector bet. No code execution, ML models, or GPUs required.'
         },
         {
           id: 'technical-skills',
@@ -164,7 +164,7 @@ const QuantaFAQ = () => {
         {
           id: 'ante-mechanism',
           q: 'What is the ante mechanism?',
-          a: 'Every miner posts α-token ante proportional to their desired reward exposure (minimum 100α). Rewards scale with ante size—stake more to earn more if you perform well. Top 10% receive premium rewards, profitable tier (45%) get positive ROI, break-even (25%) get ante returned, and penalty band (bottom 20%) forfeit ante (50% burned, 50% redistributed to winners).'
+          a: 'Every miner posts α-token ante proportional to their desired reward exposure (any amount > 0). Rewards scale with ante size—stake more to earn more if you perform well. Top 10% receive premium rewards, profitable tier (45%) get positive ROI, break-even (25%) get ante returned, and penalty band (bottom 20%) forfeit ante (50% burned, 50% redistributed to winners). There is no fixed minimum—the market filters by performance, not capital requirements.'
         },
         {
           id: 'deflationary',

@@ -1,0 +1,286 @@
+---
+title: "Miners"
+description: "Signal generators and their role in QUANTA"
+---
+
+# Miners (Signal Generators)
+
+In QUANTA, "miners" are signal generators who submit portfolio recommendations to the network. Unlike traditional proof-of-work mining, QUANTA miners compete on the quality of their trading signals.
+
+## Role Overview
+
+<CardGroup cols={2}>
+  <Card title="What Miners Do" icon="chart-line">
+    Generate and submit portfolio signals (stock picks with weights)
+  </Card>
+  <Card title="What Miners Earn" icon="coins">
+    TAO emissions + α-tokens based on risk-adjusted performance
+  </Card>
+</CardGroup>
+
+## Miner Taxonomy
+
+QUANTA supports multiple types of signal generators:
+
+### Direct Miners
+
+Hold their own UID and submit signals directly to validators.
+
+| Aspect | Details |
+|--------|---------|
+| Requirements | UID registration + validator connectivity |
+| Control | Full control over signal submission |
+| Rewards | 100% of earned rewards (no pool fees) |
+| Best For | Serious quant traders with infrastructure |
+
+### Pool Participants
+
+Submit signals to the Signal Pool without holding a UID.
+
+| Aspect | Details |
+|--------|---------|
+| Requirements | α-token stake only |
+| Control | Signal submission, no UID management |
+| Rewards | ~85% of earned rewards (pool operator takes fee) |
+| Best For | Individual traders, beginners, strategy testers |
+
+### Pool Operators
+
+Run infrastructure to aggregate signals from pool participants.
+
+| Aspect | Details |
+|--------|---------|
+| Requirements | UID registration + pool infrastructure |
+| Control | Aggregation strategy, participant selection |
+| Rewards | 15% fee on participant rewards |
+| Best For | Infrastructure providers, community leaders |
+
+## Signal Generation
+
+### Portfolio Format
+
+Miners submit weighted portfolios over the approved universe:
+
+```python
+portfolio = {
+    "AAPL": 0.10,   # 10% long Apple
+    "MSFT": 0.08,   # 8% long Microsoft
+    "TSLA": -0.05,  # 5% short Tesla
+    "NVDA": 0.12,   # 12% long Nvidia
+    # ... up to 500 positions
+}
+
+# Constraints:
+# - Sum of |weights| ≤ 2.0 (max 200% gross exposure)
+# - Each |weight| ≤ 0.20 (max 20% per position)
+# - Only approved universe tickers
+```
+
+### Strategy Types
+
+QUANTA welcomes diverse strategies:
+
+<AccordionGroup>
+  <Accordion title="Momentum" icon="chart-line">
+    **Idea:** Winners keep winning, losers keep losing
+
+    ```python
+    # Simple momentum signal
+    momentum_12m = returns_12_month.rank()
+    momentum_1m = returns_1_month.rank()
+
+    signal = momentum_12m - momentum_1m  # 12-1 momentum
+    portfolio = normalize_to_weights(signal)
+    ```
+  </Accordion>
+
+  <Accordion title="Value" icon="scale-balanced">
+    **Idea:** Cheap stocks outperform expensive ones
+
+    ```python
+    # Simple value signal
+    earnings_yield = earnings / market_cap
+    book_to_market = book_value / market_cap
+
+    signal = (earnings_yield.rank() + book_to_market.rank()) / 2
+    portfolio = normalize_to_weights(signal)
+    ```
+  </Accordion>
+
+  <Accordion title="Market Neutral" icon="equals">
+    **Idea:** Long best stocks, short worst stocks, zero market exposure
+
+    ```python
+    # Market neutral portfolio
+    signal = your_alpha_signal()
+
+    longs = signal.nlargest(50)
+    shorts = signal.nsmallest(50)
+
+    portfolio = concat([
+        normalize(longs, target=1.0),
+        normalize(shorts, target=-1.0)
+    ])
+    # Net exposure ≈ 0
+    ```
+  </Accordion>
+
+  <Accordion title="Multi-Factor" icon="layer-group">
+    **Idea:** Combine multiple signals for diversification
+
+    ```python
+    # Multi-factor composite
+    momentum = calculate_momentum()
+    value = calculate_value()
+    quality = calculate_quality()
+    low_vol = calculate_low_volatility()
+
+    composite = (
+        0.30 * momentum.rank() +
+        0.25 * value.rank() +
+        0.25 * quality.rank() +
+        0.20 * low_vol.rank()
+    )
+
+    portfolio = normalize_to_weights(composite)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Reward Mechanics
+
+### TAO Emissions
+
+Miners receive 41% of subnet TAO emissions, distributed by performance:
+
+```
+Miner_TAO = (Miner_Score / Sum_All_Scores) × 0.41 × Epoch_Emissions
+
+Example:
+- Your score: 100
+- Total network score: 10,000
+- Epoch emissions: 10 TAO
+
+Your TAO = (100 / 10,000) × 0.41 × 10 = 0.041 TAO
+```
+
+### α-Token Rewards
+
+Additional α-token rewards from the competition pot:
+
+| Performance Tier | Ante Result | Share of Winner Pool |
+|------------------|-------------|---------------------|
+| Top 10% | Returned + Premium | 50% of total pool |
+| Profitable (35%) | Returned + Bonus | 40% of total pool |
+| Break-even (25%) | Returned | 10% of total pool |
+| Bottom 30% | Forfeited | 0% |
+
+<Info>
+50% of forfeited antes are burned (deflationary), 50% go to the winner pool.
+</Info>
+
+### Reward Multipliers
+
+Top performers earn bonus multipliers:
+
+| Rank | Multiplier |
+|------|------------|
+| #1 | 5.0x |
+| Top 5 | 3.0x |
+| Top 10% | 2.0x |
+| Top 25% | 1.5x |
+| Others | 1.0x |
+
+## Getting Started as a Miner
+
+### Option 1: Pool Participation (Easy)
+
+<Steps>
+  <Step title="Get α-tokens">
+    Acquire α-tokens from DEX or earn through initial participation programs
+  </Step>
+  <Step title="Develop Strategy">
+    Create your trading signal (backtest first!)
+  </Step>
+  <Step title="Submit to Pool">
+    Stake α-tokens and submit your signal to the Signal Pool
+  </Step>
+  <Step title="Monitor Performance">
+    Track your signal's performance on the leaderboard
+  </Step>
+</Steps>
+
+### Option 2: Direct Mining (Advanced)
+
+<Steps>
+  <Step title="Register UID">
+    ```bash
+    btcli subnet register --netuid X --wallet.name mywallet
+    ```
+  </Step>
+  <Step title="Setup Infrastructure">
+    Run miner node with market data feeds and submission pipeline
+  </Step>
+  <Step title="Submit Signals">
+    Connect to validators and submit signals directly
+  </Step>
+  <Step title="Manage Operations">
+    Monitor performance, adjust strategies, maintain uptime
+  </Step>
+</Steps>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Backtest Thoroughly" icon="flask">
+    Test your strategy on historical data before risking capital
+  </Card>
+  <Card title="Manage Risk" icon="shield">
+    Keep position sizes reasonable; avoid concentrated bets
+  </Card>
+  <Card title="Diversify Signals" icon="chart-pie">
+    Multiple uncorrelated signals reduce variance
+  </Card>
+  <Card title="Monitor Drawdowns" icon="arrow-trend-down">
+    Maximum drawdown heavily impacts your score
+  </Card>
+</CardGroup>
+
+### Common Mistakes to Avoid
+
+<Warning>
+**Overfitting:** Strategies that work perfectly on historical data often fail live. Use out-of-sample testing.
+</Warning>
+
+<Warning>
+**High Turnover:** Excessive trading incurs transaction costs and turnover penalties. Target < 20% monthly turnover.
+</Warning>
+
+<Warning>
+**Copying Signals:** Highly correlated signals receive correlation penalties. Be original.
+</Warning>
+
+## Hardware Requirements
+
+For direct miners:
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 4 cores | 8+ cores |
+| RAM | 16 GB | 32+ GB |
+| Storage | 100 GB SSD | 500 GB NVMe |
+| Network | 100 Mbps | 1 Gbps |
+| Uptime | 95% | 99%+ |
+
+Pool participants have no hardware requirements beyond a wallet.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Miner Setup Guide" icon="rocket" href="/guides/miner-setup">
+    Step-by-step setup instructions
+  </Card>
+  <Card title="Signal Strategies" icon="lightbulb" href="/guides/signal-strategies">
+    Strategy development best practices
+  </Card>
+</CardGroup>

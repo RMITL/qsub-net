@@ -1,0 +1,122 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "QUANTA Documentation",
+  "theme": "maple",
+  "logo": {
+    "dark": "/logo/quanta-logo-dark.svg",
+    "light": "/logo/quanta-logo-light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#d4af37",
+    "light": "#f4d03f",
+    "dark": "#b8960c"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Website",
+        "href": "https://qsub.net"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://qsub.net"
+    }
+  },
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "introduction/overview",
+                  "introduction/why-quanta",
+                  "introduction/how-it-works"
+                ]
+              },
+              {
+                "group": "Core Concepts",
+                "pages": [
+                  "concepts/signal-pool",
+                  "concepts/miners",
+                  "concepts/validators",
+                  "concepts/scoring",
+                  "concepts/bittensor-integration"
+                ]
+              },
+              {
+                "group": "How It Works",
+                "pages": [
+                  "how-it-works/signal-submission",
+                  "how-it-works/evaluation",
+                  "how-it-works/rewards",
+                  "how-it-works/epoch-lifecycle"
+                ]
+              },
+              {
+                "group": "Tokenomics",
+                "pages": [
+                  "tokenomics/overview",
+                  "tokenomics/dual-revenue",
+                  "tokenomics/alpha-token",
+                  "tokenomics/emissions"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/quickstart",
+                  "guides/miner-setup",
+                  "guides/validator-setup",
+                  "guides/signal-strategies"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Reference",
+            "groups": [
+              {
+                "group": "Technical Reference",
+                "pages": [
+                  "reference/signal-format",
+                  "reference/api",
+                  "reference/cli",
+                  "reference/smart-contracts"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "resources/faq",
+                  "resources/glossary",
+                  "resources/roadmap"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/qsub_net",
+      "github": "https://github.com/RMITL/QUANTA",
+      "telegram": "https://t.me/qsubnet",
+      "discord": "https://discord.com/users/qsubnet"
+    }
+  }
+}

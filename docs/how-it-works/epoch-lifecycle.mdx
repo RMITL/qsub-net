@@ -1,0 +1,343 @@
+---
+title: "Epoch Lifecycle"
+description: "Understanding QUANTA's timing and operational cycles"
+---
+
+# Epoch Lifecycle
+
+QUANTA operates on regular cycles called epochs. Understanding epoch timing is essential for effective participation.
+
+## Epoch Types
+
+QUANTA uses two overlapping epoch cycles:
+
+<Tabs>
+  <Tab title="1-Hour Epochs">
+    **Purpose:** Signal submission and updates
+
+    | Phase | Duration | Activity |
+    |-------|----------|----------|
+    | Commit | 50 min | Submit signal commitments |
+    | Reveal | 10 min | Reveal portfolio weights |
+
+    ```
+    Epoch N (1 hour)
+    ├── 0:00-0:50  Commit Window
+    │   └── Submit hash of portfolio
+    └── 0:50-1:00  Reveal Window
+        └── Reveal actual weights
+    ```
+  </Tab>
+  <Tab title="Daily Epochs">
+    **Purpose:** Performance evaluation and reward distribution
+
+    | Phase | Time (ET) | Activity |
+    |-------|-----------|----------|
+    | Market Open | 9:30 AM | Price data collection begins |
+    | Market Close | 4:00 PM | Daily returns calculated |
+    | Evaluation | 4:00-6:00 PM | Validators compute scores |
+    | Consensus | 6:00-8:00 PM | Yuma consensus finalized |
+    | Distribution | 8:00 PM | Rewards distributed |
+  </Tab>
+</Tabs>
+
+## Daily Schedule
+
+### Trading Day Timeline
+
+```
+Eastern Time (ET)
+
+04:00 ─┬─ Pre-market data collection
+       │
+09:30 ─┼─ Market Open
+       │  └─ Begin tracking daily returns
+       │
+16:00 ─┼─ Market Close
+       │  └─ Capture closing prices
+       │
+16:00 ─┼─ Evaluation Window Opens
+       │  └─ Validators fetch price data
+       │
+18:00 ─┼─ Score Submission Deadline
+       │  └─ Validators submit to consensus
+       │
+20:00 ─┼─ Consensus Finalized
+       │  └─ Final scores determined
+       │
+20:00 ─┼─ Reward Distribution
+       │  └─ TAO + α-tokens distributed
+       │
+21:00 ─┴─ Day Complete
+```
+
+### Weekend Handling
+
+| Day | Activity |
+|-----|----------|
+| Saturday | No trading, no new evaluations |
+| Sunday | No trading, no new evaluations |
+| Monday | Resumes at market open |
+
+<Info>
+Evaluation windows continue to accumulate—a signal's 7-day, 30-day, and 90-day windows use trading days only.
+</Info>
+
+## Submission Windows
+
+### Commit Phase (0:00 - 0:50)
+
+During the commit phase, signal generators submit commitments:
+
+```python
+from quanta import SignalPool
+import time
+
+pool = SignalPool()
+
+# Check if commit window is open
+status = pool.get_epoch_status()
+if status.phase == "COMMIT":
+    # Safe to commit
+    result = pool.commit(commitment, stake)
+else:
+    # Wait for next window
+    wait_time = status.next_commit_opens - time.time()
+    print(f"Commit window opens in {wait_time} seconds")
+```
+
+**Best Practices:**
+- Submit early in the window to avoid last-minute issues
+- Monitor gas prices for optimal submission timing
+- Have backup submission methods ready
+
+### Reveal Phase (0:50 - 1:00)
+
+The reveal phase is shorter and time-critical:
+
+```python
+# Automated reveal system
+def scheduled_reveal():
+    while True:
+        status = pool.get_epoch_status()
+
+        if status.phase == "REVEAL":
+            for pending in get_pending_reveals():
+                pool.reveal(pending.portfolio, pending.nonce)
+
+        time.sleep(60)  # Check every minute
+```
+
+<Warning>
+**Missing the reveal window forfeits your ante.** Set up automated systems to handle reveals.
+</Warning>
+
+## Evaluation Cycles
+
+### Rolling Windows
+
+Evaluations happen continuously with rolling windows:
+
+```
+Day 1    Day 7    Day 30   Day 90
+  │        │        │        │
+  │◄──────►│        │        │   7-day window (20% weight)
+  │        │        │        │
+  │◄────────────────►│       │   30-day window (35% weight)
+  │        │        │        │
+  │◄─────────────────────────►│  90-day window (45% weight)
+```
+
+### New Signal Ramp-up
+
+New signals have limited scoring until they build history:
+
+| Days Active | Scoring |
+|-------------|---------|
+| 0-6 | No rewards (building track record) |
+| 7-29 | 7-day score only (reduced total weight) |
+| 30-89 | 7-day + 30-day scores |
+| 90+ | Full scoring (all windows) |
+
+```python
+def get_scoring_weight(days_active):
+    if days_active < 7:
+        return 0  # No rewards yet
+    elif days_active < 30:
+        return 0.20  # 7-day only
+    elif days_active < 90:
+        return 0.50  # 7-day + 30-day
+    else:
+        return 1.00  # Full scoring
+```
+
+## Consensus Timing
+
+### Validator Submission
+
+Validators must submit scores within the consensus window:
+
+| Deadline | Consequence |
+|----------|-------------|
+| On time | Full participation rewards |
+| Late (< 30 min) | 50% penalty on rewards |
+| Very late (> 30 min) | No rewards, potential slashing |
+
+### Consensus Finalization
+
+```python
+# Consensus timeline
+consensus_events = {
+    "score_submission_open": "16:00 ET",
+    "score_submission_close": "18:00 ET",
+    "aggregation_complete": "19:00 ET",
+    "consensus_finalized": "20:00 ET",
+    "rewards_distributed": "20:00 ET",
+}
+```
+
+## Epoch States
+
+### State Machine
+
+```
+┌─────────────┐
+│   COMMIT    │◄───────────────┐
+└──────┬──────┘                │
+       │ 50 min                │
+       ▼                       │
+┌─────────────┐                │
+│   REVEAL    │                │
+└──────┬──────┘                │
+       │ 10 min                │
+       ▼                       │
+┌─────────────┐                │
+│  EVALUATE   │                │
+└──────┬──────┘                │
+       │ 2 hours               │
+       ▼                       │
+┌─────────────┐                │
+│  CONSENSUS  │                │
+└──────┬──────┘                │
+       │ 2 hours               │
+       ▼                       │
+┌─────────────┐                │
+│  DISTRIBUTE │────────────────┘
+└─────────────┘
+```
+
+### Checking Current State
+
+```python
+from quanta import Network
+
+network = Network()
+
+# Get current epoch info
+epoch = network.get_current_epoch()
+
+print(f"Epoch: {epoch.number}")
+print(f"Phase: {epoch.phase}")
+print(f"Time remaining: {epoch.time_remaining} seconds")
+print(f"Next phase: {epoch.next_phase}")
+```
+
+## Market Holidays
+
+### U.S. Market Holidays (2025)
+
+| Date | Holiday |
+|------|---------|
+| Jan 1 | New Year's Day |
+| Jan 20 | MLK Day |
+| Feb 17 | Presidents Day |
+| Apr 18 | Good Friday |
+| May 26 | Memorial Day |
+| Jun 19 | Juneteenth |
+| Jul 4 | Independence Day |
+| Sep 1 | Labor Day |
+| Nov 27 | Thanksgiving |
+| Dec 25 | Christmas |
+
+<Note>
+No evaluations on market holidays. Evaluation windows use trading days only.
+</Note>
+
+### Early Close Days
+
+| Date | Close Time |
+|------|------------|
+| Jul 3 | 1:00 PM ET |
+| Nov 28 | 1:00 PM ET |
+| Dec 24 | 1:00 PM ET |
+
+## Timing Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Automate Everything" icon="robot">
+    Use scripts for commit, reveal, and claiming to never miss windows
+  </Card>
+  <Card title="Monitor Network" icon="tower-broadcast">
+    Watch for network congestion that might delay transactions
+  </Card>
+  <Card title="Time Zone Awareness" icon="clock">
+    All critical times are in Eastern Time (ET)
+  </Card>
+  <Card title="Build Buffer" icon="shield">
+    Submit before deadlines to account for delays
+  </Card>
+</CardGroup>
+
+## Automation Example
+
+Complete epoch automation script:
+
+```python
+import schedule
+from quanta import SignalPool, Wallet
+
+wallet = Wallet.load("path/to/wallet")
+pool = SignalPool()
+
+def generate_signal():
+    # Your strategy logic here
+    return {"AAPL": 0.10, "MSFT": 0.08, ...}
+
+def handle_commit():
+    portfolio = generate_signal()
+    nonce = generate_nonce()
+    commitment = create_commitment(portfolio, nonce)
+
+    pool.commit(commitment, calculate_stake(portfolio))
+    save_for_reveal(portfolio, nonce)
+
+def handle_reveal():
+    portfolio, nonce = load_pending_reveal()
+    pool.reveal(portfolio, nonce)
+
+def handle_claim():
+    unclaimed = pool.get_unclaimed(wallet.address)
+    if unclaimed > 0:
+        pool.claim_rewards(wallet)
+
+# Schedule tasks
+schedule.every().hour.at(":00").do(handle_commit)
+schedule.every().hour.at(":51").do(handle_reveal)
+schedule.every().day.at("21:00").do(handle_claim)
+
+# Run scheduler
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart Guide" icon="rocket" href="/guides/quickstart">
+    Set up your first signal
+  </Card>
+  <Card title="Tokenomics" icon="coins" href="/tokenomics/overview">
+    Understand the economic model
+  </Card>
+</CardGroup>

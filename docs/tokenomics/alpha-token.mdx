@@ -1,0 +1,335 @@
+---
+title: "α-Token"
+description: "QUANTA's native token specification and utility"
+---
+
+# α-Token (Alpha Token)
+
+The α-token is QUANTA's native token, designed to create economic alignment between signal quality and network value.
+
+## Token Basics
+
+| Property | Value |
+|----------|-------|
+| Name | QUANTA Alpha Token |
+| Symbol | α (or ALPHA) |
+| Total Supply | 100,000,000 |
+| Decimals | 18 |
+| Chain | Bittensor (Substrate) |
+| Initial Circulation | 15,000,000 (15%) |
+
+## Core Utility
+
+### 1. Signal Staking
+
+Required to submit signals to the network:
+
+```python
+# Stake requirement
+required_stake = gross_exposure × BASE_RATE
+
+# BASE_RATE = 10 α per 100% exposure
+# 100% long portfolio → 10 α
+# 150% long-short → 15 α
+# 200% leveraged → 20 α
+```
+
+<Info>
+Stakes are locked during signal evaluation and serve as skin-in-the-game collateral.
+</Info>
+
+### 2. Validator Staking
+
+Validators must stake α-tokens to participate:
+
+| Tier | Stake Required | Benefits |
+|------|----------------|----------|
+| Standard | 10,000 α | Basic validation rights |
+| Enhanced | 50,000 α | Priority in consensus |
+| Premium | 100,000+ α | Governance voting weight |
+
+### 3. Competition Participation
+
+α-tokens are the currency of the competition pot:
+
+- **Ante:** Proportional stake required
+- **Winnings:** Redistributed from underperformers
+- **Losses:** Forfeited if bottom 30%
+
+### 4. Governance
+
+Token holders vote on protocol parameters:
+
+<AccordionGroup>
+  <Accordion title="Scoring Parameters" icon="calculator">
+    - Metric weights (Sortino, Calmar, etc.)
+    - Evaluation window durations
+    - Normalization methods
+  </Accordion>
+
+  <Accordion title="Economic Parameters" icon="coins">
+    - Network rake percentage
+    - Tier thresholds
+    - Multiplier values
+  </Accordion>
+
+  <Accordion title="Universe Updates" icon="list">
+    - Adding/removing tickers
+    - Liquidity requirements
+    - Position limits
+  </Accordion>
+
+  <Accordion title="Protocol Upgrades" icon="code">
+    - Smart contract changes
+    - New features
+    - Emergency actions
+  </Accordion>
+</AccordionGroup>
+
+### 5. Fee Discounts
+
+Stake α-tokens for reduced platform fees:
+
+| Stake Amount | API Discount | Analytics Discount |
+|--------------|--------------|-------------------|
+| 100 α | 10% | 5% |
+| 1,000 α | 25% | 15% |
+| 10,000 α | 50% | 30% |
+| 100,000+ α | 75% | 50% |
+
+## Token Distribution
+
+### Initial Allocation
+
+```
+┌─────────────────────────────────────────────┐
+│              100,000,000 α                  │
+└─────────────────────────────────────────────┘
+           │
+           ├── 40,000,000 (40%) Miner Emissions
+           │   └── 4-year emission schedule
+           │
+           ├── 25,000,000 (25%) Validator Rewards
+           │   └── Performance-based distribution
+           │
+           ├── 20,000,000 (20%) Team & Advisors
+           │   └── 2-year vesting with 6-month cliff
+           │
+           ├── 10,000,000 (10%) Ecosystem Fund
+           │   └── Grants, partnerships, bounties
+           │
+           └── 5,000,000 (5%) Initial Liquidity
+               └── DEX launch + market making
+```
+
+### Vesting Schedules
+
+<Tabs>
+  <Tab title="Team & Advisors">
+    **Total:** 20,000,000 α (20%)
+
+    | Period | Unlock |
+    |--------|--------|
+    | Month 0-6 | 0% (cliff) |
+    | Month 6 | 10% (2M α) |
+    | Month 7-24 | 5%/month |
+    | Month 24 | 100% vested |
+
+    ```
+    Month:  0   6   12   18   24
+    Vested: 0% 10%  40%  70% 100%
+    ```
+  </Tab>
+  <Tab title="Ecosystem Fund">
+    **Total:** 10,000,000 α (10%)
+
+    | Period | Unlock | Use |
+    |--------|--------|-----|
+    | Month 0 | 20% | Initial grants |
+    | Month 1-36 | 2.2%/month | Ongoing programs |
+
+    Managed by DAO governance after Month 12.
+  </Tab>
+  <Tab title="Initial Liquidity">
+    **Total:** 5,000,000 α (5%)
+
+    | Allocation | Amount | Purpose |
+    |------------|--------|---------|
+    | DEX LP | 3M α | α/TAO pair |
+    | CEX listing | 1M α | Exchange inventory |
+    | Market making | 1M α | Spread maintenance |
+
+    Fully unlocked at launch.
+  </Tab>
+</Tabs>
+
+## Emission Schedule
+
+### Miner Emissions (40M α)
+
+Performance-based emissions over 4 years:
+
+```python
+# Yearly emission (approximate)
+year_1 = 16_000_000  # 40%
+year_2 = 12_000_000  # 30%
+year_3 = 8_000_000   # 20%
+year_4 = 4_000_000   # 10%
+total  = 40_000_000  # 100%
+
+# Per-epoch emission
+daily_year_1 = 16_000_000 / 365 ≈ 43,836 α/day
+```
+
+### Emission Decay
+
+```
+Year 1: ████████████████  16M α (40%)
+Year 2: ████████████       12M α (30%)
+Year 3: ████████           8M α (20%)
+Year 4: ████               4M α (10%)
+```
+
+### Top Performer Multipliers
+
+| Rank | Multiplier | Example (1000 α base) |
+|------|------------|----------------------|
+| #1 | 5.0× | 5,000 α |
+| #2-5 | 3.0× | 3,000 α |
+| Top 10% | 2.0× | 2,000 α |
+| Top 25% | 1.5× | 1,500 α |
+| Others | 1.0× | 1,000 α |
+
+## Value Accrual
+
+### Staking Demand
+
+As the network grows, more α must be staked:
+
+```python
+# Validator staking demand
+validator_demand = num_validators × avg_stake
+# 64 validators × 50,000 α = 3,200,000 α
+
+# Signal staking demand
+signal_demand = num_signals × avg_exposure × base_rate
+# 1000 signals × 150% × 10 α = 1,500,000 α
+
+# Total locked
+total_locked = validator_demand + signal_demand
+# = 4,700,000 α (4.7% of supply)
+```
+
+### Burn Mechanics
+
+50% of forfeited antes are permanently burned:
+
+```python
+# Daily burn estimate
+daily_signals = 1000
+forfeit_rate = 0.30  # Bottom 30%
+avg_stake = 15
+
+forfeited = daily_signals × forfeit_rate × avg_stake
+# = 4,500 α forfeited daily
+
+burned = forfeited × 0.50
+# = 2,250 α burned daily
+
+annual_burn = burned × 365
+# = 821,250 α burned annually (~0.8% of supply)
+```
+
+### Protocol Revenue
+
+Protocol revenue supports token value:
+
+| Source | Use |
+|--------|-----|
+| Network Rake (8%) | 20% to buybacks |
+| API Subscriptions | 10% to buybacks |
+| Premium Features | Ecosystem fund |
+
+## Acquiring α-Tokens
+
+### At Launch
+
+<Steps>
+  <Step title="DEX Launch">
+    Initial liquidity on α/TAO pair
+
+    ```
+    DEX: SushiSwap (Bittensor)
+    Pair: α/TAO
+    Initial Price: TBD
+    ```
+  </Step>
+  <Step title="Earn Through Participation">
+    Submit signals and earn emissions
+
+    ```
+    No purchase required
+    Earn based on performance
+    ```
+  </Step>
+</Steps>
+
+### Ongoing
+
+| Method | Description |
+|--------|-------------|
+| Mining | Submit high-quality signals |
+| Validating | Run validator infrastructure |
+| LP Rewards | Provide α/TAO liquidity |
+| Grants | Ecosystem fund programs |
+
+## Token Security
+
+### Smart Contract
+
+<Warning>
+Smart contracts will be audited before mainnet. Until audit completion, use testnet only.
+</Warning>
+
+| Security Measure | Status |
+|------------------|--------|
+| External Audit | Planned |
+| Bug Bounty | Active (testnet) |
+| Multisig Treasury | 3/5 threshold |
+| Timelock | 48-hour delay |
+
+### Wallet Recommendations
+
+| Use Case | Recommendation |
+|----------|----------------|
+| Long-term holding | Hardware wallet |
+| Active trading | Hot wallet (small amounts) |
+| Validator staking | Dedicated coldkey |
+| Signal staking | Operational hotkey |
+
+## Token Metrics Dashboard
+
+Track α-token metrics:
+
+| Metric | Description |
+|--------|-------------|
+| Circulating Supply | Tokens in circulation |
+| Staked Supply | Tokens locked in staking |
+| Burned Supply | Tokens permanently removed |
+| 24h Volume | Trading volume |
+| Price | Current market price |
+
+```
+Dashboard: https://qsub.net/token
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Emission Schedule" icon="calendar" href="/tokenomics/emissions">
+    Detailed emission timeline
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+    Start earning α-tokens
+  </Card>
+</CardGroup>

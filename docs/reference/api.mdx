@@ -1,0 +1,524 @@
+---
+title: "API Reference"
+description: "QUANTA REST and WebSocket API documentation"
+---
+
+# API Reference
+
+QUANTA provides REST and WebSocket APIs for programmatic interaction with the network.
+
+## Base URLs
+
+| Environment | REST API | WebSocket |
+|-------------|----------|-----------|
+| Mainnet | `https://api.qsub.net/v1` | `wss://ws.qsub.net/v1` |
+| Testnet | `https://api-testnet.qsub.net/v1` | `wss://ws-testnet.qsub.net/v1` |
+
+## Authentication
+
+### API Key
+
+```bash
+curl -X GET "https://api.qsub.net/v1/signals" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Wallet Signature
+
+For write operations, sign requests with your wallet:
+
+```python
+import time
+import hmac
+import hashlib
+
+def sign_request(method, path, body, secret_key):
+    timestamp = str(int(time.time()))
+    message = f"{timestamp}{method}{path}{body}"
+    signature = hmac.new(
+        secret_key.encode(),
+        message.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    return timestamp, signature
+```
+
+## REST API
+
+### Signals
+
+#### List Signals
+
+```
+GET /signals
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `wallet` | string | Filter by wallet address |
+| `status` | string | Filter by status (active, pending, closed) |
+| `limit` | integer | Max results (default: 100) |
+| `offset` | integer | Pagination offset |
+
+**Response:**
+
+```json
+{
+  "signals": [
+    {
+      "id": "sig_abc123",
+      "wallet": "5GrwvaEF...",
+      "status": "active",
+      "stake": 15.0,
+      "created_at": "2025-01-15T10:30:00Z",
+      "performance": {
+        "return_7d": 0.023,
+        "sortino_7d": 1.85,
+        "rank": 45
+      }
+    }
+  ],
+  "total": 230,
+  "limit": 100,
+  "offset": 0
+}
+```
+
+#### Get Signal
+
+```
+GET /signals/{signal_id}
+```
+
+**Response:**
+
+```json
+{
+  "id": "sig_abc123",
+  "wallet": "5GrwvaEF...",
+  "status": "active",
+  "stake": 15.0,
+  "strategy_tag": "momentum_v1",
+  "created_at": "2025-01-15T10:30:00Z",
+  "portfolio": {
+    "AAPL": 0.10,
+    "MSFT": 0.08
+  },
+  "performance": {
+    "return_7d": 0.023,
+    "return_30d": 0.058,
+    "return_90d": 0.142,
+    "sortino_7d": 1.85,
+    "sortino_30d": 2.10,
+    "sortino_90d": 1.95,
+    "calmar_30d": 1.65,
+    "max_drawdown": 0.032,
+    "turnover": 0.15,
+    "composite_score": 0.72,
+    "rank": 45
+  },
+  "rewards": {
+    "pending_tao": 0.15,
+    "pending_alpha": 2.3,
+    "total_earned_tao": 5.2,
+    "total_earned_alpha": 85.0
+  }
+}
+```
+
+#### Submit Signal (Commit)
+
+```
+POST /signals/commit
+```
+
+**Request:**
+
+```json
+{
+  "commitment": "0x1234abcd...",
+  "stake_amount": 15.0,
+  "strategy_tag": "momentum_v1",
+  "signature": "0xabcd1234..."
+}
+```
+
+**Response:**
+
+```json
+{
+  "commitment_id": "cmt_xyz789",
+  "status": "committed",
+  "reveal_deadline": "2025-01-15T11:00:00Z"
+}
+```
+
+#### Reveal Signal
+
+```
+POST /signals/reveal
+```
+
+**Request:**
+
+```json
+{
+  "commitment_id": "cmt_xyz789",
+  "portfolio": {
+    "AAPL": 0.10,
+    "MSFT": 0.08
+  },
+  "nonce": "0x5678efgh...",
+  "signature": "0xijkl9012..."
+}
+```
+
+**Response:**
+
+```json
+{
+  "signal_id": "sig_abc123",
+  "status": "active",
+  "stake": 15.0,
+  "valid_from": "2025-01-15T11:00:00Z"
+}
+```
+
+#### Update Signal
+
+```
+PATCH /signals/{signal_id}
+```
+
+**Request:**
+
+```json
+{
+  "portfolio": {
+    "AAPL": 0.12,
+    "MSFT": 0.06
+  },
+  "signature": "0x..."
+}
+```
+
+#### Withdraw Signal
+
+```
+DELETE /signals/{signal_id}
+```
+
+**Response:**
+
+```json
+{
+  "status": "withdrawn",
+  "stake_returned": 15.0
+}
+```
+
+---
+
+### Leaderboard
+
+#### Get Leaderboard
+
+```
+GET /leaderboard
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `window` | string | Time window: 7d, 30d, 90d |
+| `metric` | string | Sort metric: composite, sortino, return |
+| `limit` | integer | Max results (default: 100) |
+
+**Response:**
+
+```json
+{
+  "window": "7d",
+  "metric": "composite",
+  "updated_at": "2025-01-15T16:00:00Z",
+  "entries": [
+    {
+      "rank": 1,
+      "signal_id": "sig_top001",
+      "composite_score": 0.95,
+      "sortino": 3.42,
+      "return": 0.058,
+      "max_drawdown": 0.021
+    }
+  ]
+}
+```
+
+---
+
+### Network
+
+#### Get Network Status
+
+```
+GET /network/status
+```
+
+**Response:**
+
+```json
+{
+  "network": "mainnet",
+  "epoch": 12345,
+  "phase": "evaluation",
+  "active_signals": 1234,
+  "active_validators": 64,
+  "total_stake_tao": 50000,
+  "total_stake_alpha": 15000000,
+  "next_commit_window": "2025-01-15T17:00:00Z"
+}
+```
+
+#### Get Current Epoch
+
+```
+GET /network/epoch
+```
+
+**Response:**
+
+```json
+{
+  "epoch_number": 12345,
+  "phase": "evaluation",
+  "phase_start": "2025-01-15T16:00:00Z",
+  "phase_end": "2025-01-15T18:00:00Z",
+  "time_remaining": 3600
+}
+```
+
+#### Get Universe
+
+```
+GET /network/universe
+```
+
+**Response:**
+
+```json
+{
+  "version": "2025-Q1",
+  "updated_at": "2025-01-01T00:00:00Z",
+  "tickers": ["AAPL", "MSFT", "GOOGL", ...],
+  "count": 500
+}
+```
+
+---
+
+### Wallet
+
+#### Get Wallet Balance
+
+```
+GET /wallet/{address}/balance
+```
+
+**Response:**
+
+```json
+{
+  "address": "5GrwvaEF...",
+  "balances": {
+    "tao": 125.5,
+    "alpha": 5000.0,
+    "alpha_staked": 3000.0
+  }
+}
+```
+
+#### Get Wallet Rewards
+
+```
+GET /wallet/{address}/rewards
+```
+
+**Response:**
+
+```json
+{
+  "address": "5GrwvaEF...",
+  "unclaimed": {
+    "tao": 2.5,
+    "alpha": 45.0
+  },
+  "claimed_total": {
+    "tao": 50.0,
+    "alpha": 850.0
+  }
+}
+```
+
+#### Claim Rewards
+
+```
+POST /wallet/{address}/claim
+```
+
+**Request:**
+
+```json
+{
+  "signal_ids": ["sig_abc123", "sig_def456"],
+  "signature": "0x..."
+}
+```
+
+---
+
+## WebSocket API
+
+### Connection
+
+```javascript
+const ws = new WebSocket('wss://ws.qsub.net/v1');
+
+ws.onopen = () => {
+  // Subscribe to channels
+  ws.send(JSON.stringify({
+    action: 'subscribe',
+    channels: ['signals', 'leaderboard']
+  }));
+};
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log(data);
+};
+```
+
+### Channels
+
+#### signals
+
+Real-time signal updates:
+
+```json
+{
+  "channel": "signals",
+  "event": "signal_submitted",
+  "data": {
+    "signal_id": "sig_abc123",
+    "wallet": "5GrwvaEF...",
+    "stake": 15.0
+  }
+}
+```
+
+#### leaderboard
+
+Leaderboard changes:
+
+```json
+{
+  "channel": "leaderboard",
+  "event": "rank_changed",
+  "data": {
+    "signal_id": "sig_abc123",
+    "old_rank": 50,
+    "new_rank": 45
+  }
+}
+```
+
+#### epoch
+
+Epoch lifecycle events:
+
+```json
+{
+  "channel": "epoch",
+  "event": "phase_changed",
+  "data": {
+    "epoch": 12345,
+    "new_phase": "evaluation",
+    "timestamp": "2025-01-15T16:00:00Z"
+  }
+}
+```
+
+### Subscription Example
+
+```javascript
+// Subscribe to specific signal
+ws.send(JSON.stringify({
+  action: 'subscribe',
+  channel: 'signal',
+  signal_id: 'sig_abc123'
+}));
+
+// Unsubscribe
+ws.send(JSON.stringify({
+  action: 'unsubscribe',
+  channel: 'signal',
+  signal_id: 'sig_abc123'
+}));
+```
+
+---
+
+## Rate Limits
+
+| Endpoint Type | Rate Limit |
+|---------------|------------|
+| Read (GET) | 100/minute |
+| Write (POST/PATCH/DELETE) | 10/minute |
+| WebSocket messages | 50/minute |
+
+**Rate limit headers:**
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1705332000
+```
+
+## Error Responses
+
+```json
+{
+  "error": {
+    "code": "E001",
+    "message": "Invalid ticker: XYZ not in approved universe",
+    "details": {
+      "ticker": "XYZ"
+    }
+  }
+}
+```
+
+| HTTP Code | Meaning |
+|-----------|---------|
+| 400 | Bad request (validation error) |
+| 401 | Unauthorized (missing/invalid auth) |
+| 403 | Forbidden (insufficient permissions) |
+| 404 | Not found |
+| 429 | Rate limited |
+| 500 | Server error |
+
+## SDKs
+
+<CardGroup cols={3}>
+  <Card title="Python" icon="python" href="https://github.com/RMITL/quanta-python">
+    Official Python SDK
+  </Card>
+  <Card title="TypeScript" icon="js" href="https://github.com/RMITL/quanta-ts">
+    Official TypeScript SDK
+  </Card>
+  <Card title="Rust" icon="rust" href="https://github.com/RMITL/quanta-rust">
+    Community Rust SDK
+  </Card>
+</CardGroup>

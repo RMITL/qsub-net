@@ -1,0 +1,367 @@
+---
+title: "Signal Strategies"
+description: "How to build winning strategies for QUANTA"
+---
+
+# Signal Strategies
+
+This guide covers strategy development best practices optimized for QUANTA's scoring system.
+
+## Understanding QUANTA's Metrics
+
+Before building strategies, understand what QUANTA rewards:
+
+| Metric | Weight | What It Measures | Optimize For |
+|--------|--------|------------------|--------------|
+| Sortino | 35% | Return per downside risk | Minimize losses, not volatility |
+| Calmar | 25% | Return / max drawdown | Smooth equity curves |
+| Max Drawdown | 25% | Worst peak-to-trough | Capital preservation |
+| Turnover | 15% | Trading frequency | Low-frequency rebalancing |
+
+<Info>
+**Key insight:** QUANTA heavily penalizes drawdowns and rewards consistency. A steady 1%/month beats a volatile 3%/month with big drawdowns.
+</Info>
+
+## Strategy Development Framework
+
+### Step 1: Define Your Edge
+
+What information advantage do you have?
+
+<AccordionGroup>
+  <Accordion title="Factor-Based Edge" icon="layer-group">
+    Exploit known market factors that persist over time:
+
+    - **Momentum** — Winners keep winning
+    - **Value** — Cheap stocks outperform
+    - **Quality** — Profitable companies outperform
+    - **Low Volatility** — Less volatile stocks outperform
+  </Accordion>
+
+  <Accordion title="Data Edge" icon="database">
+    Use alternative data others don't have:
+
+    - Satellite imagery
+    - Credit card transactions
+    - Web traffic data
+    - Social sentiment
+  </Accordion>
+
+  <Accordion title="Timing Edge" icon="clock">
+    Capitalize on predictable patterns:
+
+    - Earnings momentum
+    - Seasonal patterns
+    - Options expiration effects
+    - Index rebalancing
+  </Accordion>
+
+  <Accordion title="Execution Edge" icon="bolt">
+    Better implementation of known strategies:
+
+    - Smart rebalancing
+    - Transaction cost optimization
+    - Tax-loss harvesting
+  </Accordion>
+</AccordionGroup>
+
+### Step 2: Build the Signal
+
+```python
+import pandas as pd
+import numpy as np
+
+class QuantaSignal:
+    def __init__(self, universe):
+        self.universe = universe
+
+    def calculate_raw_signal(self, data):
+        """
+        Your proprietary signal calculation.
+        Returns: pd.Series with ticker -> raw score
+        """
+        raise NotImplementedError
+
+    def normalize_to_portfolio(self, raw_signal, constraints):
+        """
+        Convert raw signal to portfolio weights.
+        """
+        # Rank transform (more robust than raw values)
+        ranked = raw_signal.rank(pct=True)
+
+        # Determine longs and shorts
+        longs = ranked[ranked > 0.8].index  # Top 20%
+        shorts = ranked[ranked < 0.2].index  # Bottom 20%
+
+        weights = pd.Series(0.0, index=self.universe)
+
+        # Equal weight within long/short buckets
+        if len(longs) > 0:
+            weights[longs] = constraints['max_gross'] * 0.5 / len(longs)
+        if len(shorts) > 0:
+            weights[shorts] = -constraints['max_gross'] * 0.5 / len(shorts)
+
+        # Apply position limits
+        weights = weights.clip(-constraints['max_position'], constraints['max_position'])
+
+        return weights
+
+    def generate(self, data):
+        raw = self.calculate_raw_signal(data)
+        portfolio = self.normalize_to_portfolio(raw, {
+            'max_gross': 1.5,
+            'max_position': 0.05
+        })
+        return portfolio.to_dict()
+```
+
+### Step 3: Backtest Properly
+
+<Warning>
+**Overfitting is the #1 killer of live performance.** If your backtest looks too good, it probably is.
+</Warning>
+
+```python
+from quanta.backtest import Backtester
+
+# Split data properly
+train_data = data['2015-01-01':'2020-12-31']  # 6 years train
+val_data = data['2021-01-01':'2022-12-31']    # 2 years validation
+test_data = data['2023-01-01':'2024-12-31']   # 2 years test (TOUCH LAST)
+
+# Train and tune on train_data only
+signal = MySignal()
+signal.fit(train_data)
+
+# Validate hyperparameters on val_data
+val_results = Backtester.run(signal, val_data)
+
+# Final evaluation on test_data (ONLY ONCE)
+test_results = Backtester.run(signal, test_data)
+```
+
+#### Backtest Checklist
+
+- [ ] No look-ahead bias (only use data available at decision time)
+- [ ] Include transaction costs (5-10 bps)
+- [ ] Test on out-of-sample data
+- [ ] Check performance across market regimes
+- [ ] Verify results are not data mining
+
+### Step 4: Optimize for QUANTA Metrics
+
+#### Maximizing Sortino
+
+```python
+def sortino_optimized_weights(signals, returns, target=0):
+    """
+    Optimize weights to maximize Sortino ratio.
+    """
+    from scipy.optimize import minimize
+
+    def neg_sortino(weights):
+        portfolio_returns = returns @ weights
+        excess = portfolio_returns - target
+        downside = excess[excess < 0]
+        downside_std = np.sqrt((downside ** 2).mean())
+        return -excess.mean() / downside_std if downside_std > 0 else 0
+
+    # Initial weights
+    n = len(signals)
+    w0 = np.ones(n) / n
+
+    # Constraints
+    constraints = [
+        {'type': 'eq', 'fun': lambda w: w.sum() - 1},  # Sum to 1
+    ]
+    bounds = [(0, 0.10) for _ in range(n)]  # Max 10% per position
+
+    result = minimize(neg_sortino, w0, constraints=constraints, bounds=bounds)
+    return result.x
+```
+
+#### Minimizing Drawdown
+
+```python
+def drawdown_aware_sizing(base_weights, recent_drawdown, max_dd_tolerance=0.10):
+    """
+    Reduce position sizes when approaching drawdown limits.
+    """
+    # Scale factor based on remaining drawdown budget
+    remaining_budget = max_dd_tolerance - recent_drawdown
+    scale = min(1.0, remaining_budget / max_dd_tolerance)
+
+    return base_weights * scale
+```
+
+#### Controlling Turnover
+
+```python
+def smooth_rebalance(current_weights, target_weights, threshold=0.02):
+    """
+    Only trade if weight change exceeds threshold.
+    Reduces turnover while maintaining signal exposure.
+    """
+    new_weights = current_weights.copy()
+
+    for ticker in target_weights.index:
+        current = current_weights.get(ticker, 0)
+        target = target_weights[ticker]
+
+        if abs(target - current) > threshold:
+            # Partial rebalance (move 50% toward target)
+            new_weights[ticker] = current + 0.5 * (target - current)
+
+    return new_weights
+```
+
+## Strategy Templates
+
+### Template 1: Momentum
+
+```python
+class MomentumStrategy(QuantaSignal):
+    def __init__(self, universe, lookback=252, skip=21):
+        super().__init__(universe)
+        self.lookback = lookback
+        self.skip = skip
+
+    def calculate_raw_signal(self, prices):
+        # 12-month momentum, skipping most recent month
+        returns = prices.pct_change(self.lookback).shift(self.skip)
+        return returns.iloc[-1]
+```
+
+**Characteristics:**
+- Monthly rebalancing (low turnover)
+- Works in trending markets
+- Suffers in reversals
+
+### Template 2: Market Neutral Value
+
+```python
+class MarketNeutralValue(QuantaSignal):
+    def __init__(self, universe):
+        super().__init__(universe)
+
+    def calculate_raw_signal(self, fundamentals):
+        # Composite value score
+        pe_rank = (1 / fundamentals['pe_ratio']).rank(pct=True)
+        pb_rank = (1 / fundamentals['price_to_book']).rank(pct=True)
+        div_rank = fundamentals['dividend_yield'].rank(pct=True)
+
+        return (pe_rank + pb_rank + div_rank) / 3
+
+    def normalize_to_portfolio(self, raw_signal, constraints):
+        # Market neutral: equal long and short exposure
+        ranked = raw_signal.rank(pct=True)
+
+        weights = pd.Series(0.0, index=self.universe)
+
+        top_quintile = ranked[ranked > 0.8].index
+        bottom_quintile = ranked[ranked < 0.2].index
+
+        weights[top_quintile] = 1.0 / len(top_quintile)
+        weights[bottom_quintile] = -1.0 / len(bottom_quintile)
+
+        return weights
+```
+
+**Characteristics:**
+- Zero net exposure (market neutral)
+- Low correlation to market
+- Consistent but lower returns
+
+### Template 3: Multi-Factor Composite
+
+```python
+class MultiFactor(QuantaSignal):
+    def __init__(self, universe, factor_weights=None):
+        super().__init__(universe)
+        self.factor_weights = factor_weights or {
+            'momentum': 0.30,
+            'value': 0.25,
+            'quality': 0.25,
+            'low_vol': 0.20
+        }
+
+    def calculate_raw_signal(self, data):
+        factors = {
+            'momentum': self._momentum(data['prices']),
+            'value': self._value(data['fundamentals']),
+            'quality': self._quality(data['fundamentals']),
+            'low_vol': self._low_vol(data['prices'])
+        }
+
+        composite = sum(
+            factors[f].rank(pct=True) * w
+            for f, w in self.factor_weights.items()
+        )
+
+        return composite
+
+    def _momentum(self, prices):
+        return prices.pct_change(252).iloc[-1]
+
+    def _value(self, fundamentals):
+        return 1 / fundamentals['pe_ratio']
+
+    def _quality(self, fundamentals):
+        return fundamentals['roe']
+
+    def _low_vol(self, prices):
+        return -prices.pct_change().std()
+```
+
+**Characteristics:**
+- Diversified factor exposure
+- More stable returns
+- Moderate turnover
+
+## Common Pitfalls
+
+<CardGroup cols={2}>
+  <Card title="Overfitting" icon="warning">
+    **Problem:** Strategy works perfectly in backtest, fails live
+
+    **Solution:** Use out-of-sample testing, limit parameters
+  </Card>
+  <Card title="Survivorship Bias" icon="ghost">
+    **Problem:** Only testing on stocks that still exist
+
+    **Solution:** Include delisted stocks in backtest
+  </Card>
+  <Card title="Look-Ahead Bias" icon="eye">
+    **Problem:** Using future information in signals
+
+    **Solution:** Strict point-in-time data management
+  </Card>
+  <Card title="Transaction Costs" icon="receipt">
+    **Problem:** Ignoring trading costs
+
+    **Solution:** Model 5-10 bps per trade minimum
+  </Card>
+</CardGroup>
+
+## Performance Checklist
+
+Before submitting to QUANTA:
+
+- [ ] Sortino ratio > 1.0 out-of-sample
+- [ ] Max drawdown < 20%
+- [ ] Monthly turnover < 50%
+- [ ] Works across different market regimes
+- [ ] No single position > 10%
+- [ ] Transaction costs included
+- [ ] No look-ahead bias
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scoring Deep Dive" icon="calculator" href="/concepts/scoring">
+    Understand exactly how you'll be scored
+  </Card>
+  <Card title="Signal Format" icon="code" href="/reference/signal-format">
+    Technical specification for submissions
+  </Card>
+</CardGroup>

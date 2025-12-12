@@ -903,7 +903,7 @@ const QuantaPitchDeckFinal = () => {
             },
             {
               tier: 1, name: 'Signal Generator', icon: '📈', color: '#3b82f6',
-              req: 'Stake minimum, submit valid portfolio signal',
+              req: 'Stake any ante amount, submit valid portfolio signal',
               benefit: 'Build track record, earn via pools, learn the game',
               count: 'Unlimited'
             }

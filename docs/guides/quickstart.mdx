@@ -1,0 +1,255 @@
+---
+title: "Quickstart"
+description: "Get started with QUANTA in 10 minutes"
+---
+
+# Quickstart Guide
+
+This guide gets you from zero to submitting your first signal in about 10 minutes.
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+- [ ] Python 3.9+ installed
+- [ ] Basic understanding of stock trading concepts
+- [ ] Small amount of α-tokens (for testnet, use faucet)
+
+<Note>
+**New to crypto?** You'll need a wallet to interact with QUANTA. We'll cover wallet setup below.
+</Note>
+
+## Step 1: Install QUANTA CLI
+
+<Tabs>
+  <Tab title="pip (Recommended)">
+    ```bash
+    pip install quanta-cli
+    ```
+  </Tab>
+  <Tab title="From Source">
+    ```bash
+    git clone https://github.com/RMITL/QUANTA
+    cd QUANTA
+    pip install -e .
+    ```
+  </Tab>
+</Tabs>
+
+Verify installation:
+
+```bash
+quanta --version
+# quanta-cli v1.0.0
+```
+
+## Step 2: Create a Wallet
+
+Create a new wallet for QUANTA:
+
+```bash
+quanta wallet create --name mywallet
+```
+
+Output:
+```
+Creating new wallet...
+Wallet created successfully!
+
+Address: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+Mnemonic: [SAVE THIS SECURELY - NEVER SHARE]
+
+⚠️  Write down your mnemonic phrase and store it safely!
+```
+
+<Warning>
+**CRITICAL:** Write down your mnemonic phrase on paper and store it securely. This is your only backup. Never share it with anyone.
+</Warning>
+
+## Step 3: Get Testnet Tokens
+
+For testnet, use the faucet:
+
+```bash
+quanta faucet request --wallet mywallet --network testnet
+```
+
+Output:
+```
+Requesting testnet tokens...
+✓ Received 100 α (testnet)
+Balance: 100 α
+```
+
+## Step 4: Create Your First Signal
+
+Create a simple momentum signal:
+
+```python
+# signal.py
+from quanta import SignalPool, Wallet
+
+# Load wallet
+wallet = Wallet.load("mywallet")
+
+# Define portfolio (weights must sum to ≤ 1.0 for long-only)
+portfolio = {
+    "AAPL": 0.15,   # 15% Apple
+    "MSFT": 0.12,   # 12% Microsoft
+    "NVDA": 0.10,   # 10% Nvidia
+    "GOOGL": 0.08,  # 8% Google
+    "AMZN": 0.08,   # 8% Amazon
+    "META": 0.07,   # 7% Meta
+    "TSLA": 0.06,   # 6% Tesla
+    "BRK.B": 0.05,  # 5% Berkshire
+    "UNH": 0.05,    # 5% UnitedHealth
+    "JPM": 0.04,    # 4% JPMorgan
+}
+
+# Connect to testnet
+pool = SignalPool(network="testnet")
+
+# Submit signal
+result = pool.submit_signal(
+    portfolio=portfolio,
+    wallet=wallet,
+    stake_amount=10,  # 10 α stake
+    strategy_tag="momentum_v1"
+)
+
+print(f"Signal submitted!")
+print(f"Signal ID: {result.signal_id}")
+print(f"Status: {result.status}")
+```
+
+Run it:
+
+```bash
+python signal.py
+```
+
+Output:
+```
+Signal submitted!
+Signal ID: sig_abc123def456
+Status: COMMITTED
+```
+
+## Step 5: Monitor Your Signal
+
+Check your signal's status:
+
+```bash
+quanta signal status sig_abc123def456
+```
+
+Output:
+```
+Signal: sig_abc123def456
+Status: ACTIVE
+Submitted: 2025-01-15 10:30:00 UTC
+Stake: 10 α
+
+Performance (7-day):
+  Return: +2.3%
+  Sortino: 1.85
+  Max Drawdown: 3.2%
+  Rank: 45/230
+
+Rewards (pending):
+  TAO: 0.15 TAO
+  α-tokens: 2.3 α
+```
+
+## Step 6: View Leaderboard
+
+See how you stack up:
+
+```bash
+quanta leaderboard --limit 10
+```
+
+Output:
+```
+QUANTA Leaderboard (7-day)
+═══════════════════════════════════════════════════════
+Rank │ Signal ID      │ Sortino │ Return │ Max DD │
+═══════════════════════════════════════════════════════
+  1  │ sig_top001     │   3.42  │ +5.8%  │  2.1%  │
+  2  │ sig_pro002     │   3.15  │ +4.9%  │  2.8%  │
+  3  │ sig_alpha03    │   2.98  │ +4.2%  │  3.0%  │
+  ...
+ 45  │ sig_abc123*    │   1.85  │ +2.3%  │  3.2%  │
+═══════════════════════════════════════════════════════
+* Your signal
+```
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Miner Setup" icon="hammer" href="/guides/miner-setup">
+    Full mining setup for serious participants
+  </Card>
+  <Card title="Signal Strategies" icon="lightbulb" href="/guides/signal-strategies">
+    Learn how to build winning strategies
+  </Card>
+  <Card title="Validator Setup" icon="shield-check" href="/guides/validator-setup">
+    Run infrastructure and earn rewards
+  </Card>
+  <Card title="API Reference" icon="code" href="/reference/api">
+    Build custom integrations
+  </Card>
+</CardGroup>
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="'No module named quanta' error">
+    Make sure you installed the package:
+    ```bash
+    pip install quanta-cli
+    ```
+
+    If using a virtual environment, ensure it's activated.
+  </Accordion>
+
+  <Accordion title="'Insufficient balance' error">
+    You need α-tokens to stake. For testnet:
+    ```bash
+    quanta faucet request --wallet mywallet
+    ```
+
+    For mainnet, acquire α-tokens from a DEX.
+  </Accordion>
+
+  <Accordion title="'Invalid ticker' error">
+    Your portfolio contains a ticker not in the approved universe. Check valid tickers:
+    ```bash
+    quanta universe list
+    ```
+  </Accordion>
+
+  <Accordion title="'Commit window closed' error">
+    You missed the submission window. Windows open every hour:
+    ```bash
+    quanta epoch status
+    # Shows next commit window
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Summary
+
+In this quickstart, you:
+
+1. ✅ Installed QUANTA CLI
+2. ✅ Created a wallet
+3. ✅ Got testnet tokens
+4. ✅ Submitted your first signal
+5. ✅ Monitored performance
+
+You're now participating in decentralized alpha generation!
+
+<Info>
+**Testnet vs Mainnet:** Everything you learned here works on mainnet. The only differences are real tokens and real money. Practice on testnet until you're confident.
+</Info>

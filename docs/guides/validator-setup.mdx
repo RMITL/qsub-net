@@ -1,0 +1,505 @@
+---
+title: "Validator Setup"
+description: "Complete guide to running a QUANTA validator"
+---
+
+# Validator Setup Guide
+
+Validators are the backbone of QUANTA, responsible for evaluating signals, maintaining consensus, and distributing rewards.
+
+## Requirements
+
+### Hardware
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 8 cores | 16+ cores |
+| RAM | 32 GB | 64+ GB |
+| Storage | 500 GB NVMe | 1 TB NVMe |
+| Network | 1 Gbps | 10 Gbps |
+| Uptime | 99% | 99.9%+ |
+
+### Software
+
+- Ubuntu 22.04 LTS (recommended)
+- Python 3.10+
+- Bittensor CLI
+- Market data subscription
+
+### Economic
+
+| Requirement | Amount | Purpose |
+|-------------|--------|---------|
+| TAO | 1,000+ | Subnet registration + staking |
+| α-tokens | 10,000+ | Validator staking |
+| Operating costs | ~$200/month | Server + data feeds |
+
+---
+
+## Step 1: Server Setup
+
+### Provision Server
+
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install dependencies
+sudo apt install -y python3.10 python3-pip git build-essential
+
+# Install Bittensor
+pip install bittensor
+```
+
+### Configure Firewall
+
+```bash
+# Allow SSH
+sudo ufw allow 22
+
+# Allow Bittensor P2P
+sudo ufw allow 9944
+sudo ufw allow 30333
+
+# Enable firewall
+sudo ufw enable
+```
+
+---
+
+## Step 2: Wallet Setup
+
+### Create Validator Wallet
+
+```bash
+# Create coldkey (KEEP OFFLINE AFTER SETUP)
+btcli wallet create --wallet.name validator
+
+# Create hotkey for daily operations
+btcli wallet new_hotkey --wallet.name validator --wallet.hotkey validator_hotkey
+```
+
+<Warning>
+**CRITICAL SECURITY:**
+- Coldkey controls your funds - keep it on an air-gapped machine
+- Only hotkey should be on the validator server
+- Never expose coldkey mnemonic
+</Warning>
+
+### Transfer Hotkey to Server
+
+```bash
+# On cold machine: export hotkey
+btcli wallet export \
+    --wallet.name validator \
+    --wallet.hotkey validator_hotkey \
+    --output hotkey_export.json
+
+# Transfer to server (secure channel)
+scp hotkey_export.json validator@server:~/
+
+# On server: import hotkey
+btcli wallet import --input hotkey_export.json
+```
+
+---
+
+## Step 3: Fund Wallet
+
+### Transfer TAO
+
+```bash
+# Check required stake
+btcli subnet info --netuid X
+
+# Transfer TAO to validator coldkey
+# Use your preferred method (exchange, wallet transfer)
+
+# Verify balance
+btcli wallet balance --wallet.name validator
+```
+
+### Acquire α-tokens
+
+Validators need α-tokens for staking:
+
+1. **Purchase on DEX** - α/TAO pair on SushiSwap
+2. **Earn through mining** - Run a miner first
+3. **Ecosystem grants** - Apply for validator grants
+
+---
+
+## Step 4: Register as Validator
+
+```bash
+# Register on QUANTA subnet
+btcli subnet register \
+    --netuid X \
+    --wallet.name validator \
+    --wallet.hotkey validator_hotkey
+
+# Stake TAO (increases consensus weight)
+btcli stake add \
+    --wallet.name validator \
+    --wallet.hotkey validator_hotkey \
+    --amount 1000
+```
+
+Verify registration:
+
+```bash
+btcli subnet metagraph --netuid X | grep validator_hotkey
+```
+
+---
+
+## Step 5: Install QUANTA Validator
+
+```bash
+# Clone repository
+git clone https://github.com/RMITL/QUANTA
+cd QUANTA
+
+# Install validator requirements
+pip install -r requirements-validator.txt
+
+# Copy configuration
+cp config.validator.example.yaml config.yaml
+```
+
+### Configure Validator
+
+```yaml
+# config.yaml
+network:
+  netuid: X
+  network: mainnet
+
+wallet:
+  name: validator
+  hotkey: validator_hotkey
+
+validator:
+  # Data sources
+  primary_data_source: polygon
+  backup_data_source: alpha_vantage
+
+  # API keys
+  polygon_api_key: ${POLYGON_API_KEY}
+  alpha_vantage_key: ${ALPHA_VANTAGE_KEY}
+
+  # Evaluation settings
+  evaluation_batch_size: 100
+  consensus_timeout: 120  # seconds
+
+  # Staking
+  alpha_stake_amount: 10000  # α-tokens
+
+logging:
+  level: INFO
+  file: /var/log/quanta/validator.log
+```
+
+### Set Environment Variables
+
+```bash
+# /etc/environment or ~/.bashrc
+export POLYGON_API_KEY="your_polygon_key"
+export ALPHA_VANTAGE_KEY="your_av_key"
+```
+
+---
+
+## Step 6: Stake α-tokens
+
+```python
+from quanta import ValidatorStaking, Wallet
+
+# Load wallet
+wallet = Wallet.load("validator")
+
+# Initialize staking
+staking = ValidatorStaking(network="mainnet")
+
+# Stake α-tokens
+tx = staking.stake(
+    wallet=wallet,
+    amount=10000,  # 10,000 α minimum
+)
+
+print(f"Staked 10,000 α")
+print(f"Transaction: {tx.hash}")
+```
+
+---
+
+## Step 7: Run Validator
+
+### Development Mode
+
+```bash
+python -m quanta.validator \
+    --config config.yaml \
+    --wallet.name validator \
+    --wallet.hotkey validator_hotkey
+```
+
+### Production Mode (systemd)
+
+```ini
+# /etc/systemd/system/quanta-validator.service
+[Unit]
+Description=QUANTA Validator
+After=network.target
+
+[Service]
+Type=simple
+User=quanta
+Group=quanta
+WorkingDirectory=/home/quanta/QUANTA
+Environment="POLYGON_API_KEY=your_key"
+Environment="ALPHA_VANTAGE_KEY=your_key"
+ExecStart=/usr/bin/python -m quanta.validator --config config.yaml
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/log/quanta /home/quanta/QUANTA/data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable quanta-validator
+sudo systemctl start quanta-validator
+sudo systemctl status quanta-validator
+```
+
+---
+
+## Step 8: Monitor Operations
+
+### Log Monitoring
+
+```bash
+# Real-time logs
+journalctl -u quanta-validator -f
+
+# Or custom log file
+tail -f /var/log/quanta/validator.log
+```
+
+### Performance Dashboard
+
+```bash
+# Check validator metrics
+quanta validator status
+
+# Expected output:
+# Validator: validator_hotkey
+# Status: ACTIVE
+# Stake: 1,000 TAO + 10,000 α
+# Consensus Alignment: 98.5%
+# Signals Evaluated: 1,234
+# Rewards (24h): 2.5 TAO + 45 α
+```
+
+### Health Checks
+
+```python
+# health_check.py
+import requests
+from quanta import Validator
+
+def check_health():
+    validator = Validator.status()
+
+    checks = {
+        "data_feed": validator.data_feed_connected,
+        "consensus": validator.consensus_alignment > 0.90,
+        "uptime": validator.uptime_24h > 0.99,
+        "stake": validator.alpha_stake >= 10000,
+    }
+
+    for check, passed in checks.items():
+        status = "✓" if passed else "✗"
+        print(f"{status} {check}")
+
+    return all(checks.values())
+
+if __name__ == "__main__":
+    healthy = check_health()
+    exit(0 if healthy else 1)
+```
+
+### Alerting
+
+```yaml
+# prometheus/alerts.yml
+groups:
+  - name: quanta-validator
+    rules:
+      - alert: ValidatorDown
+        expr: quanta_validator_up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "QUANTA validator is down"
+
+      - alert: ConsensusDeviation
+        expr: quanta_consensus_alignment < 0.90
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Validator consensus alignment below 90%"
+
+      - alert: MissedEvaluations
+        expr: rate(quanta_missed_evaluations[1h]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Validator missing signal evaluations"
+```
+
+---
+
+## Validator Operations
+
+### Daily Checklist
+
+- [ ] Check consensus alignment (>95%)
+- [ ] Verify data feed connectivity
+- [ ] Review error logs
+- [ ] Check stake balances
+- [ ] Monitor resource usage
+
+### Weekly Checklist
+
+- [ ] Review performance metrics
+- [ ] Update software if needed
+- [ ] Backup configuration
+- [ ] Check reward accumulation
+- [ ] Review network announcements
+
+### Slashing Prevention
+
+| Risk | Mitigation |
+|------|------------|
+| Extended downtime | Redundant infrastructure |
+| Consensus deviation | Regular calibration |
+| Data manipulation | Use approved sources only |
+| Software bugs | Update promptly |
+
+---
+
+## Rewards
+
+### Earning Structure
+
+| Source | Share | Notes |
+|--------|-------|-------|
+| TAO Emissions | 41% of subnet | Stake-weighted |
+| α-Token Staking | Variable APY | 12-18% target |
+| Protocol Fees | Share of rake | Performance-based |
+
+### Claiming Rewards
+
+```bash
+# TAO rewards (automatic)
+btcli wallet balance --wallet.name validator
+
+# α-token rewards
+quanta validator claim-rewards --wallet validator
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'Consensus deviation' warnings">
+    Your scores differ from network consensus.
+
+    **Causes:**
+    - Different data source
+    - Clock drift
+    - Software version mismatch
+
+    **Fix:**
+    ```bash
+    # Sync time
+    sudo timedatectl set-ntp on
+
+    # Update software
+    git pull && pip install -r requirements-validator.txt
+
+    # Verify data source
+    quanta validator test-data-feed
+    ```
+  </Accordion>
+
+  <Accordion title="'Insufficient stake' error">
+    Need more α-tokens staked.
+
+    ```bash
+    # Check current stake
+    quanta validator stake-status
+
+    # Add more stake
+    quanta validator add-stake --amount 5000
+    ```
+  </Accordion>
+
+  <Accordion title="High resource usage">
+    Validator consuming too much CPU/RAM.
+
+    **Optimize:**
+    ```yaml
+    # config.yaml
+    validator:
+      evaluation_batch_size: 50  # Reduce from 100
+      parallel_evaluations: 4   # Limit parallelism
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Security Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Coldkey Isolation" icon="lock">
+    Keep coldkey on air-gapped machine, only hotkey on server
+  </Card>
+  <Card title="Regular Backups" icon="hard-drive">
+    Backup configuration and hotkey weekly to secure location
+  </Card>
+  <Card title="Update Promptly" icon="rotate">
+    Apply security updates within 24 hours of release
+  </Card>
+  <Card title="Monitor Logs" icon="eye">
+    Set up alerting for suspicious activity
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scoring Methodology" icon="calculator" href="/concepts/scoring">
+    Understand what you're evaluating
+  </Card>
+  <Card title="Bittensor Integration" icon="link" href="/concepts/bittensor-integration">
+    Deep dive into consensus mechanics
+  </Card>
+</CardGroup>

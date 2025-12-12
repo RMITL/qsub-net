@@ -1,0 +1,481 @@
+---
+title: "Miner Setup"
+description: "Complete guide to running a QUANTA miner"
+---
+
+# Miner Setup Guide
+
+This guide covers everything you need to run a QUANTA miner, from basic setup to advanced automation.
+
+## Choose Your Path
+
+<CardGroup cols={2}>
+  <Card title="Pool Participant" icon="users">
+    **Easiest entry point**
+
+    Submit signals to the Signal Pool without running infrastructure.
+
+    - No UID required
+    - Minimal setup
+    - Pool operator fee (~15%)
+  </Card>
+  <Card title="Direct Miner" icon="server">
+    **Maximum control**
+
+    Register a UID and submit directly to validators.
+
+    - Full rewards (no fees)
+    - More setup required
+    - Infrastructure costs
+  </Card>
+</CardGroup>
+
+## Option A: Pool Participant
+
+### Requirements
+
+- Python 3.9+
+- α-tokens for staking
+- Internet connection
+
+### Step 1: Install SDK
+
+```bash
+pip install quanta-sdk
+```
+
+### Step 2: Configure Wallet
+
+```python
+from quanta import Wallet
+
+# Create or load wallet
+wallet = Wallet.create("my_signal_wallet")
+# or
+wallet = Wallet.load("path/to/existing/wallet")
+
+print(f"Address: {wallet.address}")
+```
+
+### Step 3: Connect to Pool
+
+```python
+from quanta import SignalPool
+
+# Connect to mainnet pool
+pool = SignalPool(
+    network="mainnet",
+    operator="default"  # Use default pool operator
+)
+
+# Check pool status
+status = pool.status()
+print(f"Active signals: {status.active_signals}")
+print(f"Pool fee: {status.operator_fee}%")
+```
+
+### Step 4: Submit Signals
+
+```python
+def generate_my_signal():
+    """Your signal generation logic"""
+    return {
+        "AAPL": 0.10,
+        "MSFT": 0.08,
+        # ... your positions
+    }
+
+# Submit
+result = pool.submit_signal(
+    portfolio=generate_my_signal(),
+    wallet=wallet,
+    stake_amount=15,  # α-tokens
+    strategy_tag="my_strategy_v1"
+)
+```
+
+### Step 5: Automate
+
+```python
+import schedule
+import time
+
+def hourly_submission():
+    portfolio = generate_my_signal()
+    pool.submit_signal(portfolio, wallet, stake_amount=15)
+    print(f"Signal submitted at {time.ctime()}")
+
+# Run every hour at :00
+schedule.every().hour.at(":00").do(hourly_submission)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+```
+
+---
+
+## Option B: Direct Miner
+
+### Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 4 cores | 8+ cores |
+| RAM | 16 GB | 32+ GB |
+| Storage | 100 GB SSD | 500 GB NVMe |
+| Network | 100 Mbps | 1 Gbps |
+| TAO | Registration cost | + staking buffer |
+| α-tokens | Signal stakes | + reserve |
+
+### Step 1: Install Bittensor
+
+```bash
+# Install Bittensor
+pip install bittensor
+
+# Verify
+btcli --version
+```
+
+### Step 2: Create Wallet
+
+```bash
+# Create coldkey (keep secure!)
+btcli wallet create --wallet.name miner_wallet
+
+# Create hotkey
+btcli wallet new_hotkey --wallet.name miner_wallet --wallet.hotkey default
+
+# Verify
+btcli wallet list
+```
+
+<Warning>
+**CRITICAL:** Backup your coldkey mnemonic immediately. Store it offline in multiple secure locations.
+</Warning>
+
+### Step 3: Fund Wallet
+
+Transfer TAO for registration:
+
+```bash
+# Check required registration cost
+btcli subnet info --netuid X
+
+# Check balance
+btcli wallet balance --wallet.name miner_wallet
+```
+
+### Step 4: Register on Subnet
+
+```bash
+btcli subnet register \
+    --netuid X \
+    --wallet.name miner_wallet \
+    --wallet.hotkey default
+```
+
+Output:
+```
+Registering on subnet X...
+Registration successful!
+UID: 42
+```
+
+### Step 5: Install QUANTA Miner
+
+```bash
+# Clone repository
+git clone https://github.com/RMITL/QUANTA
+cd QUANTA
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure
+cp config.example.yaml config.yaml
+```
+
+### Step 6: Configure Miner
+
+Edit `config.yaml`:
+
+```yaml
+# config.yaml
+network:
+  netuid: X  # QUANTA subnet ID
+  network: mainnet  # or testnet
+
+wallet:
+  name: miner_wallet
+  hotkey: default
+
+miner:
+  signal_source: custom  # or 'file', 'api'
+  signal_file: signals/portfolio.json  # if using file
+  update_frequency: 3600  # seconds
+
+  # Custom signal generator
+  custom_module: my_signals
+  custom_function: generate_portfolio
+
+logging:
+  level: INFO
+  file: logs/miner.log
+```
+
+### Step 7: Create Signal Generator
+
+```python
+# my_signals.py
+
+def generate_portfolio():
+    """
+    Your proprietary signal generation logic.
+
+    Returns:
+        dict: Ticker -> weight mapping
+    """
+    # Example: Simple momentum
+    from quanta.data import get_momentum_scores
+
+    scores = get_momentum_scores(lookback_days=30)
+    top_50 = scores.nlargest(50)
+    bottom_50 = scores.nsmallest(50)
+
+    portfolio = {}
+
+    # Long top momentum
+    for ticker, score in top_50.items():
+        portfolio[ticker] = 0.02  # 2% each
+
+    # Short bottom momentum
+    for ticker, score in bottom_50.items():
+        portfolio[ticker] = -0.01  # 1% short each
+
+    return portfolio
+```
+
+### Step 8: Run Miner
+
+```bash
+# Start miner
+python -m quanta.miner \
+    --config config.yaml \
+    --wallet.name miner_wallet
+
+# Or with PM2 for production
+pm2 start "python -m quanta.miner --config config.yaml" --name quanta-miner
+```
+
+### Step 9: Monitor
+
+```bash
+# Check status
+quanta miner status
+
+# View logs
+tail -f logs/miner.log
+
+# Check on-chain
+btcli subnet metagraph --netuid X
+```
+
+---
+
+## Signal Generation Strategies
+
+### Data Sources
+
+<Tabs>
+  <Tab title="Free Sources">
+    ```python
+    import yfinance as yf
+
+    def get_prices(tickers, period="1mo"):
+        data = yf.download(tickers, period=period)
+        return data['Adj Close']
+    ```
+  </Tab>
+  <Tab title="Premium Sources">
+    ```python
+    import polygon
+
+    client = polygon.RESTClient(api_key="YOUR_KEY")
+
+    def get_prices(tickers, days=30):
+        prices = {}
+        for ticker in tickers:
+            bars = client.get_aggs(ticker, 1, "day", days_ago(days), today())
+            prices[ticker] = [b.close for b in bars]
+        return prices
+    ```
+  </Tab>
+</Tabs>
+
+### Strategy Examples
+
+<AccordionGroup>
+  <Accordion title="Momentum Strategy" icon="chart-line">
+    ```python
+    def momentum_signal(prices, lookback=30):
+        returns = prices.pct_change(lookback)
+        ranked = returns.iloc[-1].rank(pct=True)
+
+        portfolio = {}
+        for ticker, pct_rank in ranked.items():
+            if pct_rank > 0.8:  # Top 20%
+                portfolio[ticker] = 0.03
+            elif pct_rank < 0.2:  # Bottom 20%
+                portfolio[ticker] = -0.02
+
+        return portfolio
+    ```
+  </Accordion>
+
+  <Accordion title="Mean Reversion" icon="arrows-rotate">
+    ```python
+    def mean_reversion_signal(prices, lookback=20):
+        sma = prices.rolling(lookback).mean()
+        deviation = (prices.iloc[-1] - sma.iloc[-1]) / sma.iloc[-1]
+
+        portfolio = {}
+        for ticker, dev in deviation.items():
+            if dev < -0.05:  # 5% below SMA - buy
+                portfolio[ticker] = 0.03
+            elif dev > 0.05:  # 5% above SMA - short
+                portfolio[ticker] = -0.02
+
+        return portfolio
+    ```
+  </Accordion>
+
+  <Accordion title="Value Factor" icon="scale-balanced">
+    ```python
+    def value_signal(fundamentals):
+        # PE ratio
+        pe_rank = fundamentals['pe_ratio'].rank(ascending=True)
+
+        # Book to market
+        btm_rank = fundamentals['book_to_market'].rank(ascending=False)
+
+        # Composite
+        value_score = (pe_rank + btm_rank) / 2
+
+        portfolio = {}
+        for ticker, score in value_score.nlargest(50).items():
+            portfolio[ticker] = 0.02
+
+        return portfolio
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Production Deployment
+
+### Systemd Service
+
+```ini
+# /etc/systemd/system/quanta-miner.service
+[Unit]
+Description=QUANTA Miner
+After=network.target
+
+[Service]
+Type=simple
+User=quanta
+WorkingDirectory=/home/quanta/QUANTA
+ExecStart=/usr/bin/python -m quanta.miner --config config.yaml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+
+```bash
+sudo systemctl enable quanta-miner
+sudo systemctl start quanta-miner
+sudo systemctl status quanta-miner
+```
+
+### Monitoring
+
+Set up alerts for:
+
+| Event | Action |
+|-------|--------|
+| Miner offline > 10 min | Page on-call |
+| Score dropped > 20% | Notify via Slack |
+| Missed submission | Auto-retry + alert |
+| Balance low | Notify to refill |
+
+### Backup Strategy
+
+```bash
+# Backup wallet (encrypted)
+btcli wallet export --wallet.name miner_wallet --output backup.json
+
+# Store securely
+gpg --encrypt --recipient your@email.com backup.json
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'UID not registered' error">
+    Your UID was deregistered due to low performance or inactivity.
+
+    ```bash
+    # Check registration status
+    btcli subnet metagraph --netuid X | grep YOUR_HOTKEY
+
+    # Re-register
+    btcli subnet register --netuid X --wallet.name miner_wallet
+    ```
+  </Accordion>
+
+  <Accordion title="'Connection refused' errors">
+    Cannot connect to validators.
+
+    ```bash
+    # Check network
+    ping validator.qsub.net
+
+    # Check firewall
+    sudo ufw status
+
+    # Check Bittensor connectivity
+    btcli subnet metagraph --netuid X
+    ```
+  </Accordion>
+
+  <Accordion title="Low scores despite good backtests">
+    Common causes:
+
+    1. **Overfitting** - Backtest too good to be true
+    2. **Look-ahead bias** - Using future data in backtest
+    3. **Transaction costs** - Not modeled in backtest
+    4. **Slippage** - Real execution differs from backtest
+
+    Solution: Use out-of-sample testing and realistic cost models.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Signal Strategies" icon="lightbulb" href="/guides/signal-strategies">
+    Advanced strategy development
+  </Card>
+  <Card title="Scoring Deep Dive" icon="calculator" href="/concepts/scoring">
+    Optimize for QUANTA's metrics
+  </Card>
+</CardGroup>

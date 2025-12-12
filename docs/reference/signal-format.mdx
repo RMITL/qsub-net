@@ -1,0 +1,369 @@
+---
+title: "Signal Format"
+description: "Technical specification for QUANTA signal submissions"
+---
+
+# Signal Format Specification
+
+This document provides the complete technical specification for QUANTA signal submissions.
+
+## Portfolio Vector
+
+### Schema
+
+```json
+{
+  "portfolio": {
+    "type": "object",
+    "description": "Ticker to weight mapping",
+    "additionalProperties": {
+      "type": "number",
+      "minimum": -1.0,
+      "maximum": 1.0
+    },
+    "minProperties": 1
+  },
+  "metadata": {
+    "type": "object",
+    "properties": {
+      "strategy_tag": { "type": "string", "maxLength": 64 },
+      "rebalance_freq": { "enum": ["hourly", "daily", "weekly"] },
+      "signal_version": { "type": "string" }
+    }
+  }
+}
+```
+
+<Note>
+QUANTA is a **flexible protocol**. The only hard requirements are:
+- Weights must sum to 1.0 (±0.001)
+- All tickers must have a validator price feed
+- Ante must be > 0
+
+Everything else (portfolio size, concentration, strategy) is **miner's choice**.
+</Note>
+
+### Example
+
+```json
+{
+  "portfolio": {
+    "AAPL": 0.08,
+    "MSFT": 0.07,
+    "GOOGL": 0.06,
+    "AMZN": 0.05,
+    "NVDA": 0.10,
+    "META": 0.04,
+    "TSLA": -0.05,
+    "JPM": 0.03,
+    "V": 0.03,
+    "MA": 0.03
+  },
+  "metadata": {
+    "strategy_tag": "momentum_v2",
+    "rebalance_freq": "daily",
+    "signal_version": "1.0.0"
+  }
+}
+```
+
+## Core Requirements
+
+The only **hard requirements** enforced by the protocol:
+
+| Requirement | Value | Rationale |
+|-------------|-------|-----------|
+| Weight sum | 1.0 (±0.001) | Mathematical necessity for scoring |
+| Ticker validity | Must have price feed | Validators must be able to score |
+| Ante | > 0 α-tokens | Skin in the game |
+
+### Validation Rules
+
+```python
+def validate_portfolio(portfolio: dict, eligible_tickers: set) -> tuple[bool, str]:
+    """
+    Validate a portfolio submission.
+
+    QUANTA uses minimal validation - only core protocol requirements.
+    """
+    # Weight sum must equal 1.0
+    total = sum(portfolio.values())
+    if abs(total - 1.0) > 0.001:
+        return False, f"Weights sum to {total:.4f}, must be 1.0 ±0.001"
+
+    # All tickers must be priceable
+    for ticker in portfolio.keys():
+        if ticker not in eligible_tickers:
+            return False, f"Ticker {ticker} not available in price feed"
+
+    return True, ""
+```
+
+## Ticker Eligibility
+
+### Available Tickers
+
+A ticker is eligible if validators can provide a reliable price feed. The validator network maintains the current list.
+
+```python
+from quanta import Universe
+
+# Get current priceable tickers
+universe = Universe.current()
+
+print(f"Available tickers: {len(universe)}")
+print(f"Last updated: {universe.updated_at}")
+
+# Check if ticker has price feed
+if "AAPL" in universe:
+    print("AAPL is available")
+```
+
+### Coverage
+
+Validators currently support:
+- U.S. equities (NYSE, NASDAQ, ARCA)
+- U.S.-listed ETFs
+- American Depositary Receipts (ADRs)
+
+<Note>
+The universe reflects what validators **can** price, not what miners **should** choose. Miners bear all risk for their ticker selections.
+</Note>
+
+## Submission Protocol
+
+### Commit Phase
+
+```python
+from quanta import SignalPool
+import hashlib
+
+def create_commitment(portfolio: dict, nonce: bytes) -> str:
+    """
+    Create cryptographic commitment for portfolio.
+    """
+    # Serialize portfolio deterministically
+    sorted_items = sorted(portfolio.items())
+    portfolio_bytes = str(sorted_items).encode('utf-8')
+
+    # Combine with nonce
+    commitment_input = portfolio_bytes + nonce
+
+    # SHA-256 hash
+    commitment = hashlib.sha256(commitment_input).hexdigest()
+
+    return commitment
+
+# Usage
+import os
+
+portfolio = {"AAPL": 0.10, "MSFT": 0.08}
+nonce = os.urandom(32)
+
+commitment = create_commitment(portfolio, nonce)
+# Store nonce securely for reveal phase!
+```
+
+### Reveal Phase
+
+```python
+def reveal_signal(pool: SignalPool, portfolio: dict, nonce: bytes,
+                  commitment_id: str, wallet) -> dict:
+    """
+    Reveal previously committed signal.
+    """
+    # Verify commitment matches
+    expected = create_commitment(portfolio, nonce)
+    stored = pool.get_commitment(commitment_id)
+
+    if expected != stored.hash:
+        raise ValueError("Commitment mismatch - portfolio changed?")
+
+    # Submit reveal
+    result = pool.reveal(
+        commitment_id=commitment_id,
+        portfolio=portfolio,
+        nonce=nonce,
+        signature=wallet.sign(portfolio)
+    )
+
+    return result
+```
+
+## Cryptographic Signing
+
+### Signature Format
+
+Signals must be signed with your wallet's private key:
+
+```python
+from quanta.crypto import sign_portfolio
+
+def sign_portfolio(portfolio: dict, private_key: bytes) -> str:
+    """
+    Sign portfolio for submission.
+
+    Returns:
+        Base64-encoded signature
+    """
+    import nacl.signing
+
+    # Serialize portfolio
+    message = serialize_portfolio(portfolio)
+
+    # Sign with Ed25519
+    signing_key = nacl.signing.SigningKey(private_key)
+    signature = signing_key.sign(message)
+
+    return base64.b64encode(signature.signature).decode('utf-8')
+```
+
+### Verification
+
+Validators verify signatures:
+
+```python
+def verify_signature(portfolio: dict, signature: str, public_key: str) -> bool:
+    """
+    Verify portfolio signature.
+    """
+    import nacl.signing
+
+    message = serialize_portfolio(portfolio)
+    sig_bytes = base64.b64decode(signature)
+    pub_bytes = base64.b64decode(public_key)
+
+    verify_key = nacl.signing.VerifyKey(pub_bytes)
+
+    try:
+        verify_key.verify(message, sig_bytes)
+        return True
+    except nacl.exceptions.BadSignature:
+        return False
+```
+
+## Timestamp Requirements
+
+| Field | Format | Requirements |
+|-------|--------|--------------|
+| submission_time | Unix timestamp (seconds) | Within ±60s of block time |
+| valid_from | Unix timestamp | Must be future epoch start |
+| valid_until | Unix timestamp | Max 7 days from submission |
+
+```python
+import time
+
+submission = {
+    "portfolio": {...},
+    "timestamps": {
+        "submission_time": int(time.time()),
+        "valid_from": next_epoch_start(),
+        "valid_until": next_epoch_start() + 7 * 24 * 3600
+    }
+}
+```
+
+## Update Protocol
+
+### Signal Updates
+
+Existing signals can be updated with new weights:
+
+```python
+result = pool.update_signal(
+    signal_id="sig_abc123",
+    new_portfolio={"AAPL": 0.12, "MSFT": 0.06, ...},
+    wallet=wallet
+)
+```
+
+### Update Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Min time between updates | 1 hour |
+| Stake adjustment | Required if exposure changes |
+| Track record | Continues from original signal |
+
+## Error Codes
+
+| Code | Name | Description |
+|------|------|-------------|
+| `E001` | INVALID_TICKER | Ticker not in universe |
+| `E002` | POSITION_EXCEEDED | Single position > 20% |
+| `E003` | EXPOSURE_EXCEEDED | Gross exposure > 200% |
+| `E004` | INSUFFICIENT_POSITIONS | Fewer than 10 positions |
+| `E005` | INSUFFICIENT_STAKE | Stake below required |
+| `E006` | COMMITMENT_MISMATCH | Reveal doesn't match commit |
+| `E007` | WINDOW_CLOSED | Submission window ended |
+| `E008` | SIGNATURE_INVALID | Signature verification failed |
+| `E009` | DUPLICATE_SIGNAL | Signal already exists |
+| `E010` | STAKE_LOCKED | Cannot withdraw during lock |
+
+## SDK Reference
+
+### Python SDK
+
+```python
+from quanta import SignalPool, Wallet
+
+# Initialize
+pool = SignalPool(network="mainnet")
+wallet = Wallet.load("my_wallet")
+
+# Submit signal
+result = pool.submit_signal(
+    portfolio={"AAPL": 0.10, ...},
+    wallet=wallet,
+    stake_amount=15,
+    strategy_tag="my_strategy"
+)
+
+# Check status
+status = pool.get_signal(result.signal_id)
+
+# Update signal
+pool.update_signal(
+    signal_id=result.signal_id,
+    new_portfolio={"AAPL": 0.12, ...},
+    wallet=wallet
+)
+
+# Withdraw signal
+pool.withdraw_signal(
+    signal_id=result.signal_id,
+    wallet=wallet
+)
+```
+
+### TypeScript SDK
+
+```typescript
+import { SignalPool, Wallet } from '@quanta/sdk';
+
+// Initialize
+const pool = new SignalPool({ network: 'mainnet' });
+const wallet = await Wallet.load('my_wallet');
+
+// Submit signal
+const result = await pool.submitSignal({
+  portfolio: { AAPL: 0.10, ... },
+  wallet,
+  stakeAmount: 15,
+  strategyTag: 'my_strategy'
+});
+
+// Check status
+const status = await pool.getSignal(result.signalId);
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/reference/api">
+    Complete API documentation
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/reference/cli">
+    Command-line interface
+  </Card>
+</CardGroup>

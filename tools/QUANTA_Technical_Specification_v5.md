@@ -82,7 +82,7 @@ Validators independently execute signals in simulated environments, tracking:
 
 **Economic Design:**
 The α-token serves multiple functions:
-1. **Validator Staking**: Required collateral (minimum 10,000α) to participate in validation; miners require minimum 100α ante for signal submissions
+1. **Validator Staking**: Required collateral to participate in validation; miners stake ante (any amount > 0) for signal submissions
 2. **Performance Proxy**: Token value correlates with network-wide risk-adjusted returns
 3. **Governance Rights**: Weighted voting on protocol parameters and universe updates
 4. **Liquidity Incentives**: LP rewards for α/TAO and α/USDC pairs
@@ -139,7 +139,7 @@ Signal generators stake a proportional ante in α-tokens when submitting signals
 
 **Ante Flow:**
 ```
-All generators stake proportional ante (minimum 100α)
+All generators stake proportional ante (any amount > 0)
         ↓
 Network rake (8%) taken FIRST
         ↓
@@ -188,8 +188,7 @@ The dual model creates a self-sustaining flywheel: emissions keep infrastructure
 
 **Ecosystem Milestones:**
 - Month 3: Testnet launch with simulated markets
-- Month 6: Mainnet launch with top 100 liquid U.S. equities
-- Month 9: Expand to top 500 equities universe
+- Month 6: Mainnet launch with U.S. equities (all tickers with reliable price feeds)
 - Month 12: Integration with on-chain execution protocols
 - Month 18: Multi-asset class expansion (crypto, commodities)
 - Month 24: Institutional API and compliance framework
@@ -295,10 +294,9 @@ Despite these challenges, QUANTA represents a unique opportunity at the intersec
   - 5.2.3 Rebalancing Frequency
   - 5.2.4 Update Mechanisms
 - 5.3 Universe Management
-  - 5.3.1 Initial Universe: Top 500 U.S. Equities
-  - 5.3.2 Liquidity Requirements
-  - 5.3.3 Corporate Actions Handling
-  - 5.3.4 Universe Updates and Governance
+  - 5.3.1 Ticker Eligibility (Price Feed Availability)
+  - 5.3.2 Corporate Actions Handling
+  - 5.3.3 Universe Updates and Governance
 
 ### 6. Evaluation Methodology
 - 6.1 Multi-Horizon Framework
@@ -477,7 +475,7 @@ Despite these challenges, QUANTA represents a unique opportunity at the intersec
 | 2.5 | October 2025 | Technical Committee | Enhanced risk metrics, dTAO integration details |
 | 3.0 | November 2025 | Full Team | Comprehensive specification for mainnet launch |
 | 4.0 | December 2025 | Full Team | Added dual revenue architecture (pot + emissions), proportional ante model, pitch deck alignment |
-| 5.0 | December 2025 | Full Team | Parameter standardization (100α minimum ante, $2B market cap, 30/40/30 horizon weights), realistic 18-22 month roadmap, team requirements, budget specification, enhanced regulatory framework, empirical parameter justifications |
+| 5.0 | December 2025 | Full Team | Flexible protocol design (no fixed constraints on portfolio construction or ante), 30/40/30 horizon weights, realistic 18-22 month roadmap, team requirements, budget specification, enhanced regulatory framework, natural Sybil resistance via performance requirements |
 
 ### Contributors
 
@@ -1295,7 +1293,7 @@ Contributor Revenue_i = (Pool Revenue - Operator Fee) ×
 ```
 
 **UID Requirements:**
-- Minimum stake: 100 α-tokens (~$5K-$10K)
+- Ante required: Any amount > 0 (miner's choice based on risk appetite)
 - Uptime requirement: 99%+ availability
 - Performance threshold: Pool must rank in top 50% of all UIDs over 90-day window
 
@@ -1318,7 +1316,7 @@ Contributor Revenue_i = (Pool Revenue - Operator Fee) ×
    - No evidence of gaming or manipulation (validator screening)
 
 3. **Capital Commitment:**
-   - UID registration stake (100-1000 α-tokens)
+   - UID registration stake (α-tokens, amount varies)
    - Bonding requirement increases with subnet competitiveness
 
 **Advantages of Solo Mining:**
@@ -2119,9 +2117,9 @@ The QUANTA protocol accepts portfolio signals in a standardized JSON format that
 | `epoch_id` | string | Yes | Unique identifier for scoring period (format: YYYY-QQ-WWW) | Must match current epoch window |
 | `miner_hotkey` | string | Yes | Bittensor hotkey (SS58 format) | Must be registered subnet miner |
 | `timestamp` | string | Yes | ISO 8601 UTC timestamp | Must be within epoch window |
-| `tickers` | array[string] | Yes | Stock/ETF ticker symbols | 5-30 tickers, all uppercase |
+| `tickers` | array[string] | Yes | Stock/ETF ticker symbols | 1+ tickers, must have price feed |
 | `weights` | array[float] | Yes | Portfolio allocation weights | Must sum to 1.0 (±0.001) |
-| `ante_amount` | float | Yes | Stake amount in alpha-tokens | Minimum 100.0 α-tokens |
+| `ante_amount` | float | Yes | Stake amount in alpha-tokens | Any amount > 0 |
 | `ante_token` | string | Yes | Token identifier | Must be "ALPHA" |
 | `commitment_hash` | string | Yes | Keccak256 hash for commit-reveal | 66 chars (0x + 64 hex) |
 | `portfolio_hash` | string | Yes | Hash of tickers+weights for integrity | 66 chars (0x + 64 hex) |
@@ -2141,60 +2139,75 @@ The QUANTA protocol accepts portfolio signals in a standardized JSON format that
 }
 ```
 
-### 3.2 Signal Constraints & Validation Rules
+### 3.2 Signal Format & Validation
 
-All signal constraints are **governance-tunable parameters** that can be adjusted through the on-chain governance process (see Section 10). The values shown below represent the **default configuration** for QUANTA v1.0.
+QUANTA is designed as a **flexible framework protocol** where miners have full autonomy over their portfolio construction strategy. The protocol imposes minimal constraints—only those necessary for technical validation and scoring.
 
-#### 3.2.1 Portfolio Construction Constraints
+#### 3.2.1 Core Protocol Requirements
 
-| Parameter | Default Value | Governance | Rationale |
-|-----------|---------------|------------|-----------|
-| `PORTFOLIO_SIZE_MIN` | 5 tickers | Tunable | Prevents over-concentration |
-| `PORTFOLIO_SIZE_MAX` | 30 tickers | Tunable | Prevents over-diversification |
-| `WEIGHT_SUM_TARGET` | 1.0 (±0.001) | Fixed | Ensures full capital allocation |
-| `ELIGIBLE_UNIVERSE` | U.S. equities and ETFs | Tunable | Liquidity, data availability, regulatory clarity |
-| `MAX_SINGLE_POSITION` | 20% (0.20) | Tunable | Risk management, prevents single-stock dependency |
-| `MIN_SINGLE_POSITION` | 0.5% (0.005) | Tunable | Prevents dust positions that add complexity |
-| `MIN_ANTE` | 100 α-tokens | Tunable | Sybil resistance, meaningful skin-in-the-game (increased from 10α based on security analysis) |
-| `MAX_ANTE` | 1,000 α-tokens | Tunable | Prevents whale dominance |
-| `ALLOW_SHORT_POSITIONS` | false (v1.0) | Tunable | Simplified scoring; short positions planned for v2.0 |
+These are the **only mandatory requirements** enforced by the protocol:
 
-**Example Configuration**: The defaults above create a balanced system suitable for diversified long-only equity strategies while maintaining meaningful economic commitment through the ante mechanism.
+| Requirement | Value | Rationale |
+|-------------|-------|-----------|
+| `WEIGHT_SUM_TARGET` | 1.0 (±0.001) | Mathematical necessity for portfolio scoring |
+| `VALID_TICKER` | Must have validator price feed | Validators must be able to fetch prices to score the signal |
+| `ANTE_REQUIRED` | > 0 α-tokens | Skin-in-the-game; amount is miner's choice |
 
-#### 3.2.2 Ticker Eligibility Requirements
+**That's it.** Everything else is up to the miner.
 
-Eligible tickers must satisfy the criteria defined by governance-tunable eligibility parameters. The default configuration requires:
+#### 3.2.2 Miner Flexibility
 
-| Parameter | Default Value | Governance | Purpose |
-|-----------|---------------|------------|---------|
-| `ELIGIBLE_EXCHANGES` | NYSE, NASDAQ, ARCA | Tunable | Primary listing exchanges |
-| `MIN_MARKET_CAP` | $2B (30-day avg) | Tunable | Oracle manipulation resistance, institutional-grade liquidity (increased from $500M based on security analysis) |
-| `MIN_DAILY_VOLUME` | $100M value (30-day avg) | Tunable | Ensures executable positions with meaningful liquidity depth |
-| `MIN_PRICE` | $5.00 | Tunable | Excludes penny stocks |
-| `MAX_PRICE` | $10,000 | Tunable | Excludes extreme outliers |
-| `MIN_PRICE_HISTORY` | 90 days continuous | Tunable | Ensures sufficient scoring history |
-| `EXCLUDE_OTC` | true | Tunable | Excludes over-the-counter securities |
-| `ADR_MIN_VOLUME` | $1M daily | Tunable | Minimum volume for foreign ADRs |
+Miners have **complete freedom** in portfolio construction:
 
-**Example**: With defaults, approximately 2,500+ U.S. equities and 500+ ETFs qualify for the eligible universe.
+| Dimension | Miner Choice | Examples |
+|-----------|--------------|----------|
+| **Portfolio size** | 1 to unlimited tickers | Single stock "buy and hold AAPL" is valid |
+| **Position concentration** | 0.01% to 100% per ticker | 100% in one stock is valid |
+| **Ticker selection** | Any ticker with price feed | Large-cap, small-cap, ETFs, ADRs |
+| **Ante amount** | Any amount > 0 | Scale risk/reward to your confidence |
+| **Strategy type** | Any approach | Momentum, value, quant, fundamental, random |
 
-**Validation Endpoint**: Validators maintain a daily-updated whitelist available at:
+**The market is the filter.** Poor strategies will underperform and lose ante. Good strategies will outperform and earn rewards. The protocol doesn't impose opinions about what constitutes a "good" portfolio.
+
+#### 3.2.3 Ticker Eligibility
+
+A ticker is eligible if validators can provide a reliable price feed for it. The validator network maintains the set of priceable tickers based on data provider coverage.
+
+**Current Coverage** (validator-dependent):
+- U.S. equities (NYSE, NASDAQ, ARCA)
+- U.S.-listed ETFs
+- American Depositary Receipts (ADRs)
+
+**Validation Endpoint**: Validators publish available tickers at:
 ```
 https://quanta.subnet8.io/api/v1/eligible-tickers
 ```
 
-#### 3.2.3 Temporal Constraints
+This list reflects what validators *can* price, not what miners *should* choose. Miners bear all risk for their ticker selections—including liquidity risk, corporate action risk, and price feed reliability.
 
-| Parameter | Default Value | Governance | Purpose |
-|-----------|---------------|------------|---------|
-| `EPOCH_START` | 00:00 UTC Monday | Tunable | Epoch boundary alignment |
-| `EPOCH_END` | 16:00 UTC Friday | Tunable | Aligns with U.S. market close |
-| `COMMIT_MIN_DELAY` | 6 hours | Tunable | Minimum commitment period |
-| `COMMIT_MAX_DELAY` | 24 hours | Tunable | Maximum commitment period (reduced from 48h to prevent timing manipulation) |
-| `COMMIT_RECOMMENDED` | 12-18 hours | Advisory | Optimal security vs. flexibility |
-| `REVEAL_WINDOW` | 24 hours | Tunable | Time to reveal after commitment (mandatory reveal, 100% forfeit for non-reveal) |
-| `SCORING_LAG` | T+1 | Fixed | Prevents lookahead bias |
-| `RESUBMIT_COOLDOWN` | 1 epoch (7 days) | Tunable | Prevents hash collision gaming |
+#### 3.2.4 Example Strategies (Illustrative Only)
+
+These examples show the range of valid strategies. None are recommended or required:
+
+| Strategy | Tickers | Concentration | Ante | Risk Profile |
+|----------|---------|---------------|------|--------------|
+| Single stock conviction | 1 | 100% | 10α | High concentration risk |
+| Diversified large-cap | 20 | 5% each | 500α | Lower volatility |
+| Concentrated sector bet | 5 | 20% each | 100α | Sector-specific risk |
+| Broad market ETF | 1 (SPY) | 100% | 50α | Market beta only |
+| Small-cap value | 30 | ~3% each | 200α | Factor exposure |
+
+**The protocol scores all strategies equally** using the same Sharpe-weighted methodology. Performance determines rewards, not portfolio construction choices.
+
+#### 3.2.5 Temporal Requirements
+
+These timing parameters are protocol-level requirements for the commit-reveal mechanism:
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| `EPOCH_DURATION` | 7 days (Monday-Friday) | Weekly evaluation cycle aligned with U.S. markets |
+| `REVEAL_WINDOW` | 24 hours after commit | Mandatory reveal; 100% ante forfeit for non-reveal |
+| `SCORING_LAG` | T+1 | Prevents lookahead bias in scoring |
 
 ### 3.3 Commit-Reveal Protocol
 
@@ -2339,110 +2352,72 @@ def verify_commitment(reveal_data, original_commitment):
 
 ### 3.4 Signal Validation Rules
 
-#### 3.4.1 Pre-Commitment Validation (Client-Side)
+QUANTA validation is minimal by design. The protocol only enforces what is technically necessary for scoring.
 
-Before submitting commitment, miners SHOULD validate against the current governance parameters:
+#### 3.4.1 Client-Side Validation
+
+Miners should validate before submitting:
 
 ```python
-def validate_signal_pre_commitment(signal, params=None):
+def validate_signal(signal, eligible_tickers):
     """
-    Validate signal against governance-tunable parameters.
-    params: Dict of governance parameters (fetched from chain or API)
+    Minimal validation - only core protocol requirements.
     """
-    # Load governance parameters with defaults
-    if params is None:
-        params = fetch_governance_params()  # From chain or validator API
-
-    PORTFOLIO_SIZE_MIN = params.get('PORTFOLIO_SIZE_MIN', 5)
-    PORTFOLIO_SIZE_MAX = params.get('PORTFOLIO_SIZE_MAX', 30)
-    MAX_SINGLE_POSITION = params.get('MAX_SINGLE_POSITION', 0.20)
-    MIN_SINGLE_POSITION = params.get('MIN_SINGLE_POSITION', 0.005)
-    MIN_ANTE = params.get('MIN_ANTE', 100.0)
-    MAX_ANTE = params.get('MAX_ANTE', 1000.0)
-
     errors = []
 
-    # 1. Portfolio size (governance-tunable)
-    if not (PORTFOLIO_SIZE_MIN <= len(signal['tickers']) <= PORTFOLIO_SIZE_MAX):
-        errors.append(f"Portfolio must contain {PORTFOLIO_SIZE_MIN}-{PORTFOLIO_SIZE_MAX} tickers")
-
-    # 2. Weight sum (fixed constraint)
+    # 1. Weight sum must equal 1.0 (mathematical requirement)
     weight_sum = sum(signal['weights'])
     if abs(weight_sum - 1.0) > 0.001:
         errors.append(f"Weights sum to {weight_sum}, must be 1.0 ±0.001")
 
-    # 3. Single position limits (governance-tunable)
-    for i, weight in enumerate(signal['weights']):
-        if weight > MAX_SINGLE_POSITION:
-            errors.append(f"{signal['tickers'][i]} weight {weight} exceeds {MAX_SINGLE_POSITION*100:.0f}% max")
-        if weight < MIN_SINGLE_POSITION:
-            errors.append(f"{signal['tickers'][i]} weight {weight} below {MIN_SINGLE_POSITION*100:.1f}% min")
-
-    # 4. Ticker format (fixed constraint)
+    # 2. All tickers must be priceable by validators
     for ticker in signal['tickers']:
-        if not ticker.isupper() or not ticker.isalpha():
-            errors.append(f"Invalid ticker format: {ticker}")
+        if ticker not in eligible_tickers:
+            errors.append(f"{ticker} not available in validator price feed")
 
-    # 5. No duplicates (fixed constraint)
+    # 3. No duplicate tickers
     if len(signal['tickers']) != len(set(signal['tickers'])):
         errors.append("Duplicate tickers detected")
 
-    # 6. Ante constraints (governance-tunable)
-    if signal['ante_amount'] < MIN_ANTE:
-        errors.append(f"Ante must be ≥{MIN_ANTE} α-tokens")
-    if signal['ante_amount'] > MAX_ANTE:
-        errors.append(f"Ante must be ≤{MAX_ANTE} α-tokens")
+    # 4. Ante must be positive
+    if signal['ante_amount'] <= 0:
+        errors.append("Ante must be > 0 α-tokens")
+
+    # 5. Tickers and weights must match
+    if len(signal['tickers']) != len(signal['weights']):
+        errors.append("Tickers and weights arrays must have same length")
 
     return len(errors) == 0, errors
 ```
 
-#### 3.4.2 Post-Reveal Validation (Validator-Side)
+#### 3.4.2 Validator-Side Validation
 
-After reveal, validators perform comprehensive validation against current governance parameters:
+Validators verify the signal can be scored:
 
 ```python
-def validate_signal_post_reveal(signal, eligible_tickers_db, params=None):
+def validate_signal_for_scoring(signal, price_feed):
     """
-    Validate signal against governance-tunable eligibility parameters.
+    Validator checks - can we score this signal?
     """
-    if params is None:
-        params = fetch_governance_params()
-
-    MIN_DAILY_VOLUME = params.get('MIN_DAILY_VOLUME', 500000)
-    MIN_MARKET_CAP = params.get('MIN_MARKET_CAP', 2_000_000_000)
-    MIN_PRICE_HISTORY = params.get('MIN_PRICE_HISTORY', 90)
-    ALLOWED_MISSING_DAYS = params.get('ALLOWED_MISSING_DAYS', 5)
-
     errors = []
 
-    # 1. All pre-commitment checks (with same params)
-    valid, pre_errors = validate_signal_pre_commitment(signal, params)
-    errors.extend(pre_errors)
+    # 1. All core validations
+    valid, core_errors = validate_signal(signal, price_feed.available_tickers())
+    errors.extend(core_errors)
 
-    # 2. Ticker eligibility (against whitelist)
+    # 2. Price data availability
     for ticker in signal['tickers']:
-        if ticker not in eligible_tickers_db:
-            errors.append(f"{ticker} not in eligible universe")
-        else:
-            # Check liquidity requirements (governance-tunable)
-            ticker_data = eligible_tickers_db[ticker]
-            if ticker_data['avg_daily_volume_30d'] < MIN_DAILY_VOLUME:
-                errors.append(f"{ticker} fails volume requirement (need ≥{MIN_DAILY_VOLUME:,} shares/day)")
-            if ticker_data['market_cap'] < MIN_MARKET_CAP:
-                errors.append(f"{ticker} fails market cap requirement (need ≥${MIN_MARKET_CAP/1e9:.0f}B)")
+        if not price_feed.has_price_history(ticker, days=90):
+            errors.append(f"{ticker} has insufficient price history for scoring")
 
-    # 3. Data availability check (governance-tunable)
-    for ticker in signal['tickers']:
-        price_history = fetch_price_history(ticker, days=MIN_PRICE_HISTORY)
-        if len(price_history) < (MIN_PRICE_HISTORY - ALLOWED_MISSING_DAYS):
-            errors.append(f"{ticker} insufficient price history")
-
-    # 4. Epoch timing validation
+    # 3. Epoch timing
     if not is_within_epoch_window(signal['timestamp'], signal['epoch_id']):
         errors.append("Timestamp outside epoch window")
 
     return len(errors) == 0, errors
 ```
+
+**Note**: Validators do NOT enforce portfolio size, concentration limits, market cap floors, or liquidity requirements. Those are miner choices with miner-borne consequences.
 
 #### 3.4.3 Real-Time Validation Feedback
 
@@ -2460,8 +2435,7 @@ Response (200 OK):
 {
   "valid": false,
   "errors": [
-    "MSFT weight 0.25 exceeds 20% max",
-    "TSLA not in eligible universe (market cap too low)"
+    "XYZ123 not available in validator price feed"
   ],
   "warnings": [
     "High turnover detected (85% vs previous epoch)"
@@ -2613,11 +2587,9 @@ This prevents oversized positions from dominating scoring during volatile period
 ```
 
 **Validation Result**: ✓ PASS
-- Portfolio size: 8 tickers (within 5-30 range)
-- Weight sum: 1.00 exactly
-- Max single position: 15% (under 20% limit)
-- All tickers in eligible universe
-- Ante: 150 α-tokens (above 100 minimum)
+- Weight sum: 1.00 exactly ✓
+- All tickers have price feeds ✓
+- Ante: 150 α-tokens (positive) ✓
 
 ---
 
@@ -2665,28 +2637,26 @@ This prevents oversized positions from dominating scoring during volatile period
 }
 ```
 
-**Validation Result**: ✗ FAIL
-```json
-{
-  "valid": false,
-  "errors": [
-    "NVDA weight 0.35 exceeds 20% maximum single position limit"
-  ]
-}
-```
+**Validation Result**: ✓ PASS
+- Concentrated portfolio with high conviction (35% in NVDA) is valid
+- All tickers have price feeds
+- Weights sum to 1.0
+- Ante is positive
+
+**Note**: The miner bears the concentration risk. If NVDA underperforms, the signal suffers. The protocol doesn't restrict this choice.
 
 ---
 
-#### Example 3.6.4: Valid Concentrated Portfolio (Min Size)
+#### Example 3.6.4: Valid Single-Stock Portfolio
 
 ```json
 {
   "epoch_id": "2025-Q4-W47",
   "miner_hotkey": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
   "timestamp": "2025-11-26T16:00:00Z",
-  "tickers": ["SPY", "QQQ", "IWM", "DIA", "XLF"],  // ETF-heavy
-  "weights": [0.20, 0.20, 0.20, 0.20, 0.20],
-  "ante_amount": 100.0,  // Minimum ante
+  "tickers": ["AAPL"],
+  "weights": [1.0],
+  "ante_amount": 50.0,
   "ante_token": "ALPHA",
   "commitment_hash": "0x...",
   "portfolio_hash": "0x..."
@@ -2694,10 +2664,10 @@ This prevents oversized positions from dominating scoring during volatile period
 ```
 
 **Validation Result**: ✓ PASS
-- Minimum portfolio size (5 tickers)
-- Equal-weight allocation
-- ETFs are eligible instruments
-- Minimum ante met (100α)
+- Single stock "buy and hold" is a valid strategy
+- 100% concentration is allowed
+- Any positive ante amount is valid
+- Performance will be scored against all other signals
 
 ---
 
@@ -3966,7 +3936,7 @@ flag_submission(
 ```
 
 Requirements:
-- Minimum stake: 100 Alpha tokens
+- Ante required: Any amount > 0 α-tokens
 - Flagging bond: 10 Alpha (returned if dispute succeeds)
 - Maximum flags per validator: 5 active disputes
 
@@ -4473,7 +4443,7 @@ For a pool with 500α total emissions per epoch:
 
 **Break-Even Analysis:**
 
-Assuming 100α minimum ante per signal:
+**Example calculation** (assuming 50α average ante per signal):
 - **Profitable threshold**: Rank ≤ 38 (top 38%) at γ=1.5
 - **Break-even point**: Sharpe ratio ≥ 0.5 (historically top ~40% of strategies)
 
@@ -5020,22 +4990,20 @@ Without proper safeguards, if payouts scale linearly, attackers could profit fro
 
 #### 7.2.2 Ante Stake Mechanism
 
-All participants must stake a minimum amount S_ante before submitting strategies.
+All participants must stake some amount of α-tokens (ante > 0) before submitting strategies.
 
-**Equation 7.10** - Ante Stake Requirement:
+**Ante Design**:
+
+There is no fixed minimum ante. Miners choose their stake based on their risk appetite and conviction:
+
 ```
-S_ante = max(S_min, k · E[Reward_potential])
-
-where:
-  S_min = 100 α-tokens (absolute minimum)
-  k = 2.0 (stake-to-reward ratio)
-  E[Reward_potential] = expected maximum reward over next 90 days
+S_ante > 0 (any positive amount)
 ```
 
 The ante stake serves as:
 1. **Skin in the game**: Participants lose real value from poor performance
-2. **Economic deterrent**: Cost of entry proportional to potential gain
-3. **Sybil resistance**: Cost of creating multiple low-quality strategies
+2. **Scaling mechanism**: Higher ante = higher potential reward (and risk)
+3. **Natural filtering**: The market rewards skill, not capital—small ante with great performance beats large ante with poor performance
 
 **Slashing Conditions:**
 
@@ -5793,50 +5761,56 @@ Rearranging:
 n_sybils_optimal = Total_attack_budget / Cost_per_sybil
 ```
 
-**Defense Goal:** Make Cost_per_sybil > Expected_reward for any n_sybils.
+**Defense Goal:** Make Sybil attacks unprofitable through performance requirements, not fixed stake floors.
 
-#### 7.6.2 Stake Requirements
+#### 7.6.2 Natural Sybil Resistance
 
-**Equation 7.45** - Minimum Stake Requirement:
+**Key Insight**: Unlike typical crypto systems, QUANTA has a natural anti-Sybil mechanism: **Sybil signals must actually perform well to earn rewards.**
+
+Traditional Sybil attacks succeed by:
+- Capturing voting power through numbers
+- Diluting penalties across fake identities
+- Gaming reputation through volume
+
+In QUANTA, this fails because:
+- Each signal is scored on actual market performance
+- Correlated signals are detected and penalized
+- Bad signals lose their ante regardless of how many you submit
+- **The market is the ultimate filter**
+
+**Equation 7.45** - Sybil Profitability:
 ```
-S_min ≥ k × (E[Reward_annual] / Attack_profit_ratio)
+Sybil_profit = Σᵢ (Reward(signalᵢ) - Ante(signalᵢ)) - Detection_penalty
 
 where:
-  k = 3.0 (safety multiplier)
-  E[Reward_annual] = expected rewards for median performer over 1 year
-  Attack_profit_ratio = 0.1 (attacker's edge from manipulation)
-
-Empirically: S_min = 100 α-tokens (≈ $500-$1000 at target valuation)
+  Reward(signalᵢ) = f(actual_market_performance)
+  Detection_penalty = P(detected) × Total_ante_at_risk
 ```
 
-**Economic Security Condition:**
+For Sybil attacks to be profitable:
+1. Attacker must generate signals that **actually outperform** the market
+2. Signals must be **sufficiently uncorrelated** to avoid detection
+3. Expected rewards must exceed ante + detection risk
 
-**Equation 7.46:**
+**This is the same requirement as honest participation.** There's no shortcut.
+
+**Equation 7.46** - Why Fixed Minimums Are Unnecessary:
 ```
-Creating n_sybils costs:
-Total_cost = n × S_min + n × Registration_burn
+If attacker has skill to generate profitable, uncorrelated signals:
+  → They should participate honestly (same reward, no detection risk)
 
-Expected attack profit:
-Attack_profit = E[Reward_sybil] × n - Probability_detection × n × (S_min + Penalties)
+If attacker lacks skill:
+  → Their signals underperform, lose ante, regardless of quantity
 
-For security:
-Total_cost > Attack_profit
-
-Rearranging:
-S_min > (E[Reward_sybil] - Registration_burn) / Probability_detection
+If attacker submits correlated signals:
+  → Detected by correlation analysis, penalized
 ```
 
-With:
-- E[Reward_sybil] ≈ 50 α-tokens/year for median performer
-- Registration_burn = 0.5 α-tokens
-- Probability_detection ≈ 0.8 (from correlation detection)
-
-**Equation 7.47:**
-```
-S_min > (50 - 0.5) / 0.8 ≈ 62 α-tokens
-
-Setting S_min = 100 provides ~60% safety margin
-```
+**Protocol Design**: QUANTA requires only ante > 0 α-tokens. The economic security comes from:
+1. Performance-based rewards (must beat the market)
+2. Correlation detection (must be genuinely independent)
+3. Ante-at-risk (must have skin in the game)
+4. Reputation system (track record matters)
 
 #### 7.6.3 Multi-Factor Identity Scoring
 
@@ -8932,7 +8906,7 @@ btcli wallet balance --wallet.name my_wallet
 
 **Solo Miner (UID Holder):**
 - **Minimum Stake**: Variable based on subnet competitiveness
-- **Current Estimate (Mainnet Launch)**: 100-1,000 α-tokens (~$5K-$50K at $50/token)
+- **Current Estimate (Mainnet Launch)**: No fixed minimum; competitive stake levels will emerge based on network dynamics
 - **Mechanism**: Stake required to register UID; higher stake improves registration priority
 
 **UID Registration Process:**
@@ -9524,7 +9498,7 @@ The QUANTA development roadmap spans **18-22 months** from inception to mainnet 
 
 - **Validator Limit**: 32 initial validators (expand to 64 at M21)
 - **Miner Limit**: 500 initial miners per pool (expand based on stability)
-- **Ante Cap**: Maximum 1000α per submission (limit exposure during stabilization)
+- **Ante**: No fixed minimum or maximum; market determines appropriate levels
 - **Monitoring**: 24/7 on-call rotation for first 60 days
 
 #### 11.5.2 Month 21-22: Scaling
@@ -10508,15 +10482,22 @@ S_min > (E[Score_sybil] / (0.92 × E[Score_total])) × E_total
 S_min > (0.8 / 0.92) × 10,000 = 8,696 α-tokens
 ```
 
-**QUANTA Setting**: S_min = 100 α-tokens (conservative, allows broad participation)
+**QUANTA Design**: No fixed minimum ante. Any ante > 0 is valid.
 
-**Implication**: Current ante is **insufficient** to prevent Sybil attacks via cost alone. However, combining:
-1. Detection penalties (100% ante forfeiture + epoch ban)
-2. Multi-epoch reputation tracking
-3. Validator stake slashing for collusion
-4. Exponentially increasing ante for repeat offenders
+**Why This Works**: The analysis above assumes Sybil signals can achieve above-average scores. But this requires:
+1. Actually generating market-beating signals (skill requirement)
+2. Making those signals sufficiently uncorrelated (independence requirement)
+3. Avoiding detection across multiple epochs (persistence requirement)
 
-Creates effective deterrence. Attacker expected utility:
+**Key Insight**: If an attacker can satisfy all three requirements, they have genuine alpha-generation capability and should simply participate honestly. There's no economic advantage to Sybil behavior.
+
+**Layered Defense**:
+1. Performance requirement (signals must beat the market)
+2. Correlation detection (signals must be independent)
+3. Ante forfeiture (losers lose their stake)
+4. Reputation tracking (track record matters)
+
+These mechanisms create effective deterrence without arbitrary stake floors. Attacker expected utility:
 
 ```
 U_attack = Σₖ P(undetected)ᵏ × E[Rₖ] - Σₖ P(detected)ₖ × Cₖ
@@ -10939,7 +10920,7 @@ Practical implication: Large coalitions are inherently unstable.
        whenNotPaused
    {
        // Checks
-       require(anteAmount >= MIN_ANTE, "Insufficient ante");
+       require(anteAmount > 0, "Ante required");
        require(commitments[msg.sender][currentEpoch] == bytes32(0), "Already committed");
 
        // Effects
@@ -11720,7 +11701,7 @@ def get_price_with_fallback(ticker, timestamp, max_attempts=4):
 1. Excess returns above a benchmark (e.g., S&P 500)
 2. QUANTA's native subnet token (α-token)
 
-**Ante**: Minimum stake required to submit signal (100 α-tokens). Acts as Sybil resistance and meaningful skin-in-the-game mechanism.
+**Ante**: Stake required to submit a signal (any amount > 0). Acts as skin-in-the-game mechanism; amount scales potential rewards and risk.
 
 **Axon**: Bittensor term for a server endpoint that accepts requests (miner's signal submission endpoint).
 

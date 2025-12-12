@@ -1,0 +1,354 @@
+---
+title: "Signal Submission"
+description: "How to submit portfolio signals to QUANTA"
+---
+
+# Signal Submission
+
+This page details the technical process of submitting signals to QUANTA, from portfolio construction to cryptographic commitment.
+
+## Signal Format
+
+### Portfolio Vector
+
+A QUANTA signal is a weighted vector of stock positions:
+
+```python
+signal = {
+    "portfolio": {
+        "AAPL": 0.08,    # 8% long Apple
+        "MSFT": 0.06,    # 6% long Microsoft
+        "GOOGL": 0.05,   # 5% long Alphabet
+        "TSLA": -0.04,   # 4% short Tesla
+        "NVDA": 0.10,    # 10% long Nvidia
+        # ... more positions
+    },
+    "metadata": {
+        "strategy_type": "momentum",
+        "rebalance_freq": "daily",
+        "submission_time": 1704067200
+    }
+}
+```
+
+### Core Requirements
+
+QUANTA is a **flexible protocol**. The only hard requirements:
+
+| Requirement | Value | Notes |
+|------------|-------|-------|
+| Weight sum | 1.0 (±0.001) | Mathematical necessity |
+| Ticker validity | Has price feed | Validators must be able to score |
+| Ante | > 0 α-tokens | Skin in the game |
+
+Everything else is **miner's choice**: portfolio size (1+), concentration (0-100%), strategy type.
+
+### Position Sizing
+
+Weights represent portfolio allocation:
+
+```python
+# Long-only example (net long 100%)
+weights = {"AAPL": 0.15, "MSFT": 0.12, "NVDA": 0.10, ...}
+assert sum(weights.values()) == 1.0
+
+# Market neutral example (net 0%)
+weights = {
+    "AAPL": 0.15,   # Long
+    "MSFT": 0.10,   # Long
+    "TSLA": -0.15,  # Short
+    "META": -0.10,  # Short
+}
+assert sum(weights.values()) == 0.0
+
+# Levered long-short (150% gross)
+weights = {
+    "AAPL": 0.40,
+    "MSFT": 0.35,
+    "TSLA": -0.25,
+    "META": -0.25,
+    "AMZN": -0.25,
+}
+assert sum(abs(w) for w in weights.values()) == 1.5
+```
+
+## Submission Flow
+
+### Commit-Reveal Scheme
+
+QUANTA uses a two-phase commit-reveal to prevent front-running:
+
+<Steps>
+  <Step title="Commit Phase">
+    Submit a hash of your portfolio (hides actual positions)
+
+    ```python
+    # Create commitment
+    portfolio_bytes = serialize(portfolio)
+    nonce = generate_random_bytes(32)
+    commitment = sha256(portfolio_bytes + nonce)
+
+    # Submit commitment
+    tx = signal_pool.commit(
+        commitment=commitment,
+        stake_amount=required_stake,
+        signature=sign(commitment, private_key)
+    )
+    ```
+  </Step>
+  <Step title="Wait Period">
+    Commitment window closes (prevents late entries seeing early commitments)
+
+    - **Window duration:** 10 minutes before each epoch
+    - **Late submissions:** Rejected
+  </Step>
+  <Step title="Reveal Phase">
+    Submit the actual portfolio (must match commitment)
+
+    ```python
+    # Reveal portfolio
+    tx = signal_pool.reveal(
+        portfolio=portfolio,
+        nonce=nonce,
+        signature=sign(portfolio, private_key)
+    )
+
+    # Validation
+    assert sha256(serialize(portfolio) + nonce) == commitment
+    ```
+  </Step>
+</Steps>
+
+### Timing Windows
+
+```
+Hour 0:00  ─────────────────────────────────────────  Hour 1:00
+    │                                                      │
+    │  [Commit Window: 0:00-0:50]                          │
+    │  └── Submit commitments                              │
+    │                                                      │
+    │  [Reveal Window: 0:50-1:00]                          │
+    │  └── Reveal portfolios                               │
+    │                                                      │
+    └──────────────────────────────────────────────────────┘
+                        Next Epoch Begins
+```
+
+<Warning>
+Missing the reveal window forfeits your stake for that epoch. Set up automated reveal systems.
+</Warning>
+
+## Staking Requirements
+
+### Proportional Ante
+
+Your stake is proportional to your gross exposure:
+
+```python
+def calculate_required_stake(portfolio, base_rate=10):
+    gross_exposure = sum(abs(w) for w in portfolio.values())
+    return gross_exposure * base_rate  # α-tokens
+
+# Examples:
+# 100% gross → 10 α stake
+# 150% gross → 15 α stake
+# 200% gross → 20 α stake
+```
+
+### Conviction Multiplier
+
+Optional: Stake more than minimum to signal conviction:
+
+```python
+actual_stake = required_stake * conviction_multiplier
+
+# Higher conviction = larger share of winner pool if successful
+# Higher conviction = larger loss if unsuccessful
+```
+
+### Stake Locking
+
+| Event | Lock Duration |
+|-------|---------------|
+| New signal | 7 days |
+| Signal update | 24 hours |
+| Epoch participation | Until epoch settles |
+
+## Submission Methods
+
+### Direct Submission (Pool Participants)
+
+Submit directly to the Signal Pool contract:
+
+```python
+from quanta import SignalPool, Wallet
+
+# Initialize
+wallet = Wallet.load("path/to/wallet")
+pool = SignalPool(network="mainnet")
+
+# Prepare signal
+portfolio = {
+    "AAPL": 0.10,
+    "MSFT": 0.08,
+    # ...
+}
+
+# Submit
+result = pool.submit_signal(
+    portfolio=portfolio,
+    wallet=wallet,
+    stake_amount=15,  # α-tokens
+    strategy_tag="momentum_v2"
+)
+
+print(f"Signal ID: {result.signal_id}")
+print(f"Commitment: {result.commitment}")
+```
+
+### Via Pool Operator
+
+Submit through a pool operator for aggregation:
+
+```python
+from quanta import PoolOperator
+
+# Connect to operator
+operator = PoolOperator.connect("operator.example.com")
+
+# Submit signal (operator handles commitment/reveal)
+result = operator.submit_signal(
+    portfolio=portfolio,
+    wallet=wallet,
+    operator_fee=0.15  # 15% of rewards
+)
+```
+
+### Via API
+
+REST API for programmatic submission:
+
+```bash
+# Commit phase
+curl -X POST https://api.qsub.net/v1/signals/commit \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commitment": "0x1234...abcd",
+    "stake_amount": 15,
+    "signature": "0xabcd...1234"
+  }'
+
+# Reveal phase
+curl -X POST https://api.qsub.net/v1/signals/reveal \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "portfolio": {"AAPL": 0.10, "MSFT": 0.08},
+    "nonce": "0x5678...efgh",
+    "signal_id": "sig_12345"
+  }'
+```
+
+## Signal Updates
+
+### Rebalancing
+
+Update existing signals with new weights:
+
+```python
+# Update signal (must wait 24h from last update)
+result = pool.update_signal(
+    signal_id="sig_12345",
+    new_portfolio={
+        "AAPL": 0.12,  # Increased
+        "MSFT": 0.05,  # Decreased
+        "NVDA": 0.08,  # Added
+    },
+    wallet=wallet
+)
+```
+
+### Update Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Min time between updates | 1 hour |
+| Stake adjustment | Proportional to new exposure |
+| Turnover tracking | Cumulative since epoch start |
+
+<Info>
+High-frequency updates incur turnover penalties. Target meaningful rebalances, not micro-adjustments.
+</Info>
+
+## Signal Withdrawal
+
+### Graceful Exit
+
+Withdraw signal and stake after lock period:
+
+```python
+# Check lock status
+status = pool.get_signal_status("sig_12345")
+if status.can_withdraw:
+    result = pool.withdraw_signal(
+        signal_id="sig_12345",
+        wallet=wallet
+    )
+    print(f"Stake returned: {result.stake_returned} α")
+```
+
+### Emergency Exit
+
+Exit before lock period (penalty applies):
+
+```python
+# Emergency withdrawal (50% stake penalty)
+result = pool.emergency_withdraw(
+    signal_id="sig_12345",
+    wallet=wallet
+)
+print(f"Stake returned: {result.stake_returned} α")  # 50% of original
+print(f"Penalty paid: {result.penalty} α")
+```
+
+## Validation Errors
+
+Common submission errors and fixes:
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `INVALID_TICKER` | Ticker not in universe | Check [approved universe](/reference/signal-format#universe) |
+| `EXPOSURE_EXCEEDED` | Gross exposure > 200% | Reduce position sizes |
+| `POSITION_EXCEEDED` | Single position > 20% | Cap at 20% |
+| `INSUFFICIENT_STAKE` | Stake < required | Add more α-tokens |
+| `COMMITMENT_MISMATCH` | Reveal doesn't match | Use correct nonce |
+| `WINDOW_CLOSED` | Missed submission window | Wait for next epoch |
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Automate Submission" icon="robot">
+    Use scripts to handle commit-reveal timing automatically
+  </Card>
+  <Card title="Monitor Gas" icon="gas-pump">
+    Ensure sufficient funds for transaction fees
+  </Card>
+  <Card title="Test on Testnet" icon="flask">
+    Validate your submission flow before mainnet
+  </Card>
+  <Card title="Backup Keys" icon="key">
+    Secure wallet keys—lost keys mean lost stake
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Evaluation Process" icon="chart-bar" href="/how-it-works/evaluation">
+    How your signal gets scored
+  </Card>
+  <Card title="Signal Format Reference" icon="code" href="/reference/signal-format">
+    Complete technical specification
+  </Card>
+</CardGroup>

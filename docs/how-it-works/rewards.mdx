@@ -1,0 +1,346 @@
+---
+title: "Rewards Distribution"
+description: "How TAO and α-tokens flow to participants"
+---
+
+# Rewards Distribution
+
+QUANTA distributes rewards through two complementary mechanisms: TAO emissions from Bittensor and α-token redistribution from the competition pot.
+
+## Dual Revenue Model
+
+<CardGroup cols={2}>
+  <Card title="TAO Emissions" icon="coins">
+    Sustainable rewards from Bittensor's emission schedule
+  </Card>
+  <Card title="Competition Pot" icon="trophy">
+    Winner-take-more redistribution of staked α-tokens
+  </Card>
+</CardGroup>
+
+### Why Both?
+
+| Model | Alone | Combined Benefit |
+|-------|-------|------------------|
+| TAO Emissions | Participation trophy effect | Sustains infrastructure |
+| Competition Pot | Winners take all | Rewards genuine alpha |
+| **Combined** | — | Sustainable + competitive |
+
+## TAO Emissions
+
+### Subnet Allocation
+
+QUANTA receives TAO from Bittensor based on subnet performance:
+
+```python
+subnet_tao = base_emission × subnet_weight
+
+# subnet_weight determined by:
+# - Root network voting
+# - Validator stake in subnet
+# - Historical performance metrics
+```
+
+### Distribution Split
+
+| Recipient | Share | Purpose |
+|-----------|-------|---------|
+| Miners (Signals) | 41% | Performance-based rewards |
+| Validators | 41% | Infrastructure maintenance |
+| Subnet Owner | 18% | Protocol development |
+
+### Miner TAO Distribution
+
+Miners receive TAO proportional to their normalized scores:
+
+```python
+def distribute_miner_tao(scores, total_tao):
+    miner_pool = total_tao * 0.41
+
+    # Normalize scores to sum to 1
+    total_score = sum(scores.values())
+    normalized = {m: s / total_score for m, s in scores.items()}
+
+    # Distribute proportionally
+    rewards = {m: normalized[m] * miner_pool for m in scores}
+
+    return rewards
+```
+
+**Example:**
+
+```
+Total TAO this epoch: 100 TAO
+Miner pool: 41 TAO
+
+Miner A score: 80 (normalized: 0.40)
+Miner B score: 60 (normalized: 0.30)
+Miner C score: 40 (normalized: 0.20)
+Miner D score: 20 (normalized: 0.10)
+
+Rewards:
+- Miner A: 0.40 × 41 = 16.4 TAO
+- Miner B: 0.30 × 41 = 12.3 TAO
+- Miner C: 0.20 × 41 = 8.2 TAO
+- Miner D: 0.10 × 41 = 4.1 TAO
+```
+
+### Validator TAO Distribution
+
+Validators receive TAO based on stake and consensus alignment:
+
+```python
+def distribute_validator_tao(validators, total_tao):
+    validator_pool = total_tao * 0.41
+
+    for v in validators:
+        stake_weight = v.stake / total_stake
+        alignment = calculate_alignment(v.scores, consensus_scores)
+
+        v.reward = stake_weight * alignment * validator_pool
+
+    return validators
+```
+
+## Competition Pot
+
+### Ante Collection
+
+Signal generators stake α-tokens proportional to exposure:
+
+```python
+required_ante = gross_exposure × BASE_RATE
+
+# Example:
+# 100% gross exposure → 10 α ante
+# 150% gross exposure → 15 α ante
+# 200% gross exposure → 20 α ante
+```
+
+### Pot Flow
+
+```
+All Antes Collected
+        │
+        ▼
+┌───────────────────┐
+│   Network Rake    │ ──── 8% to protocol treasury
+│       (8%)        │
+└───────────────────┘
+        │
+        ▼
+┌───────────────────┐
+│  Performance      │
+│  Evaluation       │
+└───────────────────┘
+        │
+        ├─── Bottom 30%: Forfeit ante
+        │         ├── 50% burned (deflationary)
+        │         └── 50% to winner pool
+        │
+        ├─── Break-even 25%: Ante returned
+        │
+        ├─── Profitable 35%: Ante + bonus
+        │
+        └─── Top 10%: Ante + premium bonus
+```
+
+### Tier Distribution
+
+<Tabs>
+  <Tab title="Bottom 30%">
+    **Result:** Ante forfeited
+
+    | Portion | Destination |
+    |---------|-------------|
+    | 50% | Burned (removed from supply) |
+    | 50% | Added to winner pool |
+
+    ```python
+    forfeited = bottom_tier_antes.sum()
+    burned = forfeited * 0.50
+    to_winners = forfeited * 0.50
+    ```
+  </Tab>
+  <Tab title="Break-even 25%">
+    **Result:** Ante returned, no bonus
+
+    ```python
+    reward = original_ante  # No gain, no loss
+    ```
+  </Tab>
+  <Tab title="Profitable 35%">
+    **Result:** Ante returned + share of winner pool
+
+    ```python
+    base_share = winner_pool * 0.40 / num_profitable
+    reward = original_ante + base_share
+    ```
+  </Tab>
+  <Tab title="Top 10%">
+    **Result:** Ante returned + premium share
+
+    ```python
+    premium_share = winner_pool * 0.50 / num_top_tier
+    reward = original_ante + premium_share + top_performer_bonus
+    ```
+  </Tab>
+</Tabs>
+
+### Example Calculation
+
+**Setup:**
+- 100 signals with average 15 α ante = 1,500 α total
+- Network rake (8%): 120 α to treasury
+- Remaining pot: 1,380 α
+
+**After Performance Evaluation:**
+```
+Bottom 30% (30 signals, ~450 α ante):
+  - Burned: 225 α
+  - To winners: 225 α
+
+Break-even 25% (25 signals):
+  - Each receives: original ante back
+
+Profitable 35% (35 signals):
+  - Pool share: (225 × 0.40) / 35 = ~2.6 α bonus each
+
+Top 10% (10 signals):
+  - Pool share: (225 × 0.50) / 10 = ~11.25 α bonus each
+```
+
+## Reward Multipliers
+
+### Top Performer Bonuses
+
+High-ranking signals receive multipliers on base rewards:
+
+| Rank | TAO Multiplier | α Multiplier |
+|------|----------------|--------------|
+| #1 | 5.0× | 3.0× |
+| #2-5 | 3.0× | 2.0× |
+| Top 10% | 2.0× | 1.5× |
+| Top 25% | 1.5× | 1.2× |
+| Others | 1.0× | 1.0× |
+
+### Consistency Bonus
+
+Signals maintaining top performance over multiple epochs earn bonuses:
+
+```python
+def consistency_bonus(signal_history):
+    # Consecutive epochs in top 25%
+    streak = count_consecutive_top_quarter(signal_history)
+
+    bonuses = {
+        4: 1.10,   # 4 epochs: 10% bonus
+        8: 1.20,   # 8 epochs: 20% bonus
+        12: 1.30,  # 12 epochs: 30% bonus
+        24: 1.50,  # 24 epochs: 50% bonus
+    }
+
+    for threshold, multiplier in sorted(bonuses.items(), reverse=True):
+        if streak >= threshold:
+            return multiplier
+
+    return 1.0
+```
+
+## Claim Process
+
+### Automatic Distribution
+
+TAO rewards are distributed automatically via Bittensor:
+
+```python
+# Happens automatically each epoch
+btcli subnet emissions --netuid X
+
+# Check your rewards
+btcli wallet balance --wallet.name mywallet
+```
+
+### α-Token Claims
+
+Competition pot rewards require manual claim:
+
+```python
+from quanta import RewardPool
+
+pool = RewardPool(network="mainnet")
+
+# Check unclaimed rewards
+unclaimed = pool.get_unclaimed(wallet_address)
+print(f"Unclaimed: {unclaimed} α")
+
+# Claim rewards
+tx = pool.claim_rewards(
+    wallet=wallet,
+    signal_ids=["sig_123", "sig_456"]
+)
+```
+
+### Claim Deadlines
+
+| Reward Type | Deadline | If Unclaimed |
+|-------------|----------|--------------|
+| TAO | Automatic | N/A |
+| α-tokens | 30 days | Returns to treasury |
+
+<Warning>
+Unclaimed α-tokens after 30 days are returned to the protocol treasury. Set up automatic claiming.
+</Warning>
+
+## Tax Considerations
+
+<Note>
+This is not tax advice. Consult a qualified tax professional for your jurisdiction.
+</Note>
+
+Common taxable events:
+
+| Event | Potential Tax Treatment |
+|-------|-------------------------|
+| TAO received | Income at fair market value |
+| α-tokens claimed | Income at fair market value |
+| Ante forfeited | Potential capital loss |
+| Token sale | Capital gain/loss |
+
+## Reward Tracking
+
+### Dashboard
+
+Track your rewards on the QUANTA dashboard:
+
+```
+https://qsub.net/dashboard?wallet=YOUR_ADDRESS
+```
+
+### API Queries
+
+```python
+from quanta import Analytics
+
+analytics = Analytics()
+
+# Historical rewards
+history = analytics.get_reward_history(
+    wallet=wallet_address,
+    start_date="2025-01-01"
+)
+
+for epoch in history:
+    print(f"Epoch {epoch.id}: {epoch.tao} TAO, {epoch.alpha} α")
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Epoch Lifecycle" icon="clock" href="/how-it-works/epoch-lifecycle">
+    Complete epoch timing details
+  </Card>
+  <Card title="Tokenomics Overview" icon="coins" href="/tokenomics/overview">
+    Full economic model
+  </Card>
+</CardGroup>

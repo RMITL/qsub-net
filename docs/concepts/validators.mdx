@@ -1,0 +1,326 @@
+---
+title: "Validators"
+description: "Network infrastructure operators who evaluate signals"
+---
+
+# Validators
+
+Validators are the backbone of QUANTA. They run the infrastructure that evaluates signals, reaches consensus on performance, and distributes rewards fairly.
+
+## Role Overview
+
+<CardGroup cols={2}>
+  <Card title="What Validators Do" icon="shield-check">
+    Fetch market data, simulate portfolios, score signals, participate in consensus
+  </Card>
+  <Card title="What Validators Earn" icon="coins">
+    41% of TAO emissions + α-token staking rewards
+  </Card>
+</CardGroup>
+
+## Core Responsibilities
+
+### 1. Market Data Acquisition
+
+Validators independently fetch price data for the approved universe:
+
+```python
+# Daily data fetch
+for ticker in APPROVED_UNIVERSE:
+    prices[ticker] = fetch_ohlcv(ticker, source=PRIMARY_SOURCE)
+
+    # Cross-validate with secondary source
+    prices_backup = fetch_ohlcv(ticker, source=SECONDARY_SOURCE)
+    assert abs(prices[ticker] - prices_backup) < TOLERANCE
+```
+
+<Info>
+Validators must use approved data sources to ensure consistency across the network.
+</Info>
+
+### 2. Signal Evaluation
+
+For each signal in the pool, validators simulate portfolio performance:
+
+```python
+def evaluate_signal(signal, price_data, window_days):
+    # Simulate portfolio returns
+    portfolio_returns = []
+
+    for day in range(window_days):
+        daily_return = sum(
+            signal.weights[ticker] * price_data[ticker].returns[day]
+            for ticker in signal.weights
+        )
+        portfolio_returns.append(daily_return)
+
+    # Calculate risk-adjusted metrics
+    return {
+        "sortino": sortino_ratio(portfolio_returns),
+        "calmar": calmar_ratio(portfolio_returns),
+        "max_drawdown": max_drawdown(portfolio_returns),
+        "turnover": calculate_turnover(signal)
+    }
+```
+
+### 3. Composite Scoring
+
+Validators compute a weighted composite score:
+
+| Metric | Weight | Direction |
+|--------|--------|-----------|
+| Sortino Ratio | 35% | Higher is better |
+| Calmar Ratio | 25% | Higher is better |
+| Max Drawdown | 25% | Lower is better |
+| Turnover Penalty | 15% | Lower is better |
+
+```python
+def composite_score(metrics):
+    return (
+        0.35 * normalize(metrics["sortino"]) +
+        0.25 * normalize(metrics["calmar"]) +
+        0.25 * normalize(-metrics["max_drawdown"]) +  # Invert
+        0.15 * normalize(-metrics["turnover"])        # Invert
+    )
+```
+
+### 4. Consensus Participation
+
+Validators submit scores to Yuma consensus:
+
+```python
+# Submit scores to consensus
+for signal_id, score in scores.items():
+    consensus.submit_weight(
+        miner_uid=signal_id,
+        weight=score,
+        validator_signature=sign(score)
+    )
+
+# Consensus threshold: κ = 0.67
+# Scores are accepted if 67%+ of validators agree
+```
+
+## Validator Economics
+
+### TAO Rewards
+
+Validators receive 41% of subnet emissions (same as miners):
+
+```
+Validator_TAO = Stake_Weight × Consensus_Alignment × 0.41 × Epoch_Emissions
+```
+
+Where:
+- **Stake Weight:** Proportion of total validator stake
+- **Consensus Alignment:** How closely your scores match consensus
+
+### α-Token Staking
+
+Validators must stake α-tokens to participate:
+
+| Stake Tier | Minimum Stake | Benefits |
+|------------|---------------|----------|
+| Standard | 10,000 α | Basic participation |
+| Enhanced | 50,000 α | Priority in consensus |
+| Premium | 100,000+ α | Governance voting rights |
+
+<Note>
+Staked α-tokens earn yield from protocol fees and can be slashed for malicious behavior.
+</Note>
+
+### Slashing Conditions
+
+Validators can lose staked tokens for:
+
+| Violation | Penalty |
+|-----------|---------|
+| Incorrect scores (>10% deviation from consensus) | 1% stake |
+| Extended downtime (>24 hours) | 0.5% stake |
+| Data manipulation (proven) | 100% stake |
+| Collusion (proven) | 100% stake |
+
+## Running a Validator
+
+### Hardware Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 8 cores | 16+ cores |
+| RAM | 32 GB | 64+ GB |
+| Storage | 500 GB NVMe | 1 TB NVMe |
+| Network | 1 Gbps | 10 Gbps |
+| Uptime | 99% | 99.9%+ |
+
+### Software Stack
+
+<Steps>
+  <Step title="Bittensor Node">
+    Full Bittensor node for network participation
+  </Step>
+  <Step title="Market Data Feeds">
+    Connections to approved price data providers
+  </Step>
+  <Step title="Simulation Engine">
+    Portfolio simulation with transaction cost modeling
+  </Step>
+  <Step title="Scoring Pipeline">
+    Real-time metric calculation and normalization
+  </Step>
+  <Step title="Consensus Client">
+    Yuma consensus participation module
+  </Step>
+</Steps>
+
+### Setup Overview
+
+```bash
+# Clone QUANTA validator repo
+git clone https://github.com/RMITL/QUANTA
+cd QUANTA/validator
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure wallet
+btcli wallet create --wallet.name validator_wallet
+
+# Register as validator
+btcli subnet register --netuid X --wallet.name validator_wallet
+
+# Start validator
+python validator.py \
+    --wallet.name validator_wallet \
+    --data.provider polygon \
+    --netuid X
+```
+
+## Evaluation Pipeline
+
+### Multi-Horizon Windows
+
+Validators evaluate each signal over three time horizons:
+
+<Tabs>
+  <Tab title="7-Day Window (20%)" icon="bolt">
+    **Purpose:** Capture recent alpha, detect regime changes
+
+    ```python
+    short_term_score = evaluate_signal(signal, window=7)
+    ```
+
+    - Most responsive to new information
+    - Higher variance
+    - Weight: 20%
+  </Tab>
+  <Tab title="30-Day Window (35%)">
+    **Purpose:** Balance responsiveness with noise reduction
+
+    ```python
+    medium_term_score = evaluate_signal(signal, window=30)
+    ```
+
+    - Moderate responsiveness
+    - Moderate variance
+    - Weight: 35%
+  </Tab>
+  <Tab title="90-Day Window (45%)">
+    **Purpose:** Reward consistency, penalize one-hit wonders
+
+    ```python
+    long_term_score = evaluate_signal(signal, window=90)
+    ```
+
+    - Least responsive
+    - Lowest variance
+    - Weight: 45%
+  </Tab>
+</Tabs>
+
+### Transaction Cost Modeling
+
+Validators apply realistic transaction costs:
+
+```python
+def apply_transaction_costs(signal, turnover):
+    # Base spread: 5 bps
+    spread_cost = turnover * 0.0005
+
+    # Market impact: scales with position size
+    impact_cost = turnover * estimate_market_impact(signal.position_sizes)
+
+    # Commission: 0.5 bps
+    commission = turnover * 0.00005
+
+    total_cost = spread_cost + impact_cost + commission
+    return signal.returns - total_cost
+```
+
+## Consensus Mechanics
+
+### Yuma Consensus
+
+QUANTA uses Bittensor's Yuma consensus with κ = 0.67:
+
+```
+1. Each validator submits scores for all signals
+2. Scores are stake-weighted and aggregated
+3. Final score = median of scores where validator stake > threshold
+4. Rewards distributed based on final scores
+```
+
+### Consensus Alignment
+
+Your rewards depend on alignment with consensus:
+
+```python
+alignment = 1 - abs(your_score - consensus_score) / consensus_score
+
+# Perfect alignment → 100% of base reward
+# 5% deviation → 95% of base reward
+# 10%+ deviation → slashing risk
+```
+
+<Warning>
+Validators significantly out of consensus face slashing. Ensure your data sources and scoring implementation match specifications.
+</Warning>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Redundant Data Sources" icon="database">
+    Use multiple data providers to avoid single points of failure
+  </Card>
+  <Card title="Automated Monitoring" icon="bell">
+    Set up alerts for downtime, consensus deviation, and slashing risk
+  </Card>
+  <Card title="Regular Updates" icon="rotate">
+    Keep validator software updated to match network specifications
+  </Card>
+  <Card title="Geographic Distribution" icon="globe">
+    Consider running nodes in multiple regions for reliability
+  </Card>
+</CardGroup>
+
+## Validator Checklist
+
+Before going live:
+
+- [ ] Hardware meets minimum requirements
+- [ ] Wallet funded with registration costs
+- [ ] α-tokens staked (minimum 10,000)
+- [ ] Data sources configured and validated
+- [ ] Scoring pipeline tested against historical data
+- [ ] Monitoring and alerting set up
+- [ ] Backup/failover procedures documented
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Validator Setup Guide" icon="rocket" href="/guides/validator-setup">
+    Complete setup instructions
+  </Card>
+  <Card title="Scoring Deep Dive" icon="calculator" href="/concepts/scoring">
+    Understand the scoring methodology
+  </Card>
+</CardGroup>

@@ -1,0 +1,352 @@
+---
+title: "Scoring Methodology"
+description: "How signals are evaluated and ranked"
+---
+
+# Scoring Methodology
+
+QUANTA uses a sophisticated multi-metric scoring system designed to reward genuine alpha generation while penalizing excessive risk-taking and gaming.
+
+## Philosophy
+
+<CardGroup cols={3}>
+  <Card title="Risk-Adjusted" icon="shield">
+    Raw returns don't matter—risk-adjusted returns do
+  </Card>
+  <Card title="Consistency" icon="chart-line">
+    Long-term performance weighted more than short-term
+  </Card>
+  <Card title="Realistic" icon="scale-balanced">
+    Transaction costs and turnover matter
+  </Card>
+</CardGroup>
+
+## Composite Score
+
+The final score is a weighted combination of six metrics:
+
+```
+Composite = 0.40 × Sharpe + 0.20 × PnL + 0.15 × (1 - MaxDD) + 0.10 × Sortino + 0.10 × Calmar + 0.05 × (1 - Turnover)
+```
+
+| Metric | Weight | What It Measures |
+|--------|--------|------------------|
+| Sharpe Ratio | 40% | Risk-adjusted returns (industry standard) |
+| Total P/L % | 20% | Absolute return performance |
+| Max Drawdown | 15% | Largest peak-to-trough decline |
+| Sortino Ratio | 10% | Return per unit of downside risk |
+| Calmar Ratio | 10% | Return relative to worst drawdown |
+| Turnover Penalty | 5% | Trading frequency cost |
+
+## Sharpe Ratio (40%)
+
+The Sharpe ratio is the **primary metric** and industry standard for risk-adjusted returns.
+
+### Formula
+
+```
+Sharpe = (R_p - R_f) / σ
+
+Where:
+- R_p = Portfolio return
+- R_f = Risk-free rate (Treasury rate)
+- σ = Standard deviation of portfolio returns
+```
+
+### Why Sharpe is Primary
+
+Sharpe is the universal benchmark for comparing investment performance:
+- Used by every major hedge fund and asset manager
+- Enables apples-to-apples comparison across strategies
+- Captures the fundamental risk-reward tradeoff
+
+### Interpretation
+
+| Sharpe | Quality |
+|--------|---------|
+| < 0 | Losing money |
+| 0-0.5 | Below average |
+| 0.5-1.0 | Acceptable |
+| 1.0-2.0 | Good |
+| 2.0-3.0 | Excellent |
+| > 3.0 | Outstanding |
+
+## Total P/L % (20%)
+
+Absolute return performance matters—raw profit and loss.
+
+### Formula
+
+```
+P/L % = (V_n - V_0) / V_0 × 100
+
+Where:
+- V_n = Final portfolio value
+- V_0 = Initial portfolio value
+```
+
+### Why Include P/L?
+
+While risk-adjusted metrics are primary, absolute returns still matter:
+- Investors ultimately care about dollar gains
+- Ensures strategies actually make money
+- Prevents gaming through extreme low-volatility strategies
+
+## Maximum Drawdown (15%)
+
+Maximum drawdown measures the worst-case loss from any peak.
+
+### Formula
+
+```
+MaxDD = max((Peak_i - Trough_j) / Peak_i) for all i < j
+```
+
+### Why It Matters
+
+<Warning>
+A 50% drawdown requires a 100% gain to recover. Drawdown asymmetry makes capital preservation critical.
+</Warning>
+
+| Drawdown | Recovery Required |
+|----------|-------------------|
+| 10% | 11% |
+| 20% | 25% |
+| 30% | 43% |
+| 50% | 100% |
+
+### Interpretation
+
+| Max Drawdown | Quality |
+|--------------|---------|
+| Less than 10% | Excellent |
+| 10-15% | Good |
+| 15-25% | Acceptable |
+| Greater than 25% | Concerning |
+
+## Sortino Ratio (10%)
+
+The Sortino ratio refines Sharpe by only penalizing **downside** volatility.
+
+### Formula
+
+```
+Sortino = (R_p - R_f) / σ_d
+
+Where:
+- σ_d = Downside deviation (std dev of negative returns only)
+```
+
+### Why Sortino?
+
+Sortino answers a key question: upside volatility isn't bad! A strategy that swings +5%, +15%, +8% has high volatility but zero downside risk.
+
+### Interpretation
+
+| Sortino | Quality |
+|---------|---------|
+| Less than 1 | Below average |
+| 1-2 | Good |
+| 2-3 | Excellent |
+| Greater than 3 | Outstanding |
+
+## Calmar Ratio (10%)
+
+The Calmar ratio relates return to the worst-case scenario.
+
+### Formula
+
+```
+Calmar = Annual Return / Max Drawdown
+```
+
+<Info>
+Calmar answers: "For every 1% I could lose in the worst case, how much do I expect to earn?"
+</Info>
+
+### Interpretation
+
+| Calmar | Quality |
+|--------|---------|
+| Less than 0.5 | Poor risk/reward |
+| 0.5-1.0 | Acceptable |
+| 1.0-2.0 | Good |
+| Greater than 2.0 | Excellent |
+
+## Turnover Penalty (5%)
+
+High turnover generates transaction costs that erode returns.
+
+### Formula
+
+```
+Turnover = Σ|w_t - w_{t-1}| / 2
+
+Monthly Turnover Penalty = min(Turnover / 0.50, 1.0)
+
+Where:
+- w_t = Portfolio weights at time t
+- 0.50 = Reference turnover (50% monthly = 600% annual)
+```
+
+### Transaction Cost Model
+
+```python
+# Realistic transaction costs
+def total_cost(turnover, avg_position_size):
+    spread = 0.0005  # 5 bps
+    impact = 0.0002 * sqrt(avg_position_size / ADV)  # Market impact
+    commission = 0.00005  # 0.5 bps
+
+    return turnover * (spread + impact + commission)
+```
+
+### Interpretation
+
+| Monthly Turnover | Quality | Approx Annual Cost |
+|------------------|---------|-------------------|
+| < 10% | Excellent | < 1.2% |
+| 10-20% | Good | 1.2-2.4% |
+| 20-40% | Acceptable | 2.4-4.8% |
+| 40-60% | High | 4.8-7.2% |
+| > 60% | Excessive | > 7.2% |
+
+## Multi-Horizon Weighting
+
+Metrics are calculated over three windows and combined:
+
+```
+Final_Metric = 0.20 × Metric_7d + 0.30 × Metric_30d + 0.50 × Metric_90d
+```
+
+### Why Multiple Horizons?
+
+<AccordionGroup>
+  <Accordion title="7-Day (20%)" icon="bolt">
+    **Captures:** Recent alpha, regime changes, news-driven performance
+
+    **Risk:** High variance, easily gamed
+
+    **Role:** Early signal of strategy breakdown or breakthrough
+  </Accordion>
+
+  <Accordion title="30-Day (35%)" icon="calendar">
+    **Captures:** Medium-term performance, seasonal patterns
+
+    **Risk:** Moderate variance
+
+    **Role:** Balance between responsiveness and stability
+  </Accordion>
+
+  <Accordion title="90-Day (45%)" icon="calendar-check">
+    **Captures:** Long-term consistency, strategy robustness
+
+    **Risk:** Low variance, slow to respond
+
+    **Role:** Prevent one-hit wonders, reward sustainable alpha
+  </Accordion>
+</AccordionGroup>
+
+## Score Normalization
+
+Raw metrics are normalized to [0, 1] range for combination:
+
+```python
+def normalize(values, metric_type):
+    if metric_type in ["sortino", "calmar"]:
+        # Higher is better
+        return (values - values.min()) / (values.max() - values.min())
+    else:
+        # Lower is better (drawdown, turnover)
+        return 1 - (values - values.min()) / (values.max() - values.min())
+```
+
+### Outlier Handling
+
+Extreme values are winsorized to prevent single signals from dominating:
+
+```python
+def winsorize(values, lower=0.01, upper=0.99):
+    return values.clip(
+        lower=values.quantile(lower),
+        upper=values.quantile(upper)
+    )
+```
+
+## Example Calculation
+
+Let's score a signal:
+
+<Steps>
+  <Step title="Calculate Raw Metrics">
+    | Metric | 7-Day | 30-Day | 90-Day |
+    |--------|-------|--------|--------|
+    | Sortino | 2.5 | 1.8 | 1.5 |
+    | Calmar | 3.0 | 2.2 | 1.8 |
+    | MaxDD | 8% | 12% | 15% |
+    | Turnover | 15% | 18% | 20% |
+  </Step>
+  <Step title="Horizon-Weight Each Metric">
+    ```
+    Sortino = 0.20 × 2.5 + 0.30 × 1.8 + 0.50 × 1.5 = 1.79
+    Calmar = 0.20 × 3.0 + 0.30 × 2.2 + 0.50 × 1.8 = 2.16
+    MaxDD = 0.20 × 8% + 0.30 × 12% + 0.50 × 15% = 12.7%
+    Turnover = 0.20 × 15% + 0.30 × 18% + 0.50 × 20% = 18.4%
+    ```
+  </Step>
+  <Step title="Normalize (assume network ranges)">
+    ```
+    Sortino_norm = (1.79 - 0.5) / (3.0 - 0.5) = 0.52
+    Calmar_norm = (2.16 - 0.5) / (3.5 - 0.5) = 0.55
+    MaxDD_norm = 1 - (12.7% - 5%) / (30% - 5%) = 0.69
+    Turnover_norm = 1 - (18.4% - 5%) / (50% - 5%) = 0.70
+    ```
+  </Step>
+  <Step title="Compute Composite">
+    ```
+    Composite = 0.35 × 0.52 + 0.25 × 0.55 + 0.25 × 0.69 + 0.15 × 0.70
+             = 0.182 + 0.138 + 0.173 + 0.105
+             = 0.598
+    ```
+
+    **Final Score: 59.8 out of 100**
+  </Step>
+</Steps>
+
+## Anti-Gaming Measures
+
+### Minimum Performance Thresholds
+
+Signals must meet minimum thresholds to receive rewards:
+
+| Metric | Minimum |
+|--------|---------|
+| Sortino | > 0 (profitable) |
+| MaxDD | < 35% |
+| Track Record | 7+ days |
+
+### Correlation Penalties
+
+Signals correlated with existing top performers receive reduced scores:
+
+```python
+if correlation_with_top_10 > 0.8:
+    score *= 0.5  # 50% penalty
+elif correlation_with_top_10 > 0.6:
+    score *= 0.8  # 20% penalty
+```
+
+<Note>
+This encourages diverse strategies rather than copycat signals.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Rewards Distribution" icon="coins" href="/how-it-works/rewards">
+    How scores translate to rewards
+  </Card>
+  <Card title="Signal Strategies" icon="lightbulb" href="/guides/signal-strategies">
+    Optimize your strategy for QUANTA's scoring
+  </Card>
+</CardGroup>
