@@ -104,6 +104,10 @@ def distribute_validator_tao(validators, total_tao):
 
 ## Competition Pot
 
+<Note>
+Tier thresholds and distribution percentages are **governance-tunable**. The values shown represent the launch configuration.
+</Note>
+
 ### Ante Collection
 
 Signal generators stake α-tokens proportional to exposure:
@@ -134,13 +138,13 @@ All Antes Collected
 │  Evaluation       │
 └───────────────────┘
         │
-        ├─── Bottom 30%: Forfeit ante
+        ├─── Bottom 20%: Forfeit ante
         │         ├── 50% burned (deflationary)
         │         └── 50% to winner pool
         │
         ├─── Break-even 25%: Ante returned
         │
-        ├─── Profitable 35%: Ante + bonus
+        ├─── Profitable 45%: Ante + bonus
         │
         └─── Top 10%: Ante + premium bonus
 ```
@@ -148,7 +152,7 @@ All Antes Collected
 ### Tier Distribution
 
 <Tabs>
-  <Tab title="Bottom 30%">
+  <Tab title="Bottom 20%">
     **Result:** Ante forfeited
 
     | Portion | Destination |
@@ -169,7 +173,7 @@ All Antes Collected
     reward = original_ante  # No gain, no loss
     ```
   </Tab>
-  <Tab title="Profitable 35%">
+  <Tab title="Profitable 45%">
     **Result:** Ante returned + share of winner pool
 
     ```python
@@ -196,18 +200,18 @@ All Antes Collected
 
 **After Performance Evaluation:**
 ```
-Bottom 30% (30 signals, ~450 α ante):
-  - Burned: 225 α
-  - To winners: 225 α
+Bottom 20% (20 signals, ~300 α ante):
+  - Burned: 150 α
+  - To winners: 150 α
 
 Break-even 25% (25 signals):
   - Each receives: original ante back
 
-Profitable 35% (35 signals):
-  - Pool share: (225 × 0.40) / 35 = ~2.6 α bonus each
+Profitable 45% (45 signals):
+  - Pool share: (150 × 0.40) / 45 ≈ 1.3 α bonus each
 
 Top 10% (10 signals):
-  - Pool share: (225 × 0.50) / 10 = ~11.25 α bonus each
+  - Pool share: (150 × 0.50) / 10 = 7.5 α bonus each
 ```
 
 ## Reward Multipliers

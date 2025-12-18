@@ -5,6 +5,18 @@ import {
   ComposedChart, ReferenceLine
 } from 'recharts';
 
+// Wrapper to prevent chart double-render flashing during hydration
+const ChartContainer = ({ children, height, isHydrated }) => {
+  if (!isHydrated) {
+    return <div style={{ width: '100%', height, background: 'transparent' }} />;
+  }
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      {children}
+    </ResponsiveContainer>
+  );
+};
+
 const QuantaPitchDeckFinal = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slideContainerRef = useRef(null);
@@ -1117,7 +1129,7 @@ const QuantaPitchDeckFinal = () => {
       <div className="reward-distribution-layout fade-in" style={{animationDelay: '0.1s'}}>
         <div className="rd-chart">
           <h4 className="chart-title">Performance Tier Distribution</h4>
-          <ResponsiveContainer width="100%" height={280}>
+          <ChartContainer height={280} isHydrated={isHydrated}>
             <PieChart>
               <Pie
                 data={tierData}
@@ -1128,6 +1140,7 @@ const QuantaPitchDeckFinal = () => {
                 paddingAngle={2}
                 dataKey="value"
                 label={({ name, value }) => `${name}: ${value}`}
+                isAnimationActive={false}
               >
                 {tierData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -1135,7 +1148,7 @@ const QuantaPitchDeckFinal = () => {
               </Pie>
               <Tooltip />
             </PieChart>
-          </ResponsiveContainer>
+          </ChartContainer>
           <div className="rd-total">
             <span className="rdt-value">{tokenModel.totalSignalGenerators}</span>
             <span className="rdt-label">Total Generators</span>
@@ -1428,7 +1441,7 @@ const QuantaPitchDeckFinal = () => {
       <div className="distribution-layout fade-in" style={{animationDelay: '0.1s'}}>
         <div className="dist-chart">
           <h4 className="chart-title">Reward Distribution by Rank (γ = 1.5)</h4>
-          <ResponsiveContainer width="100%" height={280}>
+          <ChartContainer height={280} isHydrated={isHydrated}>
             <ComposedChart data={powerLawData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="rank" stroke="#666" tick={{fontSize: 10}} />
@@ -1436,11 +1449,11 @@ const QuantaPitchDeckFinal = () => {
               <YAxis yAxisId="right" orientation="right" stroke="#3b82f6" tick={{fontSize: 10}} domain={[0, 100]} />
               <Tooltip contentStyle={{backgroundColor: '#1a1a2e', border: '1px solid #333'}} />
               <Legend />
-              <Bar yAxisId="left" dataKey="reward" fill="#d4af37" name="Individual %" />
-              <Line yAxisId="right" type="monotone" dataKey="cumulative" stroke="#3b82f6" strokeWidth={2} dot={false} name="Cumulative %" />
+              <Bar yAxisId="left" dataKey="reward" fill="#d4af37" name="Individual %" isAnimationActive={false} />
+              <Line yAxisId="right" type="monotone" dataKey="cumulative" stroke="#3b82f6" strokeWidth={2} dot={false} name="Cumulative %" isAnimationActive={false} />
               <ReferenceLine yAxisId="right" y={50} stroke="#22c55e" strokeDasharray="5 5" />
             </ComposedChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </div>
         <div className="dist-explanation">
           <h4>Key Insights</h4>
@@ -1864,17 +1877,17 @@ const QuantaPitchDeckFinal = () => {
       <div className="deflationary-layout fade-in" style={{animationDelay: '0.1s'}}>
         <div className="defl-chart">
           <h4 className="chart-title">36-Month Supply Projection</h4>
-          <ResponsiveContainer width="100%" height={280}>
+          <ChartContainer height={280} isHydrated={isHydrated}>
             <AreaChart data={deflationaryData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="month" stroke="#666" tick={{fontSize: 10}} />
               <YAxis stroke="#666" tick={{fontSize: 10}} />
               <Tooltip contentStyle={{backgroundColor: '#1a1a2e', border: '1px solid #333'}} />
               <Legend />
-              <Area type="monotone" dataKey="supply" stroke="#d4af37" fill="#d4af3730" name="Total Supply" />
+              <Area type="monotone" dataKey="supply" stroke="#d4af37" fill="#d4af3730" name="Total Supply" isAnimationActive={false} />
               <ReferenceLine y={1000000} stroke="#ef4444" strokeDasharray="5 5" />
             </AreaChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </div>
         <div className="defl-mechanics">
           <h4>Burn Mechanisms</h4>
@@ -2726,7 +2739,7 @@ const QuantaPitchDeckFinal = () => {
 
                 {/* Burn Chart */}
                 <div className="fm-chart-container">
-                  <ResponsiveContainer width="100%" height={160}>
+                  <ChartContainer height={160} isHydrated={isHydrated}>
                     <AreaChart data={burnCurveData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                       <defs>
                         <linearGradient id="fmBurnGrad" x1="0" y1="0" x2="0" y2="1">
@@ -2742,11 +2755,11 @@ const QuantaPitchDeckFinal = () => {
                         contentStyle={{background: 'rgba(20,20,30,0.95)', border: '1px solid #333', borderRadius: '6px', fontSize: '11px'}}
                         labelFormatter={(l) => `Month ${l}`}
                       />
-                      <Area type="monotone" dataKey="cumulative" stroke="#d4af37" fill="url(#fmBurnGrad)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="cumulative" stroke="#d4af37" fill="url(#fmBurnGrad)" strokeWidth={2} isAnimationActive={false} />
                       <ReferenceLine y={financialCalcs.adjustedAlpha} stroke="#3b82f6" strokeDasharray="4 4" />
                       <ReferenceLine y={financialCalcs.adjustedAlpha + financialCalcs.adjustedBeta} stroke="#9b59b6" strokeDasharray="4 4" />
                     </AreaChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
               </>
             )}
@@ -2938,7 +2951,7 @@ const QuantaPitchDeckFinal = () => {
           <a href="https://x.com/qsub_net" title="X (Twitter)" className="social-icon-btn" target="_blank" rel="noopener noreferrer">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
-          <a href="https://github.com/RMITL/QUANTA" title="GitHub" className="social-icon-btn" target="_blank" rel="noopener noreferrer">
+          <a href="#" title="GitHub (Coming Soon)" className="social-icon-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           </a>
           <a href="https://discord.com/users/qsubnet" title="Discord" className="social-icon-btn" target="_blank" rel="noopener noreferrer">

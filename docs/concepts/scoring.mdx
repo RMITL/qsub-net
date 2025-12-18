@@ -216,13 +216,17 @@ def total_cost(turnover, avg_position_size):
 Metrics are calculated over three windows and combined:
 
 ```
-Final_Metric = 0.20 × Metric_7d + 0.30 × Metric_30d + 0.50 × Metric_90d
+Final_Metric = 0.30 × Metric_7d + 0.40 × Metric_30d + 0.30 × Metric_90d
 ```
+
+<Note>
+All scoring weights and horizon parameters are **governance-tunable**. The values shown represent the launch configuration and can be adjusted through on-chain governance as the network matures.
+</Note>
 
 ### Why Multiple Horizons?
 
 <AccordionGroup>
-  <Accordion title="7-Day (20%)" icon="bolt">
+  <Accordion title="7-Day (30%)" icon="bolt">
     **Captures:** Recent alpha, regime changes, news-driven performance
 
     **Risk:** High variance, easily gamed
@@ -230,7 +234,7 @@ Final_Metric = 0.20 × Metric_7d + 0.30 × Metric_30d + 0.50 × Metric_90d
     **Role:** Early signal of strategy breakdown or breakthrough
   </Accordion>
 
-  <Accordion title="30-Day (35%)" icon="calendar">
+  <Accordion title="30-Day (40%)" icon="calendar">
     **Captures:** Medium-term performance, seasonal patterns
 
     **Risk:** Moderate variance
@@ -238,7 +242,7 @@ Final_Metric = 0.20 × Metric_7d + 0.30 × Metric_30d + 0.50 × Metric_90d
     **Role:** Balance between responsiveness and stability
   </Accordion>
 
-  <Accordion title="90-Day (45%)" icon="calendar-check">
+  <Accordion title="90-Day (30%)" icon="calendar-check">
     **Captures:** Long-term consistency, strategy robustness
 
     **Risk:** Low variance, slow to respond

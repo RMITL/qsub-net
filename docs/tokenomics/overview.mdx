@@ -41,17 +41,21 @@ graph TB
 
 ## α-Token: The Incentive Layer
 
+<Note>
+Like all Bittensor subnets, QUANTA's α-token follows Bittensor's dTAO tokenomics: **21 million maximum supply** with a halving emission schedule mirroring TAO. This is a protocol-level constraint—subnet founders cannot modify emission rates or supply caps.
+</Note>
+
 ### Core Functions
 
 <AccordionGroup>
   <Accordion title="Staking" icon="lock">
-    **Validators:** Must stake minimum 10,000 α to participate in consensus
+    **Validators:** Must stake minimum 2,000 α to participate in consensus
 
     **Signals:** Proportional stake required based on position exposure
 
     ```
     Signal stake = Gross exposure × Base rate
-    Validator stake = 10,000 α minimum
+    Validator stake = 2,000 α minimum
     ```
   </Accordion>
 
@@ -83,26 +87,39 @@ graph TB
 
 ## Token Supply
 
-### α-Token Distribution
+### α-Token Emission (Bittensor dTAO)
 
-| Allocation | Percentage | Amount | Vesting |
-|------------|------------|--------|---------|
-| Miner Emissions | 40% | 40,000,000 α | 4-year emission schedule |
-| Validator Rewards | 25% | 25,000,000 α | Performance-based |
-| Team & Advisors | 20% | 20,000,000 α | 2-year cliff + vesting |
-| Ecosystem Fund | 10% | 10,000,000 α | Grants and partnerships |
-| Initial Liquidity | 5% | 5,000,000 α | DEX launch |
-| **Total Supply** | **100%** | **100,000,000 α** | — |
+QUANTA's α-token follows Bittensor's standard subnet emission model:
 
-### Supply Schedule
+| Property | Value | Notes |
+|----------|-------|-------|
+| Maximum Supply | 21,000,000 α | Hard cap (same as TAO) |
+| Initial Emission | ~2 α/block | Protocol-controlled |
+| First Halving | ~10.5M α minted | ~50% of supply |
+| Halving Schedule | Mirrors TAO | Predictable deflation |
+
+<Info>
+Unlike traditional token launches, Bittensor subnet α-tokens are emitted by the protocol based on network activity—not pre-minted or allocated by founders. The emission rate is determined by Bittensor's consensus mechanism.
+</Info>
+
+### Emission Distribution
+
+All α-token emissions flow through Bittensor's standard distribution:
+
+| Recipient | Share | Purpose |
+|-----------|-------|---------|
+| Signal Generators (Miners) | 41% | Performance-based rewards |
+| Validators | 41% | Infrastructure and consensus |
+| Subnet Owner | 18% | Protocol development |
+
+### Supply Projection
 
 ```
-Year 0: 15M α circulating (15%)
-Year 1: 35M α circulating (35%)
-Year 2: 55M α circulating (55%)
-Year 3: 75M α circulating (75%)
-Year 4: 90M α circulating (90%)
-Year 5+: Approaching 100M α
+Year 1: ~3-4M α circulating (early emission phase)
+Year 2: ~6-8M α circulating
+Year 3: ~9-11M α circulating
+Year 4+: Approaching halving, emission rate decreases
+Max: 21M α (hard cap, never exceeded)
 ```
 
 ## Value Accrual
@@ -128,7 +145,7 @@ Year 5+: Approaching 100M α
 
 ```python
 # Each epoch
-forfeited_antes = sum(antes from bottom 30% performers)
+forfeited_antes = sum(antes from bottom 20% performers)
 burned = forfeited_antes * 0.50  # Permanent supply reduction
 
 # Over time
@@ -137,7 +154,7 @@ effective_supply = total_supply - cumulative_burn
 ```
 
 <Info>
-With 30% of signals forfeiting antes each epoch and 50% burn rate, significant supply reduction occurs over time.
+With the bottom 20% of signals forfeiting antes each epoch and 50% burn rate, significant supply reduction occurs over time.
 </Info>
 
 ## Key Metrics
@@ -166,9 +183,9 @@ With 30% of signals forfeiting antes each epoch and 50% burn rate, significant s
 | Use Case | Requirement | Benefit |
 |----------|-------------|---------|
 | Submit signal | Proportional stake | Participate in competition |
-| Run validator | 10,000+ α | Earn TAO + validation rewards |
+| Run validator | 2,000+ α | Earn TAO + validation rewards |
 | Vote on governance | Any α holdings | Protocol control |
-| API premium tier | 1,000+ α staked | Reduced fees, priority |
+| API premium tier | 200+ α staked | Reduced fees, priority |
 | Liquidity provision | LP tokens | LP rewards + fees |
 
 ## Economic Flywheel

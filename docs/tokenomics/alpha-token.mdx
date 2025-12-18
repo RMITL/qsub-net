@@ -5,7 +5,13 @@ description: "QUANTA's native token specification and utility"
 
 # α-Token (Alpha Token)
 
-The α-token is QUANTA's native token, designed to create economic alignment between signal quality and network value.
+The α-token is QUANTA's subnet-specific token on Bittensor, following the dTAO (Dynamic TAO) tokenomics model. Like all Bittensor subnet tokens, it creates economic alignment between signal quality and network value.
+
+## Understanding Bittensor Alpha Tokens
+
+<Note>
+Every Bittensor subnet has its own "alpha token" (α). QUANTA's α-token is not unique in structure—it follows the same protocol-level constraints as all other subnet tokens. What makes each subnet's α-token valuable is the utility and quality of the subnet itself.
+</Note>
 
 ## Token Basics
 
@@ -13,10 +19,14 @@ The α-token is QUANTA's native token, designed to create economic alignment bet
 |----------|-------|
 | Name | QUANTA Alpha Token |
 | Symbol | α (or ALPHA) |
-| Total Supply | 100,000,000 |
+| Maximum Supply | 21,000,000 |
 | Decimals | 18 |
 | Chain | Bittensor (Substrate) |
-| Initial Circulation | 15,000,000 (15%) |
+| Emission Model | dTAO (protocol-controlled) |
+
+<Info>
+The 21 million cap mirrors TAO itself and is a protocol-level constraint. Subnet founders cannot modify supply caps or arbitrarily mint tokens—all emissions are controlled by Bittensor's consensus mechanism.
+</Info>
 
 ## Core Utility
 
@@ -44,9 +54,9 @@ Validators must stake α-tokens to participate:
 
 | Tier | Stake Required | Benefits |
 |------|----------------|----------|
-| Standard | 10,000 α | Basic validation rights |
-| Enhanced | 50,000 α | Priority in consensus |
-| Premium | 100,000+ α | Governance voting weight |
+| Standard | 2,000 α | Basic validation rights |
+| Enhanced | 10,000 α | Priority in consensus |
+| Premium | 50,000+ α | Governance voting weight |
 
 ### 3. Competition Participation
 
@@ -54,7 +64,7 @@ Validators must stake α-tokens to participate:
 
 - **Ante:** Proportional stake required
 - **Winnings:** Redistributed from underperformers
-- **Losses:** Forfeited if bottom 30%
+- **Losses:** Forfeited if bottom 20%
 
 ### 4. Governance
 
@@ -92,113 +102,68 @@ Stake α-tokens for reduced platform fees:
 
 | Stake Amount | API Discount | Analytics Discount |
 |--------------|--------------|-------------------|
-| 100 α | 10% | 5% |
-| 1,000 α | 25% | 15% |
-| 10,000 α | 50% | 30% |
-| 100,000+ α | 75% | 50% |
+| 50 α | 10% | 5% |
+| 250 α | 25% | 15% |
+| 1,000 α | 50% | 30% |
+| 5,000+ α | 75% | 50% |
 
-## Token Distribution
+## Token Emission (dTAO Model)
 
-### Initial Allocation
+### How Bittensor Alpha Emission Works
+
+Unlike traditional token launches with pre-allocated supplies, Bittensor subnet α-tokens are **emitted by the protocol** based on network activity:
 
 ```
 ┌─────────────────────────────────────────────┐
-│              100,000,000 α                  │
+│         21,000,000 α (Maximum Cap)          │
 └─────────────────────────────────────────────┘
            │
-           ├── 40,000,000 (40%) Miner Emissions
-           │   └── 4-year emission schedule
+           ├── Emitted via protocol (~2 α/block initially)
            │
-           ├── 25,000,000 (25%) Validator Rewards
-           │   └── Performance-based distribution
+           ├── Halving when ~10.5M α minted
            │
-           ├── 20,000,000 (20%) Team & Advisors
-           │   └── 2-year vesting with 6-month cliff
-           │
-           ├── 10,000,000 (10%) Ecosystem Fund
-           │   └── Grants, partnerships, bounties
-           │
-           └── 5,000,000 (5%) Initial Liquidity
-               └── DEX launch + market making
+           └── Distribution per emission:
+               ├── 41% → Signal Generators (Miners)
+               ├── 41% → Validators
+               └── 18% → Subnet Owner
 ```
 
-### Vesting Schedules
+<Warning>
+There is no "team allocation" or "ecosystem fund" in the traditional sense. All α-tokens come from protocol emissions distributed to network participants. The subnet owner receives 18% of ongoing emissions, which can fund development.
+</Warning>
 
-<Tabs>
-  <Tab title="Team & Advisors">
-    **Total:** 20,000,000 α (20%)
+### Emission Schedule
 
-    | Period | Unlock |
-    |--------|--------|
-    | Month 0-6 | 0% (cliff) |
-    | Month 6 | 10% (2M α) |
-    | Month 7-24 | 5%/month |
-    | Month 24 | 100% vested |
+Bittensor controls emission rates at the protocol level:
 
-    ```
-    Month:  0   6   12   18   24
-    Vested: 0% 10%  40%  70% 100%
-    ```
-  </Tab>
-  <Tab title="Ecosystem Fund">
-    **Total:** 10,000,000 α (10%)
+| Phase | Emission Rate | Cumulative Supply |
+|-------|---------------|-------------------|
+| Launch | ~2 α/block | 0 → ~10.5M |
+| Post-Halving 1 | ~1 α/block | 10.5M → ~15.75M |
+| Post-Halving 2 | ~0.5 α/block | 15.75M → ~18.4M |
+| Asymptotic | Decreasing | Approaching 21M |
 
-    | Period | Unlock | Use |
-    |--------|--------|-----|
-    | Month 0 | 20% | Initial grants |
-    | Month 1-36 | 2.2%/month | Ongoing programs |
-
-    Managed by DAO governance after Month 12.
-  </Tab>
-  <Tab title="Initial Liquidity">
-    **Total:** 5,000,000 α (5%)
-
-    | Allocation | Amount | Purpose |
-    |------------|--------|---------|
-    | DEX LP | 3M α | α/TAO pair |
-    | CEX listing | 1M α | Exchange inventory |
-    | Market making | 1M α | Spread maintenance |
-
-    Fully unlocked at launch.
-  </Tab>
-</Tabs>
-
-## Emission Schedule
-
-### Miner Emissions (40M α)
-
-Performance-based emissions over 4 years:
+### Daily Emission Estimates
 
 ```python
-# Yearly emission (approximate)
-year_1 = 16_000_000  # 40%
-year_2 = 12_000_000  # 30%
-year_3 = 8_000_000   # 20%
-year_4 = 4_000_000   # 10%
-total  = 40_000_000  # 100%
+# At launch (~2 α/block, ~7200 blocks/day)
+daily_emission = 2 × 7200 = ~14,400 α/day
 
-# Per-epoch emission
-daily_year_1 = 16_000_000 / 365 ≈ 43,836 α/day
-```
-
-### Emission Decay
-
-```
-Year 1: ████████████████  16M α (40%)
-Year 2: ████████████       12M α (30%)
-Year 3: ████████           8M α (20%)
-Year 4: ████               4M α (10%)
+# Distribution per day:
+miners_daily = 14,400 × 0.41 = ~5,900 α
+validators_daily = 14,400 × 0.41 = ~5,900 α
+owner_daily = 14,400 × 0.18 = ~2,600 α
 ```
 
 ### Top Performer Multipliers
 
-| Rank | Multiplier | Example (1000 α base) |
+| Rank | Multiplier | Example (100 α base) |
 |------|------------|----------------------|
-| #1 | 5.0× | 5,000 α |
-| #2-5 | 3.0× | 3,000 α |
-| Top 10% | 2.0× | 2,000 α |
-| Top 25% | 1.5× | 1,500 α |
-| Others | 1.0× | 1,000 α |
+| #1 | 5.0× | 500 α |
+| #2-5 | 3.0× | 300 α |
+| Top 10% | 2.0× | 200 α |
+| Top 25% | 1.5× | 150 α |
+| Others | 1.0× | 100 α |
 
 ## Value Accrual
 
@@ -209,15 +174,15 @@ As the network grows, more α must be staked:
 ```python
 # Validator staking demand
 validator_demand = num_validators × avg_stake
-# 64 validators × 50,000 α = 3,200,000 α
+# 64 validators × 5,000 α = 320,000 α
 
 # Signal staking demand
 signal_demand = num_signals × avg_exposure × base_rate
-# 1000 signals × 150% × 10 α = 1,500,000 α
+# 1000 signals × 150% × 10 α = 15,000 α
 
 # Total locked
 total_locked = validator_demand + signal_demand
-# = 4,700,000 α (4.7% of supply)
+# = 335,000 α (~1.6% of max supply)
 ```
 
 ### Burn Mechanics
@@ -227,18 +192,22 @@ total_locked = validator_demand + signal_demand
 ```python
 # Daily burn estimate
 daily_signals = 1000
-forfeit_rate = 0.30  # Bottom 30%
-avg_stake = 15
+forfeit_rate = 0.20  # Bottom 20%
+avg_stake = 10
 
 forfeited = daily_signals × forfeit_rate × avg_stake
-# = 4,500 α forfeited daily
+# = 2,000 α forfeited daily
 
 burned = forfeited × 0.50
-# = 2,250 α burned daily
+# = 1,000 α burned daily
 
 annual_burn = burned × 365
-# = 821,250 α burned annually (~0.8% of supply)
+# = 365,000 α burned annually (~1.7% of max supply)
 ```
+
+<Info>
+Because emissions are ongoing but finite (approaching 21M), and burns are permanent, the effective circulating supply will plateau and potentially decrease over time as burn rate exceeds emission rate in later phases.
+</Info>
 
 ### Protocol Revenue
 
@@ -252,36 +221,43 @@ Protocol revenue supports token value:
 
 ## Acquiring α-Tokens
 
-### At Launch
+### How dTAO Trading Works
+
+Bittensor's dTAO system creates automatic markets for subnet α-tokens:
 
 <Steps>
-  <Step title="DEX Launch">
-    Initial liquidity on α/TAO pair
+  <Step title="Stake TAO in Subnet">
+    When you stake TAO in QUANTA subnet, you receive α-tokens from the subnet's liquidity pool.
 
     ```
-    DEX: SushiSwap (Bittensor)
-    Pair: α/TAO
-    Initial Price: TBD
+    Stake TAO → Receive α at current exchange rate
     ```
   </Step>
   <Step title="Earn Through Participation">
-    Submit signals and earn emissions
+    Submit signals or run validators to earn α-token emissions
 
     ```
     No purchase required
     Earn based on performance
     ```
   </Step>
+  <Step title="Unstake to TAO">
+    Convert α-tokens back to TAO via the subnet's AMM pool
+
+    ```
+    Unstake α → Receive TAO at current rate
+    ```
+  </Step>
 </Steps>
 
-### Ongoing
+### Ongoing Methods
 
 | Method | Description |
 |--------|-------------|
-| Mining | Submit high-quality signals |
-| Validating | Run validator infrastructure |
-| LP Rewards | Provide α/TAO liquidity |
-| Grants | Ecosystem fund programs |
+| Mining | Submit high-quality signals, earn 41% of emissions |
+| Validating | Run validator infrastructure, earn 41% of emissions |
+| Staking | Stake TAO in subnet to receive α-tokens |
+| LP Rewards | Provide liquidity in α/TAO pools |
 
 ## Token Security
 

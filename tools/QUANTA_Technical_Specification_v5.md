@@ -87,12 +87,12 @@ The α-token serves multiple functions:
 3. **Governance Rights**: Weighted voting on protocol parameters and universe updates
 4. **Liquidity Incentives**: LP rewards for α/TAO and α/USDC pairs
 
-Initial token distribution:
-- 40% - Performance-based miner emissions (4-year schedule)
-- 25% - Validator rewards and staking incentives
-- 20% - Development team and advisors (2-year vesting)
-- 10% - Ecosystem development fund
-- 5% - Initial liquidity provision
+**dTAO Emission Distribution** (protocol-controlled, not pre-allocated):
+- 41% - Signal generators (miners) based on performance ranking
+- 41% - Validators based on stake weight and consensus alignment
+- 18% - Subnet owner (protocol development and operations)
+
+Note: Unlike traditional token launches, Bittensor subnet α-tokens are emitted by the protocol—not pre-minted or allocated. The 21M cap and halving schedule are protocol-level constraints shared by all subnets.
 
 ### Tokenomics Highlights
 
@@ -106,11 +106,11 @@ QUANTA's dual-token model creates aligned incentives across the network:
 - Emission rate adjusts based on subnet ranking in Bittensor ecosystem
 
 **α-Token (QUANTA Native):**
-- Total supply: 100,000,000α
-- Initial circulation: 15,000,000α (15%)
-- Emission schedule: Exponential decay with 4-year halving
+- Maximum supply: 21,000,000α (Bittensor dTAO protocol constraint—same for all subnets)
+- Emission model: Protocol-controlled (~2 α/block initially, ~14,400 α/day)
+- Halving schedule: Mirrors TAO (halves at ~10.5M α minted)
 - Mining multiplier: Top decile miners earn 3-5x base rate
-- Validator APY: 12-18% (target) on staked α
+- Validator APY: Variable based on stake weight and emission rate
 
 **Value Accrual Mechanisms:**
 1. **Performance Correlation**: Token buybacks funded by protocol fees when network achieves target returns

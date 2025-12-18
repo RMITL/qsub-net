@@ -77,8 +77,8 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
        ▼          ▼          ▼          ▼
    ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
    │Bottom │  │Break  │  │Profit │  │ Top   │
-   │ 30%   │  │Even   │  │ able  │  │ 10%   │
-   │       │  │ 25%   │  │ 35%   │  │       │
+   │ 20%   │  │Even   │  │ able  │  │ 10%   │
+   │       │  │ 25%   │  │ 45%   │  │       │
    └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘
        │          │          │          │
    Forfeit    Return     Return +   Return +
@@ -93,16 +93,16 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
 ### Distribution by Tier
 
 <AccordionGroup>
-  <Accordion title="Bottom 30% (Forfeit)" icon="arrow-trend-down">
+  <Accordion title="Bottom 20% (Forfeit)" icon="arrow-trend-down">
     **What happens:** Entire stake is forfeited
 
     **Where it goes:**
     - 50% permanently burned (deflationary)
     - 50% added to winner pool
 
-    **Example:** 30 signals × 15 α avg = 450 α
-    - 225 α burned
-    - 225 α to winners
+    **Example:** 20 signals × 15 α avg = 300 α
+    - 150 α burned
+    - 150 α to winners
   </Accordion>
 
   <Accordion title="Break-even 25% (Return)" icon="equals">
@@ -113,15 +113,15 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
     **Example:** 25 signals each receive their original stake back
   </Accordion>
 
-  <Accordion title="Profitable 35% (Bonus)" icon="arrow-trend-up">
+  <Accordion title="Profitable 45% (Bonus)" icon="arrow-trend-up">
     **What happens:** Original stake + share of winner pool
 
-    **Pool share:** 40% of winner pool ÷ 35 signals
+    **Pool share:** 40% of winner pool ÷ 45 signals
 
     **Example:**
-    - Winner pool: 225 α
-    - Profitable share: 90 α
-    - Per signal: 90 ÷ 35 = 2.6 α bonus
+    - Winner pool: 150 α
+    - Profitable share: 60 α
+    - Per signal: 60 ÷ 45 = 1.3 α bonus
   </Accordion>
 
   <Accordion title="Top 10% (Premium)" icon="trophy">
@@ -130,9 +130,9 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
     **Pool share:** 50% of winner pool ÷ 10 signals
 
     **Example:**
-    - Winner pool: 225 α
-    - Top tier share: 112.5 α
-    - Per signal: 11.25 α bonus (before multipliers)
+    - Winner pool: 150 α
+    - Top tier share: 75 α
+    - Per signal: 7.5 α bonus (before multipliers)
   </Accordion>
 </AccordionGroup>
 
@@ -205,15 +205,15 @@ Pot: 1,500 α
 Rake (8%): 120 α → treasury
 Net pot: 1,380 α
 
-Bottom 30% forfeit: 450 α
-  → Burned: 225 α
-  → Winners: 225 α
+Bottom 20% forfeit: 300 α
+  → Burned: 150 α
+  → Winners: 150 α
 
 Distribution:
-- Bottom 30 (30 signals): 0 α each
+- Bottom 20 (20 signals): 0 α each
 - Break-even (25 signals): 15 α each (returned)
-- Profitable (35 signals): 15 + 2.6 = 17.6 α each
-- Top 10 (10 signals): 15 + 11.25 = 26.25 α each
+- Profitable (45 signals): 15 + 1.3 = 16.3 α each
+- Top 10 (10 signals): 15 + 7.5 = 22.5 α each
 ```
 
 **Step 2: TAO Emissions**
@@ -279,9 +279,9 @@ ROI: 175% (for this epoch)
 | Active signals | 1,000 |
 | Average stake | 20 α |
 | Total pot | 20,000 α |
-| Bottom 30% forfeit | 6,000 α |
-| Daily burn | 3,000 α |
-| Annual burn | ~1M α (1% of supply) |
+| Bottom 20% forfeit | 4,000 α |
+| Daily burn | 2,000 α |
+| Annual burn | ~730K α (0.73% of supply) |
 
 ### Scenario: Low Competition
 
@@ -290,9 +290,9 @@ ROI: 175% (for this epoch)
 | Active signals | 100 |
 | Average stake | 10 α |
 | Total pot | 1,000 α |
-| Bottom 30% forfeit | 300 α |
-| Daily burn | 150 α |
-| Annual burn | ~55K α (0.05% of supply) |
+| Bottom 20% forfeit | 200 α |
+| Daily burn | 100 α |
+| Annual burn | ~36.5K α (0.04% of supply) |
 
 <Info>
 Higher competition = more burn = stronger deflationary pressure. The system self-balances.

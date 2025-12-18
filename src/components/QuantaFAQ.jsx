@@ -1,9 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const QuantaFAQ = () => {
   const [openSection, setOpenSection] = useState('basics');
   const [openQuestions, setOpenQuestions] = useState({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [faqDropdownOpen, setFaqDropdownOpen] = useState(false);
+  const [glossaryDropdownOpen, setGlossaryDropdownOpen] = useState(false);
+  const faqDropdownRef = useRef(null);
+  const glossaryDropdownRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (faqDropdownRef.current && !faqDropdownRef.current.contains(event.target)) {
+        setFaqDropdownOpen(false);
+      }
+      if (glossaryDropdownRef.current && !glossaryDropdownRef.current.contains(event.target)) {
+        setGlossaryDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleSection = (sectionId) => {
     setOpenSection(openSection === sectionId ? null : sectionId);
@@ -239,7 +257,33 @@ const QuantaFAQ = () => {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setOpenSection(sectionId);
     }
+    setFaqDropdownOpen(false);
+    setGlossaryDropdownOpen(false);
   };
+
+  const scrollToGlossaryCategory = (categoryIndex) => {
+    const glossaryElement = document.getElementById('glossary');
+    if (glossaryElement) {
+      glossaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Small delay to let scroll complete, then scroll to specific category
+      setTimeout(() => {
+        const categories = glossaryElement.querySelectorAll('.glossary-category');
+        if (categories[categoryIndex]) {
+          categories[categoryIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }
+    setGlossaryDropdownOpen(false);
+  };
+
+  const glossaryCategories = [
+    { name: 'Bittensor & Crypto', index: 0 },
+    { name: 'QUANTA Roles', index: 1 },
+    { name: 'Trading & Finance', index: 2 },
+    { name: 'Anti-Gaming & Security', index: 3 },
+    { name: 'QUANTA-Specific', index: 4 },
+    { name: 'Tokenomics', index: 5 }
+  ];
 
   return (
     <div className="faq-container">
@@ -251,9 +295,57 @@ const QuantaFAQ = () => {
           <span className="brand-page">FAQ</span>
         </div>
         <nav className="faq-nav">
-          <a href="#basics" onClick={(e) => { e.preventDefault(); scrollToSection('basics'); }}>FAQ</a>
+          <div className="nav-dropdown" ref={faqDropdownRef}>
+            <button
+              className="nav-dropdown-trigger"
+              onClick={() => setFaqDropdownOpen(!faqDropdownOpen)}
+              onMouseEnter={() => setFaqDropdownOpen(true)}
+            >
+              FAQ <span className="dropdown-arrow">▾</span>
+            </button>
+            {faqDropdownOpen && (
+              <div className="nav-dropdown-menu" onMouseLeave={() => setFaqDropdownOpen(false)}>
+                {sections.map(section => (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    onClick={(e) => { e.preventDefault(); scrollToSection(section.id); }}
+                  >
+                    {section.title}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
           <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); }}>Concepts</a>
-          <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); }}>Glossary</a>
+          <div className="nav-dropdown" ref={glossaryDropdownRef}>
+            <button
+              className="nav-dropdown-trigger"
+              onClick={() => setGlossaryDropdownOpen(!glossaryDropdownOpen)}
+              onMouseEnter={() => setGlossaryDropdownOpen(true)}
+            >
+              Glossary <span className="dropdown-arrow">▾</span>
+            </button>
+            {glossaryDropdownOpen && (
+              <div className="nav-dropdown-menu" onMouseLeave={() => setGlossaryDropdownOpen(false)}>
+                <a
+                  href="#glossary"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); }}
+                >
+                  All Terms
+                </a>
+                {glossaryCategories.map(cat => (
+                  <a
+                    key={cat.index}
+                    href="#glossary"
+                    onClick={(e) => { e.preventDefault(); scrollToGlossaryCategory(cat.index); }}
+                  >
+                    {cat.name}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
         </nav>
@@ -687,7 +779,7 @@ const QuantaFAQ = () => {
             <a href="https://x.com/qsub_net" title="X (Twitter)" className="social-icon" target="_blank" rel="noopener noreferrer">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
-            <a href="https://github.com/RMITL/QUANTA" title="GitHub" className="social-icon" target="_blank" rel="noopener noreferrer">
+            <a href="#" title="GitHub (Coming Soon)" className="social-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
             </a>
             <a href="https://discord.com/users/qsubnet" title="Discord" className="social-icon" target="_blank" rel="noopener noreferrer">
@@ -762,18 +854,111 @@ const QuantaFAQ = () => {
 
         .faq-nav {
           display: flex;
+          align-items: center;
           gap: 1.5rem;
         }
 
-        .faq-nav a {
+        .faq-nav > a {
           color: rgba(232, 230, 227, 0.8);
           text-decoration: none;
           font-size: 0.9rem;
           transition: color 0.2s;
         }
 
-        .faq-nav a:hover {
+        .faq-nav > a:hover {
           color: #d4af37;
+        }
+
+        /* Dropdown styles */
+        .nav-dropdown {
+          position: relative;
+        }
+
+        .nav-dropdown-trigger {
+          background: none;
+          border: none;
+          color: rgba(232, 230, 227, 0.8);
+          font-size: 0.9rem;
+          cursor: pointer;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-family: inherit;
+          transition: color 0.2s;
+        }
+
+        .nav-dropdown-trigger:hover {
+          color: #d4af37;
+        }
+
+        .dropdown-arrow {
+          font-size: 0.7rem;
+          opacity: 0.7;
+          transition: transform 0.2s;
+        }
+
+        .nav-dropdown:hover .dropdown-arrow {
+          transform: rotate(180deg);
+        }
+
+        .nav-dropdown-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(15, 15, 22, 0.98);
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          border-radius: 8px;
+          min-width: 180px;
+          padding: 0.5rem 0;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          z-index: 200;
+          backdrop-filter: blur(8px);
+        }
+
+        .nav-dropdown-menu::before {
+          content: '';
+          position: absolute;
+          top: -6px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-left: 6px solid transparent;
+          border-right: 6px solid transparent;
+          border-bottom: 6px solid rgba(212, 175, 55, 0.25);
+        }
+
+        .nav-dropdown-menu::after {
+          content: '';
+          position: absolute;
+          top: -4px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-bottom: 5px solid rgba(15, 15, 22, 0.98);
+        }
+
+        .nav-dropdown-menu a {
+          display: block;
+          padding: 0.5rem 1rem;
+          color: rgba(232, 230, 227, 0.8);
+          text-decoration: none;
+          font-size: 0.85rem;
+          transition: all 0.15s;
+          white-space: nowrap;
+        }
+
+        .nav-dropdown-menu a:hover {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.08);
+          padding-left: 1.25rem;
+        }
+
+        .nav-dropdown-menu a:first-child {
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+          margin-bottom: 0.25rem;
+          padding-bottom: 0.625rem;
         }
 
         /* Hamburger button - hidden on desktop */

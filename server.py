@@ -928,7 +928,7 @@ if (DIST_DIR / "_astro").exists():
 @app.get("/docs/tech-spec")
 async def serve_tech_spec_redirect():
     """Redirect tech-spec to the PDF file."""
-    file_path = Path(__file__).parent / "public" / "docs" / "QUANTA_Technical_Specification_v3.pdf"
+    file_path = Path(__file__).parent / "public" / "docs" / "QUANTA_Technical_Specification_v4.pdf"
     if file_path.exists():
         return FileResponse(file_path, media_type="application/pdf")
     return JSONResponse(status_code=404, content={"error": "Technical specification not found"})

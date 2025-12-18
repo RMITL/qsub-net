@@ -1,21 +1,36 @@
 ---
 title: "Emission Schedule"
-description: "TAO and α-token emission timelines"
+description: "TAO and α-token emission timelines under Bittensor dTAO"
 ---
 
 # Emission Schedule
 
-QUANTA operates with two emission sources: TAO from Bittensor and native α-tokens. This page details both schedules.
+QUANTA operates with two emission sources: TAO from Bittensor's network emissions and native α-tokens from the subnet's own emission schedule. Both follow Bittensor's dTAO (Dynamic TAO) model.
+
+## Understanding dTAO Emissions
+
+<Note>
+Bittensor's dTAO system introduced subnet-specific α-tokens in February 2025. Each subnet emits its own α-token following the same halving schedule as TAO, with a 21 million maximum supply cap.
+</Note>
+
+### Key Principles
+
+| Principle | Description |
+|-----------|-------------|
+| Protocol-Controlled | Emission rates set by Bittensor, not subnet owners |
+| 21M Maximum | Hard cap mirrors TAO's supply limit |
+| Halving Schedule | Emissions halve after ~10.5M α minted |
+| Market-Priced | α-token value determined by staking demand |
 
 ## TAO Emissions
 
 ### How TAO Flows to QUANTA
 
-TAO emissions come from Bittensor's root network:
+TAO emissions come from Bittensor's root network based on subnet demand:
 
 ```mermaid
 graph LR
-    ROOT[Root Network] -->|Subnet Weight| QUANTA[QUANTA Subnet]
+    ROOT[Root Network] -->|dTAO Allocation| QUANTA[QUANTA Subnet]
     QUANTA -->|41%| M[Miners]
     QUANTA -->|41%| V[Validators]
     QUANTA -->|18%| O[Owner]
@@ -27,113 +42,103 @@ QUANTA's TAO allocation depends on:
 
 | Factor | Impact |
 |--------|--------|
-| Validator Stake | Higher stake → more emissions |
-| Root Network Votes | Positive votes → more emissions |
-| Subnet Performance | Quality metrics → more emissions |
-| Total Network Emissions | Base rate varies |
+| α-Token Staking | More TAO staked in subnet → more emissions |
+| Market Demand | Higher α-token price → more root weight |
+| Subnet Performance | Quality signals → sustained demand |
 
 ### Estimated TAO Schedule
 
-| Period | Daily TAO | Monthly TAO | Annual TAO |
-|--------|-----------|-------------|------------|
-| Month 1-3 | ~50 TAO | ~1,500 TAO | — |
-| Month 4-6 | ~100 TAO | ~3,000 TAO | — |
-| Month 7-12 | ~150 TAO | ~4,500 TAO | — |
-| Year 2+ | ~200 TAO | ~6,000 TAO | ~73,000 TAO |
+| Period | Daily TAO | Monthly TAO | Notes |
+|--------|-----------|-------------|-------|
+| Early Phase | ~10-50 TAO | ~300-1,500 TAO | Bootstrap period |
+| Growth Phase | ~50-150 TAO | ~1,500-4,500 TAO | Gaining traction |
+| Mature Phase | ~100-300 TAO | ~3,000-9,000 TAO | Established subnet |
 
 <Note>
-TAO emissions are dynamic and depend on Bittensor network conditions. These are estimates.
+TAO emissions are entirely dynamic and depend on market-driven staking demand. These are illustrative estimates only.
 </Note>
-
-### TAO Distribution Example
-
-**Daily scenario:** 100 TAO emission
-
-```
-Total:     100 TAO
-Miners:     41 TAO (41%)
-Validators: 41 TAO (41%)
-Owner:      18 TAO (18%)
-```
-
-**Per-participant:**
-```
-Assuming 500 miners, 64 validators:
-
-Top miner (10% of pool): 4.1 TAO
-Average miner: ~0.08 TAO
-Validator (1.5% of stake): ~0.6 TAO
-```
 
 ## α-Token Emissions
 
-### Overview
+### Protocol-Controlled Supply
 
-| Category | Allocation | Schedule |
-|----------|------------|----------|
-| Miner Emissions | 40M α | 4 years |
-| Validator Rewards | 25M α | Ongoing |
-| Team & Advisors | 20M α | 2 years |
-| Ecosystem Fund | 10M α | 3 years |
-| Initial Liquidity | 5M α | Immediate |
+Unlike traditional token launches, QUANTA's α-token supply is controlled by Bittensor's protocol:
 
-### Miner Emission Curve
+| Property | Value |
+|----------|-------|
+| Maximum Supply | 21,000,000 α |
+| Initial Emission | ~2 α/block |
+| First Halving | ~10,500,000 α minted |
+| Block Time | ~12 seconds |
 
-Emissions follow exponential decay with 4-year halving:
+### Emission Distribution
+
+All α-token emissions are distributed in real-time:
+
+| Recipient | Share | Role |
+|-----------|-------|------|
+| Signal Generators (Miners) | 41% | Performance-based rewards |
+| Validators | 41% | Infrastructure and consensus |
+| Subnet Owner | 18% | Protocol development |
+
+### Daily Emission Estimates
 
 ```python
-def miner_emission(day, total=40_000_000):
-    """
-    Exponential decay emission schedule
-    Half of remaining emitted every ~730 days (2 years)
-    """
-    decay_rate = 0.5 ** (1 / 730)
-    daily = total * (1 - decay_rate) * (decay_rate ** day)
-    return daily
+# At launch (~2 α/block, ~7200 blocks/day)
+daily_emission = 2 × 7200 = ~14,400 α/day
+
+# Distribution:
+miners_daily = 14,400 × 0.41 = ~5,900 α
+validators_daily = 14,400 × 0.41 = ~5,900 α
+owner_daily = 14,400 × 0.18 = ~2,600 α
 ```
 
-### Year-by-Year Breakdown
+### Emission Phases
 
 <Tabs>
-  <Tab title="Year 1">
-    **Total Emissions:** ~16,000,000 α (40%)
+  <Tab title="Phase 1: Launch">
+    **Emission Rate:** ~2 α/block
+    **Supply Range:** 0 → ~10.5M α
 
-    | Quarter | Emissions | Daily Average |
-    |---------|-----------|---------------|
-    | Q1 | 5,500,000 α | ~61,000 α |
-    | Q2 | 4,500,000 α | ~50,000 α |
-    | Q3 | 3,500,000 α | ~39,000 α |
-    | Q4 | 2,500,000 α | ~28,000 α |
+    | Metric | Value |
+    |--------|-------|
+    | Daily Emission | ~14,400 α |
+    | Monthly Emission | ~430,000 α |
+    | Time to Halving | ~2-3 years |
+
+    High emission rate attracts early participants and bootstraps network.
   </Tab>
-  <Tab title="Year 2">
-    **Total Emissions:** ~12,000,000 α (30%)
+  <Tab title="Phase 2: Post-Halving 1">
+    **Emission Rate:** ~1 α/block
+    **Supply Range:** 10.5M → ~15.75M α
 
-    | Quarter | Emissions | Daily Average |
-    |---------|-----------|---------------|
-    | Q1 | 3,500,000 α | ~39,000 α |
-    | Q2 | 3,000,000 α | ~33,000 α |
-    | Q3 | 2,800,000 α | ~31,000 α |
-    | Q4 | 2,700,000 α | ~30,000 α |
+    | Metric | Value |
+    |--------|-------|
+    | Daily Emission | ~7,200 α |
+    | Monthly Emission | ~215,000 α |
+    | Time to Next Halving | ~2-3 years |
+
+    Reduced emissions as network matures.
   </Tab>
-  <Tab title="Year 3">
-    **Total Emissions:** ~8,000,000 α (20%)
+  <Tab title="Phase 3: Post-Halving 2">
+    **Emission Rate:** ~0.5 α/block
+    **Supply Range:** 15.75M → ~18.4M α
 
-    | Quarter | Emissions | Daily Average |
-    |---------|-----------|---------------|
-    | Q1 | 2,200,000 α | ~24,000 α |
-    | Q2 | 2,000,000 α | ~22,000 α |
-    | Q3 | 1,900,000 α | ~21,000 α |
-    | Q4 | 1,900,000 α | ~21,000 α |
+    | Metric | Value |
+    |--------|-------|
+    | Daily Emission | ~3,600 α |
+    | Monthly Emission | ~108,000 α |
+
+    Low emissions; network relies more on fee revenue.
   </Tab>
-  <Tab title="Year 4">
-    **Total Emissions:** ~4,000,000 α (10%)
+  <Tab title="Phase 4: Asymptotic">
+    **Emission Rate:** Decreasing
+    **Supply Range:** Approaching 21M α
 
-    | Quarter | Emissions | Daily Average |
-    |---------|-----------|---------------|
-    | Q1 | 1,100,000 α | ~12,000 α |
-    | Q2 | 1,000,000 α | ~11,000 α |
-    | Q3 | 950,000 α | ~10,500 α |
-    | Q4 | 950,000 α | ~10,500 α |
+    Minimal new emissions. Network fully self-sustaining through:
+    - Competition pot fees
+    - API subscriptions
+    - Licensing revenue
   </Tab>
 </Tabs>
 
@@ -142,129 +147,106 @@ def miner_emission(day, total=40_000_000):
 ```
 Daily Emissions (α)
 │
-60k │████
-    │████████
-50k │████████████
-    │████████████████
-40k │████████████████████
-    │████████████████████████
-30k │████████████████████████████
-    │████████████████████████████████
-20k │████████████████████████████████████
-    │████████████████████████████████████████
-10k │████████████████████████████████████████████
+15k │████████████████████████████████████████████████
     │████████████████████████████████████████████████
-────┴────────────────────────────────────────────────────
-    Y1-Q1  Y1-Q3  Y2-Q1  Y2-Q3  Y3-Q1  Y3-Q3  Y4-Q1  Y4-Q3
+12k │████████████████████████████████████████
+    │████████████████████████████████████████
+ 9k │████████████████████████████████
+    │████████████████████████████████
+ 6k │████████████████████████               ← Halving 1
+    │████████████████████████
+ 3k │████████████████                       ← Halving 2
+    │████████████████
+   0│──────────────────────────────────────────────────
+    Y1     Y2     Y3     Y4     Y5     Y6     Y7     Y8
 ```
 
-## Circulating Supply
+## Circulating Supply Projection
 
-### Projection
+### Growth Model
 
-| Month | New Emissions | Cumulative | % of Total |
-|-------|---------------|------------|------------|
-| 0 | 5M (liquidity) | 5M | 5% |
-| 3 | 5.5M | 10.5M | 10.5% |
-| 6 | 5M + 1M (team) | 16.5M | 16.5% |
-| 12 | 8M + 4M | 28.5M | 28.5% |
-| 24 | 12M + 10M | 50.5M | 50.5% |
-| 36 | 8M + 6M | 64.5M | 64.5% |
-| 48 | 4M + 0 | 68.5M | 68.5% |
+| Year | Cumulative Supply | % of Maximum |
+|------|-------------------|--------------|
+| 1 | ~3-5M α | ~15-25% |
+| 2 | ~6-9M α | ~30-45% |
+| 3 | ~9-12M α | ~45-55% |
+| 4 | ~11-14M α | ~55-65% |
+| 5+ | Approaching halving, slower growth | 65%+ |
 
 <Warning>
-This projection excludes burns. Actual circulating supply will be lower due to the burn mechanism.
+This projection excludes burns. Actual circulating supply will be lower due to the burn mechanism (50% of forfeited antes).
 </Warning>
 
 ### Supply with Burns
 
-Accounting for ~0.8% annual burn from forfeited antes:
-
 ```python
-# Year 1 end
-emitted = 28_500_000
-burned = 28_500_000 × 0.008 = 228_000
-net_supply = 28_272_000
+# Example: Year 2 with active network
+emitted_cumulative = 8_000_000  # α
+annual_burn_rate = 0.015  # ~1.5% of circulating burned
 
-# Year 2 end
-emitted = 50_500_000
-burned_cumulative = ~800_000
-net_supply = 49_700_000
+burned = emitted_cumulative × annual_burn_rate
+# = ~120,000 α burned
+
+net_supply = emitted_cumulative - burned
+# = ~7,880,000 α actual circulation
 ```
 
 ## Validator Rewards
 
-### Source
+### Sources
 
-Validator α-token rewards come from:
+Validators earn from multiple streams:
 
-1. **Protocol Fees** — 8% network rake
-2. **Staking Rewards** — Dedicated allocation
-3. **Performance Bonuses** — Consensus alignment
-
-### Distribution
-
-```python
-def validator_reward(validator, epoch):
-    # Base reward from fee pool
-    fee_pool = epoch.network_rake × 0.50  # 50% to validators
-    stake_weight = validator.stake / total_validator_stake
-    base = fee_pool × stake_weight
-
-    # Alignment bonus
-    alignment = calculate_alignment(validator.scores, consensus)
-    bonus = base × alignment × 0.20  # Up to 20% bonus
-
-    return base + bonus
-```
+1. **α-Token Emissions** — 41% of subnet emissions
+2. **TAO Emissions** — 41% of TAO flowing to subnet
+3. **Protocol Fees** — Share of network rake
 
 ### Target APY
 
-| Stake Tier | Target APY |
-|------------|------------|
-| 10,000 α | 12% |
-| 50,000 α | 15% |
-| 100,000+ α | 18% |
+| Factor | Impact on APY |
+|--------|---------------|
+| α-Token Stake | Higher stake → more emissions |
+| Consensus Alignment | Better alignment → bonus rewards |
+| Uptime | 99%+ required for full rewards |
 
-## Halving Events
+<Info>
+Validator APY varies based on total validator stake and emission rates. Early validators with significant stake may see higher returns during the bootstrap phase.
+</Info>
 
-### Schedule
+## Halving Schedule
 
-| Event | Date | Effect |
-|-------|------|--------|
-| Launch | Month 0 | Full emission rate |
-| First Halving | Month 24 | 50% emission rate |
-| Second Halving | Month 48 | 25% emission rate |
-| Third Halving | Month 72 | 12.5% emission rate |
+### Bittensor Protocol Halvings
 
-### Post-Schedule
+| Event | Trigger | Effect |
+|-------|---------|--------|
+| Halving 1 | ~10.5M α minted | 50% emission rate |
+| Halving 2 | ~15.75M α minted | 25% emission rate |
+| Halving 3 | ~18.4M α minted | 12.5% emission rate |
+| Asymptotic | Approaching 21M | Minimal emissions |
 
-After Year 4, remaining emissions (~68M of 100M emitted):
+### Impact on Participants
 
-- Minimal new miner emissions
-- Validator rewards from fees only
-- Ecosystem fund depleted
-- Self-sustaining through network fees
+| Phase | Miner Strategy | Validator Strategy |
+|-------|----------------|-------------------|
+| Pre-Halving | High emissions, compete for share | Stake early for higher returns |
+| Post-Halving 1 | Fewer rewards, quality matters more | Established validators dominate |
+| Post-Halving 2+ | Fee revenue becomes primary | Long-term sustainable returns |
 
 ## Emission Controls
 
-### Governance Adjustable
+### Governance Parameters
 
-The following can be changed via governance:
+The following can be adjusted via governance (affects distribution, not supply cap):
 
 | Parameter | Range | Governance |
 |-----------|-------|------------|
-| Emission rate multiplier | 0.5× - 2× | DAO vote |
+| Distribution split | 30/30/40 to 50/50/0 | DAO vote |
 | Tier thresholds | ±20% | DAO vote |
 | Burn rate | 25% - 75% | DAO vote |
 
-### Emergency Mechanisms
-
-| Situation | Response |
-|-----------|----------|
-| Critical bug | Pause emissions (multisig) |
-| Market manipulation | Temporary caps |
-| Network attack | Emergency governance |
+<Warning>
+The 21M supply cap and halving schedule are **protocol-level constraints** that cannot be changed by subnet governance. Only the Bittensor network itself can modify these parameters.
+</Warning>
 
 ## Emission Dashboard
 
@@ -276,11 +258,11 @@ https://qsub.net/emissions
 
 | Metric | Description |
 |--------|-------------|
-| Daily Emission | Today's α emitted |
-| Cumulative | Total α ever emitted |
-| Burn Rate | Daily α burned |
-| Net Supply | Emitted minus burned |
-| Projected | Future emission estimates |
+| Current Rate | α/block being emitted |
+| Circulating | Total α in circulation |
+| Burned | Cumulative α burned |
+| Net Supply | Circulating minus burned |
+| Next Halving | Blocks/time until halving |
 
 ## Next Steps
 
@@ -288,7 +270,7 @@ https://qsub.net/emissions
   <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
     Start earning emissions
   </Card>
-  <Card title="Tokenomics Overview" icon="coins" href="/tokenomics/overview">
-    Full economic model
+  <Card title="α-Token Details" icon="circle-dollar" href="/tokenomics/alpha-token">
+    Full token specification
   </Card>
 </CardGroup>

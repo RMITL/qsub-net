@@ -13,10 +13,12 @@ Before building strategies, understand what QUANTA rewards:
 
 | Metric | Weight | What It Measures | Optimize For |
 |--------|--------|------------------|--------------|
-| Sortino | 35% | Return per downside risk | Minimize losses, not volatility |
-| Calmar | 25% | Return / max drawdown | Smooth equity curves |
-| Max Drawdown | 25% | Worst peak-to-trough | Capital preservation |
-| Turnover | 15% | Trading frequency | Low-frequency rebalancing |
+| Sharpe | 40% | Risk-adjusted returns | Consistent risk-adjusted gains |
+| Total P/L | 20% | Absolute returns | Making money |
+| Max Drawdown | 15% | Worst peak-to-trough | Capital preservation |
+| Sortino | 10% | Return per downside risk | Minimize losses, not volatility |
+| Calmar | 10% | Return / max drawdown | Smooth equity curves |
+| Turnover | 5% | Trading frequency | Low-frequency rebalancing |
 
 <Info>
 **Key insight:** QUANTA heavily penalizes drawdowns and rewards consistency. A steady 1%/month beats a volatile 3%/month with big drawdowns.

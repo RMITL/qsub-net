@@ -65,22 +65,26 @@ def evaluate_signal(signal, price_data, window_days):
 
 ### 3. Composite Scoring
 
-Validators compute a weighted composite score:
+Validators compute a weighted composite score with Sharpe as the primary metric:
 
 | Metric | Weight | Direction |
 |--------|--------|-----------|
-| Sortino Ratio | 35% | Higher is better |
-| Calmar Ratio | 25% | Higher is better |
-| Max Drawdown | 25% | Lower is better |
-| Turnover Penalty | 15% | Lower is better |
+| Sharpe Ratio | 40% | Higher is better |
+| Total P/L | 20% | Higher is better |
+| Max Drawdown | 15% | Lower is better |
+| Sortino Ratio | 10% | Higher is better |
+| Calmar Ratio | 10% | Higher is better |
+| Turnover Penalty | 5% | Lower is better |
 
 ```python
 def composite_score(metrics):
     return (
-        0.35 * normalize(metrics["sortino"]) +
-        0.25 * normalize(metrics["calmar"]) +
-        0.25 * normalize(-metrics["max_drawdown"]) +  # Invert
-        0.15 * normalize(-metrics["turnover"])        # Invert
+        0.40 * normalize(metrics["sharpe"]) +
+        0.20 * normalize(metrics["pnl"]) +
+        0.15 * normalize(-metrics["max_drawdown"]) +  # Invert
+        0.10 * normalize(metrics["sortino"]) +
+        0.10 * normalize(metrics["calmar"]) +
+        0.05 * normalize(-metrics["turnover"])        # Invert
     )
 ```
 
@@ -202,7 +206,7 @@ python validator.py \
 Validators evaluate each signal over three time horizons:
 
 <Tabs>
-  <Tab title="7-Day Window (20%)" icon="bolt">
+  <Tab title="7-Day Window (30%)" icon="bolt">
     **Purpose:** Capture recent alpha, detect regime changes
 
     ```python
@@ -211,9 +215,9 @@ Validators evaluate each signal over three time horizons:
 
     - Most responsive to new information
     - Higher variance
-    - Weight: 20%
+    - Weight: 30%
   </Tab>
-  <Tab title="30-Day Window (35%)">
+  <Tab title="30-Day Window (40%)">
     **Purpose:** Balance responsiveness with noise reduction
 
     ```python
@@ -222,9 +226,9 @@ Validators evaluate each signal over three time horizons:
 
     - Moderate responsiveness
     - Moderate variance
-    - Weight: 35%
+    - Weight: 40%
   </Tab>
-  <Tab title="90-Day Window (45%)">
+  <Tab title="90-Day Window (30%)">
     **Purpose:** Reward consistency, penalize one-hit wonders
 
     ```python
@@ -233,7 +237,7 @@ Validators evaluate each signal over three time horizons:
 
     - Least responsive
     - Lowest variance
-    - Weight: 45%
+    - Weight: 30%
   </Tab>
 </Tabs>
 

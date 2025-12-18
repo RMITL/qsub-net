@@ -58,9 +58,9 @@ QUANTA uses three rolling windows to balance responsiveness with consistency:
 
 | Window | Duration | Weight | Purpose |
 |--------|----------|--------|---------|
-| Short | 7 days | 20% | Capture recent alpha |
-| Medium | 30 days | 30% | Reduce noise |
-| Long | 90 days | 50% | Reward consistency |
+| Short | 7 days | 30% | Capture recent alpha |
+| Medium | 30 days | 40% | Balance responsiveness |
+| Long | 90 days | 30% | Reward consistency |
 
 <Warning>
 Signals are evaluated continuously. A strong 7-day performance won't save a strategy with poor 90-day results.
@@ -149,9 +149,9 @@ Network rake (8%) taken FIRST
         ↓
 Performance evaluation
         ↓
-Bottom 20-30% forfeit ante → 50% burned, 50% to winners
+Bottom 20% forfeit ante → 50% burned, 50% to winners
 Break-even tier (25%) → ante returned
-Profitable tier (35%) → ante + share of winner pool
+Profitable tier (45%) → ante + share of winner pool
 Top tier (10%) → ante + premium share
 ```
 

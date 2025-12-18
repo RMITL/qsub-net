@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="500" viewBox="0 0 1500 500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="50%" style="stop-color:#12121a"/>
+      <stop offset="100%" style="stop-color:#0a0a0f"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37"/>
+      <stop offset="100%" style="stop-color:#f4d03f"/>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;display=swap');
+      .wordmark {
+        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+      }
+      .tagline {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 400;
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1500" height="500" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(212,175,55,0.03)" stroke-width="1"/>
+  </pattern>
+  <rect width="1500" height="500" fill="url(#grid)"/>
+
+  <!-- QUANTA wordmark -->
+  <text x="750" y="230" class="wordmark" text-anchor="middle" fill="url(#goldGrad)" font-size="120">QUANTA</text>
+
+  <!-- Tagline -->
+  <text x="750" y="310" class="tagline" text-anchor="middle" fill="rgba(232,230,227,0.85)" font-size="28">Decentralized Intelligence on Bittensor</text>
+
+  <!-- Subtle decorative line -->
+  <rect x="550" y="340" width="400" height="1" fill="url(#goldGrad)" opacity="0.4"/>
+</svg>
