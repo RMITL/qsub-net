@@ -128,8 +128,8 @@ All Antes Collected
         │
         ▼
 ┌───────────────────┐
-│   Network Rake    │ ──── 8% to protocol treasury
-│       (8%)        │
+│  Optional Rake    │ ──── 0-8% to treasury (governance-tunable)*
+│     (0-8%)        │
 └───────────────────┘
         │
         ▼
@@ -148,6 +148,10 @@ All Antes Collected
         │
         └─── Top 10%: Ante + premium bonus
 ```
+
+<Note>
+*Setting the network rake to 0% is under active consideration. With TAO emissions (18% owner share) and external revenue providing sustainable network funding, 100% of the ante pool may be redistributed to winning signal generators.
+</Note>
 
 ### Tier Distribution
 
@@ -195,8 +199,10 @@ All Antes Collected
 
 **Setup:**
 - 100 signals with average 15 α ante = 1,500 α total
-- Network rake (8%): 120 α to treasury
-- Remaining pot: 1,380 α
+- Optional network rake (0-8%): 0-120 α to treasury*
+- Remaining pot: 1,380-1,500 α
+
+*Setting rake to 0% is under consideration.
 
 **After Performance Evaluation:**
 ```

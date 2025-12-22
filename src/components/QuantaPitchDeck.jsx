@@ -43,8 +43,8 @@ const QuantaPitchDeckFinal = () => {
     avgAntePerGenerator: 0.1,       // TAO equivalent
     epochsPerDay: 24,               // 1-hour rolling epochs
 
-    // Network rake (guaranteed profit)
-    networkRakePercent: 8,
+    // Network rake (optional, governance-tunable 0-8%)
+    networkRakePercent: 0,
 
     // Pool operator fee (for aggregating signals)
     poolOperatorFeePercent: 15,
@@ -1377,9 +1377,8 @@ const QuantaPitchDeckFinal = () => {
           <div className="tlp-content">
             <h3>Guaranteed Network Sustainability</h3>
             <p>
-              QUANTA takes a <strong>rake from the pool first</strong>—before any payouts.
-              As long as there are participants, the network is profitable.
-              Losers fund winners. External revenue is pure bonus.
+              QUANTA <em>can</em> take an optional <strong>rake from the pool</strong> (0-8%, governance-tunable).
+              With emissions and external revenue providing base sustainability, setting the rake to 0% is under consideration—allowing 100% of the ante pool to be redistributed to winning signal generators.
             </p>
           </div>
         </div>

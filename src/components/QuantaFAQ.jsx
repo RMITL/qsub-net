@@ -743,7 +743,7 @@ const QuantaFAQ = () => {
                 </div>
                 <div className="glossary-item">
                   <dt>Network Rake</dt>
-                  <dd>The percentage (8%) taken by the network from the reward pool. Ensures network profitability regardless of individual outcomes.</dd>
+                  <dd>An optional, governance-tunable percentage (0-8%) that may be taken from the reward pool. Currently under consideration whether to set this to 0%, as emissions and external revenue may allow 100% of the ante pool to be redistributed to winning signal generators.</dd>
                 </div>
                 <div className="glossary-item">
                   <dt>Power-Law Distribution</dt>

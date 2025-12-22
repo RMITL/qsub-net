@@ -64,13 +64,13 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
                   │
                   ▼
 ┌─────────────────────────────────────┐
-│      Network Rake (8% = 120 α)      │
+│   Optional Network Rake (0-8%)*     │
 │      → Protocol Treasury            │
 └─────────────────┬───────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────┐
-│     Remaining: 1,380 α              │
+│     Remaining Pool for Winners      │
 └─────────────────┬───────────────────┘
                   │
        ┌──────────┼──────────┬──────────┐
@@ -136,9 +136,11 @@ required_stake = gross_exposure × base_rate × conviction_multiplier
   </Accordion>
 </AccordionGroup>
 
-### Network Rake
+### Network Rake (Optional)
 
-The 8% rake serves multiple purposes:
+The network rake is governance-tunable from 0-8%. Setting it to **0% is under active consideration**, as TAO emissions (18% owner share) and external revenue may provide sufficient network sustainability—allowing 100% of the ante pool to be redistributed to winning signal generators.
+
+If enabled, the rake would serve:
 
 | Use | Percentage | Purpose |
 |-----|------------|---------|
@@ -202,8 +204,8 @@ def distribute_tao_to_miners(scores, miner_tao_pool):
 **Step 1: Competition Pot**
 ```
 Pot: 1,500 α
-Rake (8%): 120 α → treasury
-Net pot: 1,380 α
+Optional rake (0-8%): 0-120 α → treasury*
+Net pot: 1,380-1,500 α
 
 Bottom 20% forfeit: 300 α
   → Burned: 150 α
@@ -302,12 +304,14 @@ Higher competition = more burn = stronger deflationary pressure. The system self
 
 | Source | Recipient | Amount |
 |--------|-----------|--------|
-| Network Rake (8%) | Protocol | Variable |
+| Network Rake (0-8%)* | Protocol | Variable (optional) |
 | Forfeited Antes (50%) | Burned | Variable |
 | Forfeited Antes (50%) | Winners | Variable |
 | TAO Emissions (41%) | Miners | ~TAO/day × 0.41 |
 | TAO Emissions (41%) | Validators | ~TAO/day × 0.41 |
 | TAO Emissions (18%) | Owner | ~TAO/day × 0.18 |
+
+*Network rake is governance-tunable (0-8%). Setting to 0% is under consideration, as emissions and external revenue may allow 100% of the ante pool to be redistributed to winners.
 
 ## Next Steps
 

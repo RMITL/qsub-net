@@ -33,9 +33,9 @@ logger = logging.getLogger(__name__)
 # SparkPost configuration
 SPARKPOST_API_KEY = os.getenv("SPARKPOST_KEY", "")
 SPARKPOST_API_URL = "https://api.sparkpost.com/api/v1/transmissions"
-FROM_EMAIL = "applications@mail.cquant.co"
+FROM_EMAIL = "info@qsub.net"
 FROM_NAME = "QUANTA Applications"
-NOTIFICATION_EMAILS = ["info@cquant.co"]
+NOTIFICATION_EMAILS = ["info@qsub.net"]
 
 # File upload configuration
 UPLOAD_DIR = Path("data/applications/uploads")

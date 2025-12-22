@@ -10,7 +10,6 @@
 
 **Prepared by:**
 QUANTA Development Team
-CQuant Research Division
 
 **Contact:**
 info@qsub.net
@@ -135,13 +134,13 @@ Signal generators stake a proportional ante in α-tokens when submitting signals
 - Larger positions require larger stakes (skin in the game)
 - Top performers win redistributed ante from underperformers
 - Bottom-tier signals forfeit their stake (50% burned, 50% redistributed)
-- Network rake taken before any distribution (guaranteed network profit)
+- Optional network rake (0-8%, governance-tunable) may be taken before distribution
 
 **Ante Flow:**
 ```
 All generators stake proportional ante (any amount > 0)
         ↓
-Network rake (8%) taken FIRST
+Optional network rake (0-8%) - under consideration*
         ↓
 Performance evaluation
         ↓
@@ -150,6 +149,8 @@ Break-even tier (25%) → ante returned
 Profitable tier (45%) → ante + share of winner pool
 Top tier (10%) → ante + premium share of winner pool
 ```
+
+*\*Network Rake Consideration: Setting the rake to 0% is under active consideration. With TAO emissions (18% owner share) and planned external revenue streams (API subscriptions, signal licensing) providing sustainable network funding, 100% of the ante pool may be redistributed to winning signal generators. This maximizes participant incentives while maintaining network sustainability through alternative revenue sources.*
 
 **2. TAO Emissions (Bittensor Native)**
 

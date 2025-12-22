@@ -86,13 +86,13 @@ server.py                # Python server for API endpoints
 1. **Hydration**: React components use `client:load` directive. Animations were disabled to prevent double-render flashing.
 
 2. **Pitch Deck Tokenomics**: The interactive model in the pitch deck has configurable parameters. Key values:
-   - Network rake: 8%
+   - Network rake: 0-8% (governance-tunable, currently set to 0% - under consideration)
    - Emission split: 41% validators, 41% miners, 18% owner
-   - Horizon weights: 7-day (20%), 30-day (30%), 90-day (50%)
+   - Horizon weights: 7-day (30%), 30-day (40%), 90-day (30%)
 
 3. **Contact Info**: Primary contact is `info@qsub.net`
 
-4. **Technical Spec**: The authoritative technical specification is in `tools/QUANTA_Technical_Specification_v4.md`
+4. **Technical Spec**: The authoritative technical specification is in `tools/QUANTA_Technical_Specification_v5.md`
 
 ## Testing Changes
 
