@@ -90,22 +90,13 @@ Technical Specification v5.0 (whitepaper) and interactive pitch deck available a
 ## The Traction
 
 ### Revenue Model
-**Emission Layer (Bittensor Native):**
-- 41% to signal generators (miners) based on performance ranking
-- 41% to validators for infrastructure (price feeds, scoring, consensus)
-- 18% to subnet owner for development and operations
+QUANTA operates on a dual-revenue architecture that combines Bittensor's native emission system with a competitive ante pool, creating sustainable incentives at every layer of participation.
 
-**Competition Layer (Ante Pool):**
-- Signal generators stake proportional α-token ante
-- Bottom performers forfeit ante (50% burned, 50% redistributed to winners)
-- Top performers earn premium returns from redistributed stake
-- Optional network rake (0-8%, governance-tunable)—setting to 0% is under consideration, as emissions and external revenue may allow 100% redistribution to winners
+The emission layer follows Bittensor's dTAO mechanism with an 41/41/18 split: 41% flows to signal generators (miners) based on their performance ranking, 41% compensates validators for running infrastructure—fetching price feeds, computing scores, and participating in consensus—and 18% supports subnet development and operations. This base layer ensures that everyone contributing meaningful work to the network receives compensation, preventing the "death spiral" common in winner-take-all systems where only top performers remain engaged.
 
-**External Revenue (Planned):**
-- Institutional API subscriptions for aggregated signal access
-- Premium analytics and backtesting tools
-- Signal marketplace fees
-- Meta-signal licensing to ETF providers and quantitative funds
+The competition layer adds skin-in-the-game through a proportional ante pool. Signal generators stake α-tokens when submitting portfolios, with stake size scaling their potential rewards. After each evaluation period, bottom performers forfeit their ante—50% is burned permanently (creating deflationary pressure) and 50% is redistributed to winners. Top performers earn premium returns from this redistributed stake, while break-even participants receive their ante back. We're currently considering setting the optional network rake to 0%, as emissions and external revenue may provide sufficient sustainability to allow 100% of the ante pool to flow to winning signal generators.
+
+Beyond protocol-native revenue, we've identified six external monetization channels. First, a **Signals API** where hedge funds and fintech platforms subscribe for aggregated top-performer signals with tiered access from daily snapshots to real-time feeds, priced per seat or data volume ($50K-$250K/year per institutional client). Second, **SaaS Analytics** providing self-serve portfolio dashboards, backtesting, custom alerts, and factor attribution tools on a freemium model ($29-299/month tiers). Third, **Education** programs including courses taught by top-ranked miners, certification programs validating trading competency, and cohort-based mentorship with revenue-share for instructors. Fourth, **Tournaments**—quarterly championships with themed challenges where sponsors pay for branding, entry fees fund prize pools, and winners gain prestige plus recruiting visibility. Fifth, **Talent Scouting** partnering with quant funds seeking verified talent, where top miners' on-chain track records serve as auditable resumes and QUANTA earns recruitment fees (25% of first-year compensation, typically $100K-175K per placement). Finally, **Strategy Licensing** packaging proven strategies for asset managers—"QUANTA Top 10" indices, single-strategy mandates, smart contract-enforced royalties, and ETF partnerships for retail distribution (5-20 bps on AUM). These streams are additive to core network sustainability—pure bonus that further supports token value and ecosystem growth.
 
 ### User traction or milestones
 - **Working prototype**: Localnet deployed with functional miner-validator scoring loop
@@ -115,19 +106,10 @@ Technical Specification v5.0 (whitepaper) and interactive pitch deck available a
 - **Documentation**: 100+ page technical specification (v5.0), comprehensive codebase
 
 ### Why Yuma?
-Greg Schvey is COO of Yuma and a great friend who was early to Bitcoin—I should have believed him then. But beyond personal connection, the practical motivation is clear:
+Greg Schvey is COO of Yuma and a great friend who was early to Bitcoin—I should have believed him then. But beyond personal connection, QUANTA is precisely the type of project that benefits most from what the Yuma Accelerator offers.
 
-**What we need:**
-- **Bittensor expertise**: Engineers who understand subnet architecture, Yuma consensus, and dTAO mechanics deeply
-- **Validator network**: Launch partners who can run validator infrastructure from day one
-- **Quant/trader community**: Signal generators to bootstrap network effects and validate the scoring mechanism
-- **Liquidity support**: The α-token needs sufficient liquidity to function as an effective ante/reward mechanism
-- **Credibility**: Yuma's backing signals legitimacy to the broader Bittensor ecosystem
+We believe QUANTA is a great fit for the support Yuma can provide. We need access to seasoned Bittensor engineers who deeply understand subnet architecture, Yuma consensus, and dTAO mechanics—the kind of expertise that takes years to develop independently. We need launch partners who can run validator infrastructure from day one, giving the network immediate credibility and operational stability. We need increased access to the quant and trader community to bootstrap signal generators, validate our scoring mechanism, and create the network effects that make the meta-signal valuable. The α-token requires sufficient liquidity to function as an effective ante and reward mechanism, and Yuma's ecosystem can help establish that foundation. Perhaps most importantly, Yuma's backing signals legitimacy to the broader Bittensor ecosystem—a credibility multiplier that accelerates adoption.
 
-**What we bring:**
-- A fully-specified, working protocol with clear differentiation
-- Complete marketing materials and professional presentation
-- A founder who has lived the problem and built the solution
-- A market opportunity at the intersection of DeFi, AI, and quantitative finance
+What we bring to the partnership is equally substantial: a fully-specified, working protocol with clear technical differentiation; complete marketing materials and professional presentation ready for public launch; a founder who has lived the problem firsthand through years of algorithmic trading and built the solution from that experience; a market opportunity sitting at the intersection of DeFi, AI, and quantitative finance; and the will, determination, and skillset to see it through to realization.
 
-Building alone is possible. Building with Yuma's support, community, and expertise means launching stronger, faster, and with greater confidence of success.
+Building alone is possible. Building with Yuma's support, community, and expertise means launching stronger, faster, and with the confidence that comes from having the right partners at the table.
