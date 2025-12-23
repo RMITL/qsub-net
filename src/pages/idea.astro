@@ -32,9 +32,18 @@
         </p>
       </div>
 
-      <div class="stats">
-        <strong>Word count:</strong> 211 &nbsp;|&nbsp; <strong>Character count:</strong> 1,681
+      <div class="stats" id="stats">
+        <strong>Word count:</strong> <span id="word-count">—</span> &nbsp;|&nbsp; <strong>Character count:</strong> <span id="char-count">—</span>
       </div>
+
+      <script>
+        const content = document.querySelector('.content');
+        const text = content.textContent.replace(/\s+/g, ' ').trim();
+        const words = text.split(' ').filter(w => w.length > 0).length;
+        const chars = text.length;
+        document.getElementById('word-count').textContent = words;
+        document.getElementById('char-count').textContent = chars.toLocaleString();
+      </script>
 
       <div class="footer">
         <a href="/">← Back to qsub.net</a>
