@@ -124,6 +124,20 @@ const ContactForm = () => {
           color: #d4af37;
         }
 
+        .contact-nav a.nav-join {
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          color: #0d0d14;
+          padding: 0.4rem 1rem;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+
+        .contact-nav a.nav-join:hover {
+          color: #0d0d14;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
         .contact-main {
           position: relative;
           max-width: 600px;
@@ -337,8 +351,10 @@ const ContactForm = () => {
         </div>
         <nav className="contact-nav">
           <a href="/faq">FAQ</a>
+          <a href="/resources">Resources</a>
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
+          <a href="/" className="nav-join">Join</a>
         </nav>
       </header>
 

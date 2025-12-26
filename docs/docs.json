@@ -15,13 +15,29 @@
   "navbar": {
     "links": [
       {
-        "label": "Website",
-        "href": "https://qsub.net"
+        "label": "FAQ",
+        "href": "https://qsub.net/faq"
+      },
+      {
+        "label": "Resources",
+        "href": "https://qsub.net/resources"
+      },
+      {
+        "label": "Overview",
+        "href": "https://qsub.net/pitch-lite"
+      },
+      {
+        "label": "Deck",
+        "href": "https://qsub.net/pitch"
+      },
+      {
+        "label": "Contact",
+        "href": "https://qsub.net/contact"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Get Started",
+      "label": "Join",
       "href": "https://qsub.net"
     }
   },

@@ -346,8 +346,11 @@ const QuantaFAQ = () => {
               </div>
             )}
           </div>
+          <a href="/resources">Resources</a>
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
+          <a href="/contact">Contact</a>
+          <a href="/" className="nav-join">Join</a>
         </nav>
         <button
           className="hamburger-btn"
@@ -365,9 +368,11 @@ const QuantaFAQ = () => {
           <a href="#basics" onClick={(e) => { e.preventDefault(); scrollToSection('basics'); setMobileMenuOpen(false); }}>FAQ</a>
           <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); setMobileMenuOpen(false); }}>Concepts</a>
           <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); setMobileMenuOpen(false); }}>Glossary</a>
+          <a href="/resources">Resources</a>
           <a href="/pitch-lite">Overview</a>
           <a href="/pitch">Deck</a>
           <a href="/contact">Contact</a>
+          <a href="/" className="mobile-join">Join</a>
         </nav>
       )}
 
@@ -871,6 +876,20 @@ const QuantaFAQ = () => {
           color: #d4af37;
         }
 
+        .faq-nav > a.nav-join {
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          color: #0d0d14;
+          padding: 0.4rem 1rem;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+
+        .faq-nav > a.nav-join:hover {
+          color: #0d0d14;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
         /* Dropdown styles */
         .nav-dropdown {
           position: relative;
@@ -1027,6 +1046,19 @@ const QuantaFAQ = () => {
         .mobile-menu a:hover {
           color: #d4af37;
           background: rgba(212, 175, 55, 0.05);
+        }
+
+        .mobile-menu a.mobile-join {
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          color: #0d0d14;
+          font-weight: 600;
+          text-align: center;
+          margin-top: 0.5rem;
+          border-radius: 6px;
+        }
+
+        .mobile-menu a.mobile-join:hover {
+          color: #0d0d14;
         }
 
         .faq-main {
