@@ -225,7 +225,7 @@ const QuantaPitchDeckLite = () => {
         <div className="bittensor-badge">
           <span>Built on Bittensor</span>
           <span className="separator">|</span>
-          <span>Crypto + Stocks</span>
+          <span>US Equities + ETFs</span>
           <span className="separator">|</span>
           <span>Real Rewards</span>
         </div>
