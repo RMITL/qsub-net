@@ -1268,10 +1268,10 @@ const QuantaLitepaper = () => {
            QUANTA LITEPAPER STYLES - SN8 STYLE
            ============================================================================ */
 
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
 
         .lp-wrapper {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
           background: #0a0a0f;
           color: #e0e0e5;
           line-height: 1.7;
@@ -1299,7 +1299,7 @@ const QuantaLitepaper = () => {
           text-align: left;
           border-left: 2px solid transparent;
           transition: all 0.2s;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Outfit', sans-serif;
         }
         .lp-nav-item:hover { color: rgba(255,255,255,0.7); }
         .lp-nav-item.active {
@@ -1451,7 +1451,7 @@ const QuantaLitepaper = () => {
           font-weight: 600;
           cursor: pointer;
           text-decoration: none;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Outfit', sans-serif;
           transition: all 0.2s;
         }
         .lp-btn-primary:hover {
@@ -1465,7 +1465,7 @@ const QuantaLitepaper = () => {
           border-radius: 8px;
           color: #d4af37;
           text-decoration: none;
-          font-family: 'Inter', sans-serif;
+          font-family: 'Outfit', sans-serif;
           transition: all 0.2s;
         }
         .lp-btn-secondary:hover { background: rgba(212,175,55,0.1); }

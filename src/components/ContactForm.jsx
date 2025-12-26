@@ -37,11 +37,13 @@ const ContactForm = () => {
   return (
     <div className="contact-page">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
+
         .contact-page {
           min-height: 100vh;
           background: linear-gradient(135deg, #0d0d14 0%, #151520 50%, #0d0d14 100%);
           color: #e8e6e3;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .contact-page::before {
@@ -85,7 +87,7 @@ const ContactForm = () => {
           font-size: 16px;
           color: #0d0d14;
           text-decoration: none;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
         }
 
         .brand-link {

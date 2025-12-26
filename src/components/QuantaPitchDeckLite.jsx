@@ -945,12 +945,14 @@ const QuantaPitchDeckLite = () => {
   return (
     <div className="pitch-deck-lite">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
+
         /* ========== CORE STYLES ========== */
         .pitch-deck-lite {
           min-height: 100vh;
           background: linear-gradient(180deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%);
           color: #ffffff;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
           position: relative;
           overflow-x: hidden;
         }
@@ -1248,7 +1250,7 @@ const QuantaPitchDeckLite = () => {
         .nav-pill-counter {
           font-size: 0.65rem;
           color: rgba(255,255,255,0.4);
-          font-family: monospace;
+          font-family: 'JetBrains Mono', monospace;
         }
 
         .nav-pill-chevron {
@@ -1313,7 +1315,7 @@ const QuantaPitchDeckLite = () => {
         .nav-dropdown-num {
           font-size: 0.65rem;
           color: rgba(255,255,255,0.3);
-          font-family: monospace;
+          font-family: 'JetBrains Mono', monospace;
           width: 20px;
         }
 

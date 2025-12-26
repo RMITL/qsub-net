@@ -793,11 +793,13 @@ const QuantaFAQ = () => {
       </main>
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
+
         .faq-container {
           min-height: 100vh;
           background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
           color: #e8e6e3;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .faq-header {
@@ -830,7 +832,7 @@ const QuantaFAQ = () => {
           font-size: 16px;
           color: #0d0d14;
           text-decoration: none;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
         }
 
         .brand-link {
