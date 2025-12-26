@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Header from './Header.jsx';
 
 const QuantaResources = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const resourceSections = [
     {
       title: 'Presentations',
@@ -43,40 +42,7 @@ const QuantaResources = () => {
 
   return (
     <div className="resources-container">
-      <header className="resources-header">
-        <div className="resources-brand">
-          <a href="/" className="brand-logo">Q</a>
-          <a href="/" className="brand-link">QUANTA</a>
-          <span className="brand-separator">|</span>
-          <span className="brand-page">Resources</span>
-        </div>
-        <nav className="resources-nav">
-          <a href="/faq">FAQ</a>
-          <a href="/pitch-lite">Overview</a>
-          <a href="/pitch">Deck</a>
-          <a href="/contact">Contact</a>
-          <a href="/" className="nav-join">Join</a>
-        </nav>
-        <button
-          className="hamburger-btn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-        </button>
-      </header>
-
-      {mobileMenuOpen && (
-        <nav className="mobile-menu">
-          <a href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-          <a href="/pitch-lite" onClick={() => setMobileMenuOpen(false)}>Overview</a>
-          <a href="/pitch" onClick={() => setMobileMenuOpen(false)}>Deck</a>
-          <a href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
-          <a href="/" onClick={() => setMobileMenuOpen(false)} className="nav-join">Join</a>
-        </nav>
-      )}
+      <Header currentPage="Resources" variant="sticky" />
 
       <main className="resources-main">
         <div className="resources-intro">
@@ -177,152 +143,6 @@ const QuantaResources = () => {
           background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
           color: #e8e6e3;
           font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .resources-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem 2rem;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-          background: rgba(10, 10, 15, 0.9);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-
-        .resources-brand {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .brand-logo {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 16px;
-          color: #0d0d14;
-          text-decoration: none;
-          font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .brand-link {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #d4af37;
-          text-decoration: none;
-          letter-spacing: 0.1em;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .brand-separator {
-          color: rgba(212, 175, 55, 0.4);
-        }
-
-        .brand-page {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
-          letter-spacing: 0.05em;
-        }
-
-        .resources-nav {
-          display: flex;
-          gap: 1.5rem;
-        }
-
-        .resources-nav a {
-          color: rgba(232, 230, 227, 0.8);
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.2s;
-        }
-
-        .resources-nav a:hover {
-          color: #d4af37;
-        }
-
-        .resources-nav a.nav-join {
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          color: #0d0d14;
-          padding: 0.4rem 1rem;
-          border-radius: 6px;
-          font-weight: 600;
-        }
-
-        .resources-nav a.nav-join:hover {
-          color: #0d0d14;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .hamburger-btn {
-          display: none;
-          flex-direction: column;
-          justify-content: center;
-          gap: 5px;
-          width: 32px;
-          height: 32px;
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 4px;
-        }
-
-        .hamburger-line {
-          display: block;
-          width: 100%;
-          height: 2px;
-          background: #d4af37;
-          border-radius: 2px;
-          transition: transform 0.3s, opacity 0.3s;
-        }
-
-        .hamburger-line.open:nth-child(1) {
-          transform: translateY(7px) rotate(45deg);
-        }
-
-        .hamburger-line.open:nth-child(2) {
-          opacity: 0;
-        }
-
-        .hamburger-line.open:nth-child(3) {
-          transform: translateY(-7px) rotate(-45deg);
-        }
-
-        .mobile-menu {
-          display: none;
-          flex-direction: column;
-          position: fixed;
-          top: 52px;
-          left: 0;
-          right: 0;
-          background: rgba(10, 10, 15, 0.98);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-          padding: 1rem;
-          z-index: 99;
-        }
-
-        .mobile-menu a {
-          color: rgba(232, 230, 227, 0.9);
-          text-decoration: none;
-          padding: 0.875rem 1rem;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-          transition: color 0.2s, background 0.2s;
-        }
-
-        .mobile-menu a:last-child {
-          border-bottom: none;
-        }
-
-        .mobile-menu a:hover {
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.05);
         }
 
         .resources-main {
@@ -548,22 +368,6 @@ const QuantaResources = () => {
         }
 
         @media (max-width: 640px) {
-          .resources-header {
-            padding: 0.75rem 1rem;
-          }
-
-          .resources-nav {
-            display: none;
-          }
-
-          .hamburger-btn {
-            display: flex;
-          }
-
-          .mobile-menu {
-            display: flex;
-          }
-
           .resources-intro h1 {
             font-size: 1.75rem;
           }

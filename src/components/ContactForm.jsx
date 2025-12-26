@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Header from './Header.jsx';
 
 const ContactForm = () => {
   const [form, setForm] = useState({
@@ -54,88 +55,6 @@ const ContactForm = () => {
             radial-gradient(ellipse at 20% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 80%, rgba(52, 152, 219, 0.04) 0%, transparent 50%);
           pointer-events: none;
-        }
-
-        .contact-header {
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          background: rgba(13, 13, 20, 0.95);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-          padding: 0.75rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .contact-brand {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .brand-logo {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 16px;
-          color: #0d0d14;
-          text-decoration: none;
-          font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .brand-link {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #d4af37;
-          text-decoration: none;
-          letter-spacing: 0.1em;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .brand-separator {
-          color: rgba(212, 175, 55, 0.3);
-        }
-
-        .brand-page {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
-        }
-
-        .contact-nav {
-          display: flex;
-          gap: 1.5rem;
-        }
-
-        .contact-nav a {
-          color: rgba(232, 230, 227, 0.7);
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.2s;
-        }
-
-        .contact-nav a:hover {
-          color: #d4af37;
-        }
-
-        .contact-nav a.nav-join {
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          color: #0d0d14;
-          padding: 0.4rem 1rem;
-          border-radius: 6px;
-          font-weight: 600;
-        }
-
-        .contact-nav a.nav-join:hover {
-          color: #0d0d14;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
         .contact-main {
@@ -320,14 +239,6 @@ const ContactForm = () => {
         }
 
         @media (max-width: 768px) {
-          .contact-header {
-            padding: 0.75rem 1rem;
-          }
-
-          .contact-nav {
-            gap: 1rem;
-          }
-
           .contact-main {
             padding: 2rem 1rem;
           }
@@ -342,21 +253,7 @@ const ContactForm = () => {
         }
       `}</style>
 
-      <header className="contact-header">
-        <div className="contact-brand">
-          <a href="/" className="brand-logo">Q</a>
-          <a href="/" className="brand-link">QUANTA</a>
-          <span className="brand-separator">|</span>
-          <span className="brand-page">Contact</span>
-        </div>
-        <nav className="contact-nav">
-          <a href="/faq">FAQ</a>
-          <a href="/resources">Resources</a>
-          <a href="/pitch-lite">Overview</a>
-          <a href="/pitch">Deck</a>
-          <a href="/" className="nav-join">Join</a>
-        </nav>
-      </header>
+      <Header currentPage="Contact" variant="sticky" />
 
       <main className="contact-main">
         <div className="contact-intro">

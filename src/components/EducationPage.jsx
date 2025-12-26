@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Header from './Header.jsx';
 
 const EducationPage = () => {
   const [form, setForm] = useState({
@@ -81,78 +82,6 @@ const EducationPage = () => {
           color: #e8e6e3;
           font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
           overflow-x: hidden;
-        }
-
-        /* Header */
-        .education-header {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 100;
-          background: rgba(10, 10, 15, 0.9);
-          backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-          padding: 0.75rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .education-brand {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .brand-logo {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 16px;
-          color: #0d0d14;
-          text-decoration: none;
-          font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .brand-link {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #d4af37;
-          text-decoration: none;
-          letter-spacing: 0.1em;
-          font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .brand-separator { color: rgba(212, 175, 55, 0.3); }
-        .brand-page { color: rgba(232, 230, 227, 0.7); font-size: 0.9rem; }
-
-        .education-nav {
-          display: flex;
-          gap: 1.5rem;
-          align-items: center;
-        }
-
-        .education-nav a {
-          color: rgba(232, 230, 227, 0.7);
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.2s;
-        }
-
-        .education-nav a:hover { color: #d4af37; }
-
-        .education-nav a.nav-join {
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          color: #0d0d14;
-          padding: 0.4rem 1rem;
-          border-radius: 6px;
-          font-weight: 600;
         }
 
         /* Hero Section */
@@ -853,14 +782,6 @@ const EducationPage = () => {
         }
 
         @media (max-width: 640px) {
-          .education-header {
-            padding: 0.75rem 1rem;
-          }
-
-          .education-nav {
-            display: none;
-          }
-
           .hero-title {
             font-size: 2rem;
           }
@@ -891,22 +812,7 @@ const EducationPage = () => {
         }
       `}</style>
 
-      <header className="education-header">
-        <div className="education-brand">
-          <a href="/" className="brand-logo">Q</a>
-          <a href="/" className="brand-link">QUANTA</a>
-          <span className="brand-separator">|</span>
-          <span className="brand-page">Education</span>
-        </div>
-        <nav className="education-nav">
-          <a href="/sponsors">Sponsors</a>
-          <a href="/faq">FAQ</a>
-          <a href="/resources">Resources</a>
-          <a href="/pitch-lite">Overview</a>
-          <a href="/contact">Contact</a>
-          <a href="/" className="nav-join">Join</a>
-        </nav>
-      </header>
+      <Header currentPage="Education" variant="fixed" />
 
       {/* Hero */}
       <section className="hero-section">

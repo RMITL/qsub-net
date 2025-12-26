@@ -1,27 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import Header from './Header.jsx';
 
 const QuantaFAQ = () => {
   const [openSection, setOpenSection] = useState('basics');
   const [openQuestions, setOpenQuestions] = useState({});
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [faqDropdownOpen, setFaqDropdownOpen] = useState(false);
-  const [glossaryDropdownOpen, setGlossaryDropdownOpen] = useState(false);
-  const faqDropdownRef = useRef(null);
-  const glossaryDropdownRef = useRef(null);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (faqDropdownRef.current && !faqDropdownRef.current.contains(event.target)) {
-        setFaqDropdownOpen(false);
-      }
-      if (glossaryDropdownRef.current && !glossaryDropdownRef.current.contains(event.target)) {
-        setGlossaryDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const toggleSection = (sectionId) => {
     setOpenSection(openSection === sectionId ? null : sectionId);
@@ -257,15 +239,12 @@ const QuantaFAQ = () => {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setOpenSection(sectionId);
     }
-    setFaqDropdownOpen(false);
-    setGlossaryDropdownOpen(false);
   };
 
   const scrollToGlossaryCategory = (categoryIndex) => {
     const glossaryElement = document.getElementById('glossary');
     if (glossaryElement) {
       glossaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Small delay to let scroll complete, then scroll to specific category
       setTimeout(() => {
         const categories = glossaryElement.querySelectorAll('.glossary-category');
         if (categories[categoryIndex]) {
@@ -273,109 +252,45 @@ const QuantaFAQ = () => {
         }
       }, 300);
     }
-    setGlossaryDropdownOpen(false);
   };
 
-  const glossaryCategories = [
-    { name: 'Bittensor & Crypto', index: 0 },
-    { name: 'QUANTA Roles', index: 1 },
-    { name: 'Trading & Finance', index: 2 },
-    { name: 'Anti-Gaming & Security', index: 3 },
-    { name: 'QUANTA-Specific', index: 4 },
-    { name: 'Tokenomics', index: 5 }
+  // Handle dropdown item clicks from Header
+  const handleDropdownClick = (item) => {
+    if (item.categoryIndex !== undefined) {
+      scrollToGlossaryCategory(item.categoryIndex);
+    } else if (item.id) {
+      scrollToSection(item.id);
+    }
+  };
+
+  // Page-specific dropdowns for the Header
+  const pageDropdowns = [
+    {
+      label: 'Topics',
+      items: sections.map(s => ({ id: s.id, label: s.title }))
+    },
+    {
+      label: 'Glossary',
+      items: [
+        { id: 'glossary', label: 'All Terms' },
+        { id: 'glossary', categoryIndex: 0, label: 'Bittensor & Crypto' },
+        { id: 'glossary', categoryIndex: 1, label: 'QUANTA Roles' },
+        { id: 'glossary', categoryIndex: 2, label: 'Trading & Finance' },
+        { id: 'glossary', categoryIndex: 3, label: 'Anti-Gaming' },
+        { id: 'glossary', categoryIndex: 4, label: 'QUANTA-Specific' },
+        { id: 'glossary', categoryIndex: 5, label: 'Tokenomics' }
+      ]
+    }
   ];
 
   return (
     <div className="faq-container">
-      <header className="faq-header">
-        <div className="faq-brand">
-          <a href="/" className="brand-logo">Q</a>
-          <a href="/" className="brand-link">QUANTA</a>
-          <span className="brand-separator">|</span>
-          <span className="brand-page">FAQ</span>
-        </div>
-        <nav className="faq-nav">
-          <div className="nav-dropdown" ref={faqDropdownRef}>
-            <button
-              className="nav-dropdown-trigger"
-              onClick={() => setFaqDropdownOpen(!faqDropdownOpen)}
-              onMouseEnter={() => setFaqDropdownOpen(true)}
-            >
-              FAQ <span className="dropdown-arrow">▾</span>
-            </button>
-            {faqDropdownOpen && (
-              <div className="nav-dropdown-menu" onMouseLeave={() => setFaqDropdownOpen(false)}>
-                {sections.map(section => (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    onClick={(e) => { e.preventDefault(); scrollToSection(section.id); }}
-                  >
-                    {section.title}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-          <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); }}>Concepts</a>
-          <div className="nav-dropdown" ref={glossaryDropdownRef}>
-            <button
-              className="nav-dropdown-trigger"
-              onClick={() => setGlossaryDropdownOpen(!glossaryDropdownOpen)}
-              onMouseEnter={() => setGlossaryDropdownOpen(true)}
-            >
-              Glossary <span className="dropdown-arrow">▾</span>
-            </button>
-            {glossaryDropdownOpen && (
-              <div className="nav-dropdown-menu" onMouseLeave={() => setGlossaryDropdownOpen(false)}>
-                <a
-                  href="#glossary"
-                  onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); }}
-                >
-                  All Terms
-                </a>
-                {glossaryCategories.map(cat => (
-                  <a
-                    key={cat.index}
-                    href="#glossary"
-                    onClick={(e) => { e.preventDefault(); scrollToGlossaryCategory(cat.index); }}
-                  >
-                    {cat.name}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-          <a href="/resources">Resources</a>
-          <a href="/pitch-lite">Overview</a>
-          <a href="/pitch">Deck</a>
-          <a href="/contact">Contact</a>
-          <a href="/" className="nav-join">Join</a>
-        </nav>
-        <button
-          className="hamburger-btn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-          <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`}></span>
-        </button>
-      </header>
-
-      {mobileMenuOpen && (
-        <nav className="mobile-menu">
-          <a href="#basics" onClick={(e) => { e.preventDefault(); scrollToSection('basics'); setMobileMenuOpen(false); }}>FAQ</a>
-          <a href="#concepts" onClick={(e) => { e.preventDefault(); scrollToSection('concepts'); setMobileMenuOpen(false); }}>Concepts</a>
-          <a href="#glossary" onClick={(e) => { e.preventDefault(); scrollToSection('glossary'); setMobileMenuOpen(false); }}>Glossary</a>
-          <a href="/resources">Resources</a>
-          <a href="/pitch-lite">Overview</a>
-          <a href="/pitch">Deck</a>
-          <a href="/contact">Contact</a>
-          <a href="/" className="mobile-join">Join</a>
-        </nav>
-      )}
-
+      <Header
+        currentPage="FAQ"
+        variant="sticky"
+        pageDropdowns={pageDropdowns}
+        onDropdownClick={handleDropdownClick}
+      />
 
       <main className="faq-main">
         <div id="faq-intro" className="faq-intro">
@@ -805,260 +720,6 @@ const QuantaFAQ = () => {
           background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
           color: #e8e6e3;
           font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .faq-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem 2rem;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-          background: rgba(10, 10, 15, 0.9);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-
-        .faq-brand {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .brand-logo {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 16px;
-          color: #0d0d14;
-          text-decoration: none;
-          font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .brand-link {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #d4af37;
-          text-decoration: none;
-          letter-spacing: 0.1em;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .brand-separator {
-          color: rgba(212, 175, 55, 0.4);
-        }
-
-        .brand-page {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
-          letter-spacing: 0.05em;
-        }
-
-        .faq-nav {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-        }
-
-        .faq-nav > a {
-          color: rgba(232, 230, 227, 0.8);
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: color 0.2s;
-        }
-
-        .faq-nav > a:hover {
-          color: #d4af37;
-        }
-
-        .faq-nav > a.nav-join {
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          color: #0d0d14;
-          padding: 0.4rem 1rem;
-          border-radius: 6px;
-          font-weight: 600;
-        }
-
-        .faq-nav > a.nav-join:hover {
-          color: #0d0d14;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        /* Dropdown styles */
-        .nav-dropdown {
-          position: relative;
-        }
-
-        .nav-dropdown-trigger {
-          background: none;
-          border: none;
-          color: rgba(232, 230, 227, 0.8);
-          font-size: 0.9rem;
-          cursor: pointer;
-          padding: 0;
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-          font-family: inherit;
-          transition: color 0.2s;
-        }
-
-        .nav-dropdown-trigger:hover {
-          color: #d4af37;
-        }
-
-        .dropdown-arrow {
-          font-size: 0.7rem;
-          opacity: 0.7;
-          transition: transform 0.2s;
-        }
-
-        .nav-dropdown:hover .dropdown-arrow {
-          transform: rotate(180deg);
-        }
-
-        .nav-dropdown-menu {
-          position: absolute;
-          top: calc(100% + 8px);
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(15, 15, 22, 0.98);
-          border: 1px solid rgba(212, 175, 55, 0.25);
-          border-radius: 8px;
-          min-width: 180px;
-          padding: 0.5rem 0;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-          z-index: 200;
-          backdrop-filter: blur(8px);
-        }
-
-        .nav-dropdown-menu::before {
-          content: '';
-          position: absolute;
-          top: -6px;
-          left: 50%;
-          transform: translateX(-50%);
-          border-left: 6px solid transparent;
-          border-right: 6px solid transparent;
-          border-bottom: 6px solid rgba(212, 175, 55, 0.25);
-        }
-
-        .nav-dropdown-menu::after {
-          content: '';
-          position: absolute;
-          top: -4px;
-          left: 50%;
-          transform: translateX(-50%);
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-bottom: 5px solid rgba(15, 15, 22, 0.98);
-        }
-
-        .nav-dropdown-menu a {
-          display: block;
-          padding: 0.5rem 1rem;
-          color: rgba(232, 230, 227, 0.8);
-          text-decoration: none;
-          font-size: 0.85rem;
-          transition: all 0.15s;
-          white-space: nowrap;
-        }
-
-        .nav-dropdown-menu a:hover {
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.08);
-          padding-left: 1.25rem;
-        }
-
-        .nav-dropdown-menu a:first-child {
-          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-          margin-bottom: 0.25rem;
-          padding-bottom: 0.625rem;
-        }
-
-        /* Hamburger button - hidden on desktop */
-        .hamburger-btn {
-          display: none;
-          flex-direction: column;
-          justify-content: center;
-          gap: 5px;
-          width: 32px;
-          height: 32px;
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 4px;
-        }
-
-        .hamburger-line {
-          display: block;
-          width: 100%;
-          height: 2px;
-          background: #d4af37;
-          border-radius: 2px;
-          transition: transform 0.3s, opacity 0.3s;
-        }
-
-        .hamburger-line.open:nth-child(1) {
-          transform: translateY(7px) rotate(45deg);
-        }
-
-        .hamburger-line.open:nth-child(2) {
-          opacity: 0;
-        }
-
-        .hamburger-line.open:nth-child(3) {
-          transform: translateY(-7px) rotate(-45deg);
-        }
-
-        /* Mobile menu - hidden by default */
-        .mobile-menu {
-          display: none;
-          flex-direction: column;
-          position: fixed;
-          top: 52px;
-          left: 0;
-          right: 0;
-          background: rgba(10, 10, 15, 0.98);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-          padding: 1rem;
-          z-index: 99;
-        }
-
-        .mobile-menu a {
-          color: rgba(232, 230, 227, 0.9);
-          text-decoration: none;
-          padding: 0.875rem 1rem;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-          transition: color 0.2s, background 0.2s;
-        }
-
-        .mobile-menu a:last-child {
-          border-bottom: none;
-        }
-
-        .mobile-menu a:hover {
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.05);
-        }
-
-        .mobile-menu a.mobile-join {
-          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-          color: #0d0d14;
-          font-weight: 600;
-          text-align: center;
-          margin-top: 0.5rem;
-          border-radius: 6px;
-        }
-
-        .mobile-menu a.mobile-join:hover {
-          color: #0d0d14;
         }
 
         .faq-main {
@@ -1518,22 +1179,6 @@ const QuantaFAQ = () => {
 
         /* Mobile */
         @media (max-width: 640px) {
-          .faq-header {
-            padding: 0.75rem 1rem;
-          }
-
-          .faq-nav {
-            display: none;
-          }
-
-          .hamburger-btn {
-            display: flex;
-          }
-
-          .mobile-menu {
-            display: flex;
-          }
-
           .faq-intro h1 {
             font-size: 1.75rem;
           }
