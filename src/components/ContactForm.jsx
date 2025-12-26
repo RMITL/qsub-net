@@ -447,11 +447,15 @@ const ContactForm = () => {
               </div>
               <div className="contact-method">
                 <span>💬</span>
-                <span>Discord (coming soon)</span>
+                <a href="https://discord.com/users/qsubnet" target="_blank" rel="noopener noreferrer">Discord</a>
+              </div>
+              <div className="contact-method">
+                <span>✈️</span>
+                <a href="https://t.me/qsubnet" target="_blank" rel="noopener noreferrer">Telegram</a>
               </div>
               <div className="contact-method">
                 <span>🐦</span>
-                <span>Twitter/X (coming soon)</span>
+                <a href="https://x.com/qsub_net" target="_blank" rel="noopener noreferrer">X / Twitter</a>
               </div>
             </div>
           </div>
