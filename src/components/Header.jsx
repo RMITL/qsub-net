@@ -19,8 +19,16 @@ const Header = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [contactDropdownOpen, setContactDropdownOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [expandedMobileSections, setExpandedMobileSections] = useState({});
   const contactDropdownRef = useRef(null);
   const dropdownRefs = useRef({});
+
+  const toggleMobileSection = (label) => {
+    setExpandedMobileSections(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -359,6 +367,63 @@ const Header = ({
           opacity: 0.6;
         }
 
+        .mobile-accordion {
+          border-top: 1px solid rgba(212, 175, 55, 0.1);
+          margin-top: 0.25rem;
+        }
+
+        .mobile-accordion-trigger {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          background: none;
+          border: none;
+          color: rgba(232, 230, 227, 0.9);
+          font-size: 0.95rem;
+          font-family: inherit;
+          cursor: pointer;
+          text-align: left;
+          transition: color 0.2s;
+        }
+
+        .mobile-accordion-trigger:hover {
+          color: #d4af37;
+        }
+
+        .mobile-accordion-trigger .accordion-arrow {
+          font-size: 0.7rem;
+          opacity: 0.5;
+          transition: transform 0.2s;
+        }
+
+        .mobile-accordion-trigger.expanded .accordion-arrow {
+          transform: rotate(180deg);
+        }
+
+        .mobile-accordion-content {
+          display: none;
+          flex-direction: column;
+          padding-bottom: 0.5rem;
+        }
+
+        .mobile-accordion-content.expanded {
+          display: flex;
+        }
+
+        .mobile-accordion-content a {
+          padding: 0.5rem 1rem 0.5rem 1.75rem;
+          font-size: 0.85rem;
+          color: rgba(232, 230, 227, 0.7);
+          border-radius: 0;
+        }
+
+        .mobile-accordion-content a:hover {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.08);
+        }
+
         @media (max-width: 900px) {
           .header-nav {
             display: none;
@@ -493,12 +558,18 @@ const Header = ({
       </header>
 
       <nav className={`header-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
-        {/* Page-specific links for mobile */}
+        {/* Page-specific expandable sections for mobile */}
         {pageDropdowns.length > 0 && pageDropdowns.map(dropdown => (
-          <React.Fragment key={dropdown.label}>
-            <div className="mobile-submenu-label">{dropdown.label}</div>
-            <div className="mobile-submenu">
-              {dropdown.items.slice(0, 4).map(item => (
+          <div key={dropdown.label} className="mobile-accordion">
+            <button
+              className={`mobile-accordion-trigger ${expandedMobileSections[dropdown.label] ? 'expanded' : ''}`}
+              onClick={() => toggleMobileSection(dropdown.label)}
+            >
+              {dropdown.label}
+              <span className="accordion-arrow">▾</span>
+            </button>
+            <div className={`mobile-accordion-content ${expandedMobileSections[dropdown.label] ? 'expanded' : ''}`}>
+              {dropdown.items.map(item => (
                 <a
                   key={item.id || item.label}
                   href={item.href || `#${item.id}`}
@@ -514,7 +585,7 @@ const Header = ({
                 </a>
               ))}
             </div>
-          </React.Fragment>
+          </div>
         ))}
 
         <a href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
@@ -542,17 +613,26 @@ const Header = ({
 
         <div className="mobile-divider" />
 
-        <div className="mobile-submenu-label">Contact</div>
-        <div className="mobile-submenu">
-          {contactSublinks.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
+        {/* Contact accordion */}
+        <div className="mobile-accordion">
+          <button
+            className={`mobile-accordion-trigger ${expandedMobileSections['Contact'] ? 'expanded' : ''}`}
+            onClick={() => toggleMobileSection('Contact')}
+          >
+            Contact
+            <span className="accordion-arrow">▾</span>
+          </button>
+          <div className={`mobile-accordion-content ${expandedMobileSections['Contact'] ? 'expanded' : ''}`}>
+            {contactSublinks.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
 
         <a href="/" onClick={() => setMobileMenuOpen(false)} className="mobile-join">Join QUANTA</a>
