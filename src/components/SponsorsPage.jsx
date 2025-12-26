@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const SponsorsPage = () => {
   const [form, setForm] = useState({
@@ -12,6 +12,29 @@ const SponsorsPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [visibleSections, setVisibleSections] = useState(new Set());
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => new Set([...prev, entry.target.id]));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('[data-animate]').forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const isVisible = (id) => visibleSections.has(id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,30 +69,30 @@ const SponsorsPage = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
 
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
         .sponsors-page {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0d0d14 0%, #151520 50%, #0d0d14 100%);
+          background: #0a0a0f;
           color: #e8e6e3;
           font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+          overflow-x: hidden;
         }
 
-        .sponsors-page::before {
-          content: '';
-          position: fixed;
-          inset: 0;
-          background:
-            radial-gradient(ellipse at 20% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 80%, rgba(52, 152, 219, 0.04) 0%, transparent 50%);
-          pointer-events: none;
-        }
-
+        /* Header */
         .sponsors-header {
-          position: sticky;
+          position: fixed;
           top: 0;
+          left: 0;
+          right: 0;
           z-index: 100;
-          background: rgba(13, 13, 20, 0.95);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+          background: rgba(10, 10, 15, 0.9);
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.1);
           padding: 0.75rem 2rem;
           display: flex;
           justify-content: space-between;
@@ -103,21 +126,16 @@ const SponsorsPage = () => {
           color: #d4af37;
           text-decoration: none;
           letter-spacing: 0.1em;
-          font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
         }
 
-        .brand-separator {
-          color: rgba(212, 175, 55, 0.3);
-        }
-
-        .brand-page {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
-        }
+        .brand-separator { color: rgba(212, 175, 55, 0.3); }
+        .brand-page { color: rgba(232, 230, 227, 0.7); font-size: 0.9rem; }
 
         .sponsors-nav {
           display: flex;
           gap: 1.5rem;
+          align-items: center;
         }
 
         .sponsors-nav a {
@@ -127,9 +145,7 @@ const SponsorsPage = () => {
           transition: color 0.2s;
         }
 
-        .sponsors-nav a:hover {
-          color: #d4af37;
-        }
+        .sponsors-nav a:hover { color: #d4af37; }
 
         .sponsors-nav a.nav-join {
           background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
@@ -139,194 +155,474 @@ const SponsorsPage = () => {
           font-weight: 600;
         }
 
-        .sponsors-nav a.nav-join:hover {
-          color: #0d0d14;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .sponsors-main {
-          position: relative;
-          max-width: 1000px;
-          margin: 0 auto;
-          padding: 3rem 1.5rem 4rem;
-        }
-
-        .sponsors-hero {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-
-        .sponsors-hero h1 {
-          font-size: 2.5rem;
-          font-weight: 300;
-          color: #d4af37;
-          margin-bottom: 0.75rem;
-          letter-spacing: 0.05em;
-        }
-
-        .sponsors-hero p {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 1.1rem;
-          line-height: 1.6;
-          max-width: 700px;
-          margin: 0 auto;
-        }
-
-        .value-props {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 3rem;
-        }
-
-        .value-card {
-          background: rgba(26, 26, 46, 0.5);
-          border: 1px solid rgba(212, 175, 55, 0.15);
-          border-radius: 12px;
-          padding: 1.5rem;
-        }
-
-        .value-card h3 {
-          color: #d4af37;
-          font-size: 1.1rem;
-          font-weight: 600;
-          margin-bottom: 0.75rem;
+        /* Hero Section - Full viewport */
+        .hero-section {
+          min-height: 100vh;
           display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          padding: 6rem 2rem 4rem;
+          text-align: center;
+          background:
+            radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+            linear-gradient(180deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%);
+        }
+
+        .hero-section::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+          opacity: 0.5;
+        }
+
+        .hero-badge {
+          display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-        }
-
-        .value-card p {
-          color: rgba(232, 230, 227, 0.75);
-          font-size: 0.95rem;
-          line-height: 1.6;
-          margin: 0;
-        }
-
-        .sponsor-types {
-          margin-bottom: 3rem;
-        }
-
-        .sponsor-types h2 {
-          text-align: center;
+          background: rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          padding: 0.5rem 1rem;
+          border-radius: 50px;
+          font-size: 0.85rem;
           color: #d4af37;
-          font-size: 1.5rem;
-          font-weight: 400;
+          margin-bottom: 2rem;
+          animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-title {
+          font-size: clamp(2.5rem, 6vw, 4.5rem);
+          font-weight: 200;
+          letter-spacing: -0.02em;
+          line-height: 1.1;
           margin-bottom: 1.5rem;
+          animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
-        .type-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 1.5rem;
+        .hero-title .highlight {
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 400;
         }
 
-        .type-card {
-          background: rgba(26, 26, 46, 0.5);
-          border: 1px solid rgba(212, 175, 55, 0.15);
-          border-radius: 12px;
-          padding: 1.5rem;
+        .hero-subtitle {
+          font-size: 1.25rem;
+          color: rgba(232, 230, 227, 0.7);
+          max-width: 600px;
+          line-height: 1.6;
+          margin-bottom: 3rem;
+          animation: fadeInUp 0.8s ease-out 0.4s both;
         }
 
-        .type-card h3 {
-          color: #e8e6e3;
-          font-size: 1.1rem;
+        .hero-cta {
+          display: flex;
+          gap: 1rem;
+          animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .cta-primary {
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          color: #0a0a0f;
+          padding: 1rem 2rem;
+          border-radius: 8px;
           font-weight: 600;
+          font-size: 1rem;
+          text-decoration: none;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .cta-secondary {
+          background: transparent;
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          color: #d4af37;
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          font-weight: 500;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+
+        .cta-secondary:hover {
+          background: rgba(212, 175, 55, 0.1);
+        }
+
+        .scroll-indicator {
+          position: absolute;
+          bottom: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+          color: rgba(212, 175, 55, 0.5);
+          font-size: 0.75rem;
+          animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator svg {
+          width: 24px;
+          height: 24px;
+        }
+
+        @keyframes bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Section */
+        .stats-section {
+          padding: 6rem 2rem;
+          background: linear-gradient(180deg, #0a0a0f 0%, #0d0d14 100%);
+          position: relative;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .stat-card {
+          text-align: center;
+          padding: 2rem;
+          opacity: 0;
+          transform: translateY(30px);
+          transition: all 0.6s ease-out;
+        }
+
+        .stat-card.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .stat-card:nth-child(1) { transition-delay: 0s; }
+        .stat-card:nth-child(2) { transition-delay: 0.1s; }
+        .stat-card:nth-child(3) { transition-delay: 0.2s; }
+        .stat-card:nth-child(4) { transition-delay: 0.3s; }
+
+        .stat-value {
+          font-size: 3.5rem;
+          font-weight: 200;
+          font-family: 'Space Grotesk', sans-serif;
+          background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          line-height: 1;
           margin-bottom: 0.5rem;
         }
 
-        .type-card .type-label {
-          color: #d4af37;
-          font-size: 0.8rem;
+        .stat-label {
+          font-size: 0.9rem;
+          color: rgba(232, 230, 227, 0.6);
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          margin-bottom: 0.75rem;
         }
 
-        .type-card p {
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
-          line-height: 1.5;
+        /* Partnership Models */
+        .models-section {
+          padding: 8rem 2rem;
+          background: #0a0a0f;
+          position: relative;
+        }
+
+        .section-header {
+          text-align: center;
+          max-width: 700px;
+          margin: 0 auto 4rem;
+          opacity: 0;
+          transform: translateY(30px);
+          transition: all 0.6s ease-out;
+        }
+
+        .section-header.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .section-overline {
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: #d4af37;
           margin-bottom: 1rem;
         }
 
-        .type-card ul {
-          margin: 0;
-          padding-left: 1.25rem;
-          color: rgba(232, 230, 227, 0.7);
-          font-size: 0.9rem;
+        .section-title {
+          font-size: 2.5rem;
+          font-weight: 300;
+          margin-bottom: 1rem;
         }
 
-        .type-card li {
+        .section-subtitle {
+          color: rgba(232, 230, 227, 0.6);
+          font-size: 1.1rem;
+          line-height: 1.6;
+        }
+
+        .models-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .model-card {
+          position: relative;
+          background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(20, 20, 35, 0.8) 100%);
+          border: 1px solid rgba(212, 175, 55, 0.1);
+          border-radius: 16px;
+          padding: 2.5rem;
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(40px);
+          transition: all 0.6s ease-out;
+        }
+
+        .model-card.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .model-card:nth-child(1) { transition-delay: 0s; }
+        .model-card:nth-child(2) { transition-delay: 0.1s; }
+        .model-card:nth-child(3) { transition-delay: 0.2s; }
+        .model-card:nth-child(4) { transition-delay: 0.3s; }
+
+        .model-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #d4af37, #f4d03f);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.4s ease-out;
+        }
+
+        .model-card:hover::before {
+          transform: scaleX(1);
+        }
+
+        .model-card:hover {
+          border-color: rgba(212, 175, 55, 0.3);
+          transform: translateY(-5px);
+        }
+
+        .model-icon {
+          width: 60px;
+          height: 60px;
+          background: rgba(212, 175, 55, 0.1);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 1.5rem;
+          font-size: 1.5rem;
+        }
+
+        .model-label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: #d4af37;
           margin-bottom: 0.5rem;
         }
 
-        .contact-section {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-        }
-
-        .contact-info-section {
-          background: rgba(26, 26, 46, 0.5);
-          border: 1px solid rgba(212, 175, 55, 0.15);
-          border-radius: 12px;
-          padding: 2rem;
-        }
-
-        .contact-info-section h2 {
-          color: #d4af37;
-          font-size: 1.25rem;
-          font-weight: 500;
+        .model-title {
+          font-size: 1.5rem;
+          font-weight: 600;
           margin-bottom: 1rem;
         }
 
-        .contact-info-section p {
-          color: rgba(232, 230, 227, 0.75);
-          font-size: 0.95rem;
+        .model-desc {
+          color: rgba(232, 230, 227, 0.7);
           line-height: 1.6;
           margin-bottom: 1.5rem;
+        }
+
+        .model-features {
+          list-style: none;
+          display: grid;
+          gap: 0.75rem;
+        }
+
+        .model-features li {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          font-size: 0.9rem;
+          color: rgba(232, 230, 227, 0.8);
+        }
+
+        .model-features li::before {
+          content: '+';
+          color: #d4af37;
+          font-weight: bold;
+          flex-shrink: 0;
+        }
+
+        /* Value Props - Horizontal scroll */
+        .value-section {
+          padding: 6rem 0;
+          background: linear-gradient(180deg, #0d0d14 0%, #0a0a0f 100%);
+          overflow: hidden;
+        }
+
+        .value-track {
+          display: flex;
+          gap: 2rem;
+          padding: 2rem;
+          animation: scrollTrack 30s linear infinite;
+        }
+
+        @keyframes scrollTrack {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .value-item {
+          flex-shrink: 0;
+          background: rgba(26, 26, 46, 0.5);
+          border: 1px solid rgba(212, 175, 55, 0.1);
+          border-radius: 12px;
+          padding: 2rem;
+          width: 300px;
+          text-align: center;
+        }
+
+        .value-item h3 {
+          color: #d4af37;
+          font-size: 1.1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .value-item p {
+          color: rgba(232, 230, 227, 0.6);
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        /* Contact Section */
+        .contact-section {
+          padding: 8rem 2rem;
+          background:
+            radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            #0a0a0f;
+        }
+
+        .contact-container {
+          max-width: 1100px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 1.2fr;
+          gap: 4rem;
+          align-items: start;
+          opacity: 0;
+          transform: translateY(40px);
+          transition: all 0.6s ease-out;
+        }
+
+        .contact-container.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .contact-info h2 {
+          font-size: 2.5rem;
+          font-weight: 300;
+          margin-bottom: 1.5rem;
+        }
+
+        .contact-info h2 .highlight {
+          color: #d4af37;
+        }
+
+        .contact-info > p {
+          color: rgba(232, 230, 227, 0.7);
+          font-size: 1.1rem;
+          line-height: 1.7;
+          margin-bottom: 2rem;
         }
 
         .benefit-list {
           list-style: none;
-          padding: 0;
-          margin: 0;
+          display: grid;
+          gap: 1rem;
         }
 
         .benefit-list li {
           display: flex;
-          align-items: flex-start;
-          gap: 0.75rem;
-          margin-bottom: 1rem;
-          color: rgba(232, 230, 227, 0.8);
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: rgba(26, 26, 46, 0.3);
+          border-radius: 8px;
           font-size: 0.95rem;
+          transition: all 0.2s;
         }
 
-        .benefit-list .check {
+        .benefit-list li:hover {
+          background: rgba(212, 175, 55, 0.1);
+          transform: translateX(5px);
+        }
+
+        .benefit-list .icon {
+          width: 36px;
+          height: 36px;
+          background: rgba(212, 175, 55, 0.15);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           color: #d4af37;
-          font-weight: bold;
+          flex-shrink: 0;
         }
 
-        .contact-form-section {
+        .contact-form-card {
           background: rgba(26, 26, 46, 0.5);
           border: 1px solid rgba(212, 175, 55, 0.15);
-          border-radius: 12px;
-          padding: 2rem;
+          border-radius: 20px;
+          padding: 2.5rem;
         }
 
-        .contact-form-section h2 {
-          color: #d4af37;
-          font-size: 1.25rem;
+        .contact-form-card h3 {
+          font-size: 1.5rem;
           font-weight: 500;
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
+          color: #d4af37;
         }
 
         .sponsors-form {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 1.25rem;
         }
 
         .form-row {
@@ -338,7 +634,7 @@ const SponsorsPage = () => {
         .form-group {
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          gap: 0.5rem;
         }
 
         .form-group label {
@@ -350,59 +646,53 @@ const SponsorsPage = () => {
         .sponsors-form input,
         .sponsors-form select,
         .sponsors-form textarea {
-          background: rgba(13, 13, 20, 0.6);
+          background: rgba(10, 10, 15, 0.8);
           border: 1px solid rgba(212, 175, 55, 0.2);
-          border-radius: 8px;
-          padding: 0.75rem 1rem;
+          border-radius: 10px;
+          padding: 0.875rem 1rem;
           color: #e8e6e3;
-          font-size: 0.95rem;
+          font-size: 1rem;
           font-family: inherit;
-          transition: border-color 0.2s, box-shadow 0.2s;
+          transition: all 0.2s;
         }
 
         .sponsors-form input:focus,
         .sponsors-form select:focus,
         .sponsors-form textarea:focus {
           outline: none;
-          border-color: rgba(212, 175, 55, 0.5);
+          border-color: #d4af37;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
         }
 
-        .sponsors-form input::placeholder,
-        .sponsors-form textarea::placeholder {
-          color: rgba(232, 230, 227, 0.4);
+        .sponsors-form textarea {
+          min-height: 120px;
+          resize: vertical;
         }
 
         .sponsors-form select option {
           background: #1a1a2e;
-          color: #e8e6e3;
-        }
-
-        .sponsors-form textarea {
-          min-height: 100px;
-          resize: vertical;
         }
 
         .sponsors-submit {
-          background: linear-gradient(135deg, #d4af37, #c9a227);
-          color: #0d0d14;
+          background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+          color: #0a0a0f;
           border: none;
-          border-radius: 8px;
-          padding: 0.875rem 2rem;
+          border-radius: 10px;
+          padding: 1rem 2rem;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition: all 0.2s;
           margin-top: 0.5rem;
         }
 
         .sponsors-submit:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+          box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
         }
 
         .sponsors-submit:disabled {
-          opacity: 0.7;
+          opacity: 0.6;
           cursor: not-allowed;
         }
 
@@ -410,57 +700,85 @@ const SponsorsPage = () => {
           background: rgba(239, 68, 68, 0.1);
           border: 1px solid rgba(239, 68, 68, 0.3);
           color: #f87171;
-          padding: 0.75rem;
-          border-radius: 8px;
+          padding: 1rem;
+          border-radius: 10px;
           font-size: 0.9rem;
         }
 
         .form-success {
           text-align: center;
-          padding: 2rem 1rem;
+          padding: 3rem 2rem;
         }
 
-        .form-success .success-icon {
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+        .form-success .icon {
+          width: 80px;
+          height: 80px;
+          background: rgba(212, 175, 55, 0.15);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.5rem;
+          font-size: 2rem;
+          color: #d4af37;
         }
 
         .form-success h3 {
-          color: #d4af37;
-          font-size: 1.25rem;
-          font-weight: 500;
+          color: #e8e6e3;
           margin-bottom: 0.5rem;
         }
 
         .form-success p {
           color: rgba(232, 230, 227, 0.7);
-          font-size: 0.95rem;
         }
 
-        @media (max-width: 768px) {
-          .sponsors-header {
-            padding: 0.75rem 1rem;
+        /* Mobile */
+        @media (max-width: 900px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
           }
 
-          .sponsors-nav {
-            gap: 1rem;
-            font-size: 0.85rem;
+          .models-grid {
+            grid-template-columns: 1fr;
           }
 
-          .sponsors-main {
-            padding: 2rem 1rem;
-          }
-
-          .sponsors-hero h1 {
-            font-size: 2rem;
-          }
-
-          .contact-section {
+          .contact-container {
             grid-template-columns: 1fr;
           }
 
           .form-row {
             grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .sponsors-header {
+            padding: 0.75rem 1rem;
+          }
+
+          .sponsors-nav {
+            display: none;
+          }
+
+          .hero-title {
+            font-size: 2rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+
+          .stat-value {
+            font-size: 2.5rem;
+          }
+
+          .section-title {
+            font-size: 1.75rem;
+          }
+
+          .contact-form-card {
+            padding: 1.5rem;
           }
         }
       `}</style>
@@ -482,146 +800,199 @@ const SponsorsPage = () => {
         </nav>
       </header>
 
-      <main className="sponsors-main">
-        <div className="sponsors-hero">
-          <h1>Enterprise & Sponsorship Partnerships</h1>
-          <p>
-            Partner with QUANTA to host branded tournaments, run custom miner pools,
-            or become a tournament validator. Engage your audience with the future of
-            decentralized alpha generation.
+      {/* Hero */}
+      <section className="hero-section">
+        <div className="hero-badge">
+          <span>Enterprise Partnerships</span>
+        </div>
+        <h1 className="hero-title">
+          Power the Future of<br />
+          <span className="highlight">Decentralized Alpha</span>
+        </h1>
+        <p className="hero-subtitle">
+          Partner with QUANTA to host branded tournaments, operate custom miner pools,
+          or run tournament validators. Join the decentralized stock picking revolution.
+        </p>
+        <div className="hero-cta">
+          <a href="#contact" className="cta-primary">Start Partnership Discussion</a>
+          <a href="/pitch-lite" className="cta-secondary">Learn About QUANTA</a>
+        </div>
+        <div className="scroll-indicator">
+          <span>Scroll to explore</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="stats-section" id="stats" data-animate>
+        <div className="stats-grid">
+          <div className={`stat-card ${isVisible('stats') ? 'visible' : ''}`}>
+            <div className="stat-value">$45T+</div>
+            <div className="stat-label">U.S. Equity Market</div>
+          </div>
+          <div className={`stat-card ${isVisible('stats') ? 'visible' : ''}`}>
+            <div className="stat-value">256</div>
+            <div className="stat-label">On-Chain UIDs</div>
+          </div>
+          <div className={`stat-card ${isVisible('stats') ? 'visible' : ''}`}>
+            <div className="stat-value">∞</div>
+            <div className="stat-label">Signal Pool Capacity</div>
+          </div>
+          <div className={`stat-card ${isVisible('stats') ? 'visible' : ''}`}>
+            <div className="stat-value">41%</div>
+            <div className="stat-label">Validator Emissions</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partnership Models */}
+      <section className="models-section" id="models" data-animate>
+        <div className={`section-header ${isVisible('models') ? 'visible' : ''}`}>
+          <div className="section-overline">Partnership Models</div>
+          <h2 className="section-title">Multiple Ways to Partner</h2>
+          <p className="section-subtitle">
+            Choose the partnership model that aligns with your objectives,
+            from infrastructure to branded competitions.
           </p>
         </div>
 
-        <div className="value-props">
-          <div className="value-card">
-            <h3>Brand Visibility</h3>
-            <p>
-              Your brand associated with cutting-edge decentralized finance.
-              Reach crypto-native audiences and quantitative finance professionals.
+        <div className="models-grid">
+          <div className={`model-card ${isVisible('models') ? 'visible' : ''}`}>
+            <div className="model-icon">&#9881;</div>
+            <div className="model-label">Infrastructure</div>
+            <h3 className="model-title">Tournament Validator</h3>
+            <p className="model-desc">
+              Run validation infrastructure for QUANTA tournaments. Earn TAO emissions
+              while providing critical network services.
             </p>
+            <ul className="model-features">
+              <li>41% of emission split to validators</li>
+              <li>Access to raw signal data for research</li>
+              <li>Priority API access for integrations</li>
+              <li>Hardware: 4+ vCPUs, 16GB+ RAM</li>
+            </ul>
           </div>
-          <div className="value-card">
-            <h3>Talent Discovery</h3>
-            <p>
-              Identify top-performing stock pickers and quant strategists.
-              Direct pipeline to skilled traders and analysts.
+
+          <div className={`model-card ${isVisible('models') ? 'visible' : ''}`}>
+            <div className="model-icon">&#9733;</div>
+            <div className="model-label">Aggregation</div>
+            <h3 className="model-title">Custom Miner Pool</h3>
+            <p className="model-desc">
+              Operate a branded pool aggregating signals from your community,
+              employees, or customer base.
             </p>
+            <ul className="model-features">
+              <li>White-label pool with your branding</li>
+              <li>10-20% operator fee on earnings</li>
+              <li>Unlimited participant capacity</li>
+              <li>Custom onboarding flows</li>
+            </ul>
           </div>
-          <div className="value-card">
-            <h3>Custom Tournaments</h3>
-            <p>
-              Host branded competitions with custom rules, prize pools, and
-              participant criteria tailored to your objectives.
+
+          <div className={`model-card ${isVisible('models') ? 'visible' : ''}`}>
+            <div className="model-icon">&#127942;</div>
+            <div className="model-label">Competition</div>
+            <h3 className="model-title">Tournament Sponsor</h3>
+            <p className="model-desc">
+              Sponsor themed tournaments with custom prize pools,
+              participant criteria, and marketing integration.
             </p>
+            <ul className="model-features">
+              <li>Branded tournament landing pages</li>
+              <li>Custom scoring rules & themes</li>
+              <li>Winner spotlights & case studies</li>
+              <li>Joint PR opportunities</li>
+            </ul>
+          </div>
+
+          <div className={`model-card ${isVisible('models') ? 'visible' : ''}`}>
+            <div className="model-icon">&#128202;</div>
+            <div className="model-label">Data</div>
+            <h3 className="model-title">Signal API Enterprise</h3>
+            <p className="model-desc">
+              Enterprise access to aggregated QUANTA signals for research,
+              trading desk integration, or product development.
+            </p>
+            <ul className="model-features">
+              <li>Real-time WebSocket feeds</li>
+              <li>Historical performance data</li>
+              <li>Custom endpoints & filters</li>
+              <li>Dedicated support & SLA</li>
+            </ul>
           </div>
         </div>
+      </section>
 
-        <div className="sponsor-types">
-          <h2>Partnership Models</h2>
-          <div className="type-grid">
-            <div className="type-card">
-              <div className="type-label">Infrastructure</div>
-              <h3>Tournament Validator</h3>
-              <p>
-                Run validation infrastructure for QUANTA tournaments. Earn TAO emissions
-                while providing critical network services.
-              </p>
-              <ul>
-                <li>41% of emission split to validators</li>
-                <li>Hardware requirements: 4+ vCPUs, 16GB+ RAM</li>
-                <li>Access to raw signal data for internal research</li>
-                <li>Priority API access for enterprise integrations</li>
-              </ul>
-            </div>
-
-            <div className="type-card">
-              <div className="type-label">Aggregation</div>
-              <h3>Custom Miner Pool</h3>
-              <p>
-                Operate a branded pool aggregating signals from your community,
-                employees, or customer base.
-              </p>
-              <ul>
-                <li>White-label pool interface with your branding</li>
-                <li>10-20% operator fee on pool earnings</li>
-                <li>Unlimited participant capacity</li>
-                <li>Custom onboarding and compliance flows</li>
-              </ul>
-            </div>
-
-            <div className="type-card">
-              <div className="type-label">Competition</div>
-              <h3>Tournament Sponsor</h3>
-              <p>
-                Sponsor themed tournaments with custom prize pools,
-                participant criteria, and marketing integration.
-              </p>
-              <ul>
-                <li>Branded tournament landing pages</li>
-                <li>Custom scoring rules (sector-focused, ESG, etc.)</li>
-                <li>Winner spotlights and case studies</li>
-                <li>Joint PR and marketing opportunities</li>
-              </ul>
-            </div>
-
-            <div className="type-card">
-              <div className="type-label">Data</div>
-              <h3>Signal API Enterprise</h3>
-              <p>
-                Enterprise access to aggregated QUANTA signals for research,
-                trading desk integration, or product development.
-              </p>
-              <ul>
-                <li>Real-time signal feeds via WebSocket</li>
-                <li>Historical performance data and backtests</li>
-                <li>Custom filtering and ranking endpoints</li>
-                <li>Dedicated support and SLA guarantees</li>
-              </ul>
-            </div>
-          </div>
+      {/* Scrolling Value Props */}
+      <section className="value-section">
+        <div className="value-track">
+          {[...Array(2)].map((_, i) => (
+            <React.Fragment key={i}>
+              <div className="value-item">
+                <h3>Brand Visibility</h3>
+                <p>Associate your brand with cutting-edge decentralized finance</p>
+              </div>
+              <div className="value-item">
+                <h3>Talent Pipeline</h3>
+                <p>Identify top-performing traders and quantitative analysts</p>
+              </div>
+              <div className="value-item">
+                <h3>Revenue Share</h3>
+                <p>Earn from emissions and pool operator fees</p>
+              </div>
+              <div className="value-item">
+                <h3>Data Access</h3>
+                <p>Enterprise access to aggregated alpha signals</p>
+              </div>
+              <div className="value-item">
+                <h3>Community Building</h3>
+                <p>Engage your audience with competitive trading</p>
+              </div>
+              <div className="value-item">
+                <h3>Marketing Integration</h3>
+                <p>Joint campaigns and co-branded content</p>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
+      </section>
 
-        <div className="contact-section">
-          <div className="contact-info-section">
-            <h2>Why Partner with QUANTA?</h2>
+      {/* Contact */}
+      <section className="contact-section" id="contact" data-animate>
+        <div className={`contact-container ${isVisible('contact') ? 'visible' : ''}`}>
+          <div className="contact-info">
+            <h2>Ready to <span className="highlight">Partner</span>?</h2>
             <p>
-              QUANTA is building the world's largest decentralized stock picking
-              competition on Bittensor. Our unique Signal Pool architecture enables
-              unlimited participation while maintaining rigorous, risk-adjusted scoring.
+              Join the next generation of decentralized finance infrastructure.
+              Our team will work with you to design a partnership that meets your goals.
             </p>
             <ul className="benefit-list">
               <li>
-                <span className="check">+</span>
-                <span>Access to $45T+ U.S. equity market alpha signals</span>
+                <span className="icon">+</span>
+                <span>Access $45T+ U.S. equity market signals</span>
               </li>
               <li>
-                <span className="check">+</span>
-                <span>Crypto-native payments and transparent on-chain scoring</span>
+                <span className="icon">+</span>
+                <span>Transparent on-chain scoring & rewards</span>
               </li>
               <li>
-                <span className="check">+</span>
-                <span>Built on Bittensor's battle-tested consensus infrastructure</span>
+                <span className="icon">+</span>
+                <span>Built on Bittensor's proven infrastructure</span>
               </li>
               <li>
-                <span className="check">+</span>
-                <span>Portfolio-only model enables diverse participant types</span>
-              </li>
-              <li>
-                <span className="check">+</span>
-                <span>Multi-horizon evaluation (7/30/90-day) for robust signals</span>
-              </li>
-              <li>
-                <span className="check">+</span>
-                <span>Zero-to-high compute barrier accommodates all skill levels</span>
+                <span className="icon">+</span>
+                <span>Flexible partnership structures</span>
               </li>
             </ul>
           </div>
 
-          <div className="contact-form-section">
-            <h2>Start the Conversation</h2>
+          <div className="contact-form-card">
+            <h3>Start the Conversation</h3>
             {submitted ? (
               <div className="form-success">
-                <div className="success-icon">+</div>
+                <div className="icon">+</div>
                 <h3>Thank You!</h3>
                 <p>We've received your inquiry and will be in touch within 1-2 business days.</p>
               </div>
@@ -660,7 +1031,7 @@ const SponsorsPage = () => {
                     <input
                       id="organization"
                       type="text"
-                      placeholder="Company or institution"
+                      placeholder="Company name"
                       value={form.organization}
                       onChange={(e) => setForm({...form, organization: e.target.value})}
                       required
@@ -689,7 +1060,7 @@ const SponsorsPage = () => {
                     <option value="Custom Miner Pool">Custom Miner Pool</option>
                     <option value="Tournament Validator">Tournament Validator</option>
                     <option value="Signal API Enterprise">Signal API Enterprise</option>
-                    <option value="Multiple / Exploring">Multiple / Exploring Options</option>
+                    <option value="Multiple / Exploring">Multiple / Exploring</option>
                   </select>
                 </div>
 
@@ -697,7 +1068,7 @@ const SponsorsPage = () => {
                   <label htmlFor="message">Tell us about your goals</label>
                   <textarea
                     id="message"
-                    placeholder="What are you looking to achieve with a QUANTA partnership?"
+                    placeholder="What are you looking to achieve?"
                     value={form.message}
                     onChange={(e) => setForm({...form, message: e.target.value})}
                     required
@@ -711,7 +1082,7 @@ const SponsorsPage = () => {
             )}
           </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 };
