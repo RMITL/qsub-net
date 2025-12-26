@@ -148,6 +148,32 @@ const Header = ({
           box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
+        .header-nav > a.nav-external {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        .header-nav > a.nav-external .external-icon {
+          opacity: 0.5;
+          transition: opacity 0.2s;
+        }
+
+        .header-nav > a.nav-external:hover .external-icon {
+          opacity: 1;
+        }
+
+        .header-nav > a.nav-pdf {
+          font-size: 1.1rem;
+          line-height: 1;
+          padding: 0.2rem;
+          transition: transform 0.2s;
+        }
+
+        .header-nav > a.nav-pdf:hover {
+          transform: scale(1.15);
+        }
+
         .header-dropdown {
           position: relative;
         }
@@ -371,6 +397,17 @@ const Header = ({
           <a href="/faq">FAQ</a>
           <a href="/resources">Resources</a>
           <a href="/pitch-lite">Overview</a>
+          <a href="https://docs.qsub.net" target="_blank" rel="noopener noreferrer" className="nav-external">
+            Docs
+            <svg className="external-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+          <a href="/docs/QUANTA_Technical_Specification_v5.pdf" target="_blank" rel="noopener noreferrer" className="nav-pdf" title="Technical Whitepaper (PDF)">
+            📄
+          </a>
 
           {/* Contact dropdown */}
           <div className="header-dropdown" ref={contactDropdownRef}>
@@ -445,6 +482,12 @@ const Header = ({
         <a href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         <a href="/resources" onClick={() => setMobileMenuOpen(false)}>Resources</a>
         <a href="/pitch-lite" onClick={() => setMobileMenuOpen(false)}>Overview</a>
+        <a href="https://docs.qsub.net" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>
+          📚 Docs (External)
+        </a>
+        <a href="/docs/QUANTA_Technical_Specification_v5.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>
+          📄 Technical Whitepaper (PDF)
+        </a>
 
         <div className="mobile-submenu-label">Contact</div>
         <div className="mobile-submenu">
