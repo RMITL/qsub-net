@@ -164,14 +164,20 @@ const Header = ({
         }
 
         .header-nav > a.nav-pdf {
-          font-size: 1.1rem;
-          line-height: 1;
-          padding: 0.2rem;
-          transition: transform 0.2s;
+          display: flex;
+          align-items: center;
+          padding: 0.25rem;
+          opacity: 0.7;
+          transition: opacity 0.2s, color 0.2s;
         }
 
         .header-nav > a.nav-pdf:hover {
-          transform: scale(1.15);
+          opacity: 1;
+          color: #d4af37;
+        }
+
+        .header-nav > a.nav-pdf svg {
+          stroke: currentColor;
         }
 
         .header-dropdown {
@@ -313,18 +319,44 @@ const Header = ({
         }
 
         .mobile-submenu-label {
-          color: rgba(212, 175, 55, 0.6);
-          font-size: 0.75rem;
+          color: rgba(212, 175, 55, 0.5);
+          font-size: 0.7rem;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          padding: 0.5rem 1rem 0.25rem;
-          margin-top: 0.5rem;
-          border-top: 1px solid rgba(212, 175, 55, 0.1);
+          padding: 0.75rem 1rem 0.25rem;
+          margin-top: 0.25rem;
+        }
+
+        .mobile-submenu {
+          display: flex;
+          flex-direction: column;
         }
 
         .mobile-submenu a {
-          padding-left: 1.5rem;
+          padding: 0.5rem 1rem 0.5rem 1.5rem;
           font-size: 0.9rem;
+          color: rgba(232, 230, 227, 0.7);
+        }
+
+        .mobile-submenu a:hover {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.08);
+        }
+
+        .header-mobile-menu .mobile-divider {
+          height: 1px;
+          background: rgba(212, 175, 55, 0.1);
+          margin: 0.5rem 0;
+        }
+
+        .header-mobile-menu .mobile-icon-link {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .header-mobile-menu .mobile-icon-link svg {
+          opacity: 0.6;
         }
 
         @media (max-width: 900px) {
@@ -406,7 +438,13 @@ const Header = ({
             </svg>
           </a>
           <a href="/docs/QUANTA_Technical_Specification_v5.pdf" target="_blank" rel="noopener noreferrer" className="nav-pdf" title="Technical Whitepaper (PDF)">
-            📄
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
           </a>
 
           {/* Contact dropdown */}
@@ -482,12 +520,27 @@ const Header = ({
         <a href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         <a href="/resources" onClick={() => setMobileMenuOpen(false)}>Resources</a>
         <a href="/pitch-lite" onClick={() => setMobileMenuOpen(false)}>Overview</a>
-        <a href="https://docs.qsub.net" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>
-          📚 Docs (External)
+
+        <div className="mobile-divider" />
+
+        <a href="https://docs.qsub.net" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="mobile-icon-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Docs
         </a>
-        <a href="/docs/QUANTA_Technical_Specification_v5.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>
-          📄 Technical Whitepaper (PDF)
+        <a href="/docs/QUANTA_Technical_Specification_v5.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="mobile-icon-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Whitepaper
         </a>
+
+        <div className="mobile-divider" />
 
         <div className="mobile-submenu-label">Contact</div>
         <div className="mobile-submenu">
