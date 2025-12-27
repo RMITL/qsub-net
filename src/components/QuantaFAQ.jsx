@@ -71,6 +71,21 @@ const QuantaFAQ = () => {
           id: 'vs-hedge-fund',
           q: 'How is QUANTA different from a hedge fund?',
           a: 'QUANTA is a protocol, not a fund. Unlike Numerai (which operates a registered hedge fund), QUANTA has no single fund entity, lets miners own their track records, allows signals to flow to any downstream consumer, operates entirely on-chain with transparent scoring, and enables unlimited participation.'
+        },
+        {
+          id: 'why-now',
+          q: 'Why is this the right moment for QUANTA?',
+          a: 'Trading has been democratized—Robinhood, Coinbase, and commission-free platforms removed the execution barrier. But intelligence remains gatekept. Hedge funds spend $45B/year on alternative data, research teams, and Bloomberg terminals while retail relies on headlines and social media. QUANTA levels this playing field by aggregating distributed intelligence into a verified meta-signal that anyone can access.'
+        },
+        {
+          id: 'wallstreetbets-lesson',
+          q: 'What does r/wallstreetbets teach us about crowd intelligence?',
+          a: 'In January 2021, retail traders on Reddit identified a massively shorted stock that institutional analysts missed. Their coordinated conviction generated $6B+ in hedge fund losses and proved that distributed intelligence can spot opportunities professionals overlook. The problem was sustainability—no infrastructure existed to do this continuously or verify who actually had insight. QUANTA builds that infrastructure: verifiable track records, skin-in-the-game staking, and cryptographic proof of performance.'
+        },
+        {
+          id: 'vs-noise',
+          q: 'How does QUANTA cut through market noise and disinformation?',
+          a: 'Markets are flooded with paid promoters, pump-and-dump Discord groups, fake screenshots, and AI-generated "analysis." QUANTA solves this through three mechanisms: (1) Skin in the game—stake tokens on your picks, so noise-makers lose money, (2) On-chain verification—performance is cryptographically proven, not self-reported, and (3) Risk-adjusted scoring—rewards consistency over lucky guesses. Over time, the meta-signal aggregates only from proven performers.'
         }
       ]
     },

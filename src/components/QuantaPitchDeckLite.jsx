@@ -23,6 +23,7 @@ const QuantaPitchDeckLite = () => {
 
   const slides = [
     'intro',
+    'whyNow',
     'problem',
     'stockMarketGame',
     'precedents',
@@ -38,6 +39,7 @@ const QuantaPitchDeckLite = () => {
 
   const slideNames = [
     'Intro',
+    'Why Now',
     'Problem',
     'The Game',
     'Precedents',
@@ -233,15 +235,57 @@ const QuantaPitchDeckLite = () => {
     </div>
   );
 
+  const WhyNowSlide = () => (
+    <div className="slide-content">
+      <div className="slide-header">
+        <div className="overline">THE MOMENT</div>
+        <h2 className="section-title">Trading Was Democratized. <span className="gold">Intelligence Wasn't.</span></h2>
+        <p className="slide-subtitle">Robinhood gave everyone a brokerage. Wall Street kept the information.</p>
+      </div>
+
+      <div className="problem-grid fade-in" style={{animationDelay: '0.1s'}}>
+        <div className="problem-card">
+          <div className="pc-icon">📡</div>
+          <h4>Information Asymmetry</h4>
+          <p>Hedge funds spend $45B/year on data and research. Retail gets headlines and social media. Same market, different game.</p>
+        </div>
+
+        <div className="problem-card">
+          <div className="pc-icon">🎭</div>
+          <h4>The Noise Problem</h4>
+          <p>Paid promoters, pump-and-dump Discord groups, AI-generated "analysis." How do you know who to trust?</p>
+        </div>
+
+        <div className="problem-card">
+          <div className="pc-icon">🦍</div>
+          <h4>r/wallstreetbets Proved It</h4>
+          <p>January 2021: A decentralized community beat billion-dollar hedge funds. But no infrastructure existed to sustain it.</p>
+        </div>
+
+        <div className="problem-card">
+          <div className="pc-icon">🔮</div>
+          <h4>Crowds Beat Experts</h4>
+          <p>Polymarket outperformed pollsters. Superforecasters beat the CIA. The crowd knows—when measured right.</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const ProblemSlide = () => (
     <div className="slide-content">
       <div className="slide-header">
         <div className="overline">THE PROBLEM</div>
         <h2 className="section-title">Great Stock Pickers <span className="gold">Exist Everywhere</span></h2>
-        <p className="slide-subtitle">But there's no way to prove it—or profit from it</p>
+        <p className="slide-subtitle">But there's no infrastructure to prove it—or profit from it</p>
       </div>
 
       <div className="problem-grid fade-in" style={{animationDelay: '0.1s'}}>
+        <div className="problem-card">
+          <div className="pc-icon">📡</div>
+          <h4>Intelligence Is Gatekept</h4>
+          <p>Institutions have research teams and Bloomberg terminals. Retail gets CNBC headlines. Trading was democratized—information wasn't.</p>
+        </div>
+
         <div className="problem-card">
           <div className="pc-icon">📊</div>
           <h4>No Verifiable Track Record</h4>
@@ -255,15 +299,9 @@ const QuantaPitchDeckLite = () => {
         </div>
 
         <div className="problem-card">
-          <div className="pc-icon">🏦</div>
-          <h4>Wall Street Gatekeeping</h4>
-          <p>Talented individuals need hedge fund jobs to monetize skill. The barriers: credentials, connections, capital.</p>
-        </div>
-
-        <div className="problem-card">
-          <div className="pc-icon">💸</div>
-          <h4>74-89% Lose Money</h4>
-          <p>Not because retail lacks talent—but because the infrastructure rewards the wrong behaviors.</p>
+          <div className="pc-icon">🎭</div>
+          <h4>Markets Flooded with Noise</h4>
+          <p>Paid promoters, fake screenshots, pump-and-dumps. No way to separate signal from noise without skin in the game.</p>
         </div>
       </div>
     </div>
@@ -323,6 +361,22 @@ const QuantaPitchDeckLite = () => {
       <div className="precedents-grid fade-in" style={{animationDelay: '0.1s'}}>
         <div className="precedent-card">
           <div className="prec-header">
+            <span className="prec-name">r/wallstreetbets</span>
+            <span className="prec-type">Decentralized Community (2021)</span>
+          </div>
+          <div className="prec-stats">
+            <div className="prec-stat"><span>$6B+</span> HF Losses</div>
+            <div className="prec-stat"><span>10M+</span> Retail Traders</div>
+            <div className="prec-stat"><span>+1,700%</span> Peak GME</div>
+          </div>
+          <p className="prec-desc">A decentralized community spotted what Wall Street missed. Coordinated conviction beat billion-dollar hedge funds.</p>
+          <div className="prec-diff">
+            <strong>QUANTA difference:</strong> Sustainable infrastructure, not a one-time event. Verified track records.
+          </div>
+        </div>
+
+        <div className="precedent-card">
+          <div className="prec-header">
             <span className="prec-name">Numerai</span>
             <span className="prec-type">Crowdsourced Hedge Fund</span>
           </div>
@@ -347,25 +401,9 @@ const QuantaPitchDeckLite = () => {
             <div className="prec-stat"><span>Events</span> Binary</div>
             <div className="prec-stat"><span>1M+</span> Users</div>
           </div>
-          <p className="prec-desc">Bet on event outcomes (elections, sports). High volume proves demand for prediction markets.</p>
+          <p className="prec-desc">Beat pollsters on elections, sports. Proves crowds aggregate better information than experts.</p>
           <div className="prec-diff">
             <strong>QUANTA difference:</strong> Continuous stock portfolios, not one-time event bets.
-          </div>
-        </div>
-
-        <div className="precedent-card">
-          <div className="prec-header">
-            <span className="prec-name">Kalshi</span>
-            <span className="prec-type">CFTC-Regulated Exchange</span>
-          </div>
-          <div className="prec-stats">
-            <div className="prec-stat"><span>Legal</span> U.S. Trading</div>
-            <div className="prec-stat"><span>Events</span> Economic</div>
-            <div className="prec-stat"><span>Growing</span> Fast</div>
-          </div>
-          <p className="prec-desc">Regulated event contracts (inflation, Fed rates). Shows regulatory path exists.</p>
-          <div className="prec-diff">
-            <strong>QUANTA difference:</strong> Decentralized, global, portfolio-based.
           </div>
         </div>
 
@@ -927,6 +965,7 @@ const QuantaPitchDeckLite = () => {
 
   const slideComponents = {
     intro: IntroSlide,
+    whyNow: WhyNowSlide,
     problem: ProblemSlide,
     stockMarketGame: StockMarketGameSlide,
     precedents: PrecedentsSlide,

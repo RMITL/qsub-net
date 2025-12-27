@@ -70,7 +70,7 @@ const QuantaPitchDeckFinal = () => {
   }, []);
 
   const slides = [
-    'intro', 'problem', 'solution', 'precedent', 'scalability',
+    'intro', 'whyNow', 'problem', 'solution', 'precedent', 'scalability',
     'signalPool', 'participationTiers', 'minerTaxonomy', 'rewardFlow', 'howItWorks',
     'networkDiagram', 'epochLifecycle', 'scoring', 'tokenomics',
     'rewardMechanics', 'interactiveModel', 'deflationary', 'dualRevenue', 'compliance',
@@ -78,7 +78,7 @@ const QuantaPitchDeckFinal = () => {
   ];
 
   const slideNames = [
-    'Intro', 'Problem', 'Solution', 'Precedent', 'Scalability',
+    'Intro', 'Why Now', 'Problem', 'Solution', 'Precedent', 'Scalability',
     'Signal Pool', 'Tiers', 'Taxonomy', 'Rewards', 'How It Works', 'Network',
     'Epoch', 'Scoring', 'Tokenomics', 'Mechanics', 'Model',
     'Deflationary', 'Dual Revenue', 'Compliance', 'Revenue', 'Competitions', 'Architecture', 'Financial', 'Roadmap', 'Summary'
@@ -580,6 +580,55 @@ const QuantaPitchDeckFinal = () => {
     </div>
   );
 
+  const WhyNowSlide = () => (
+    <div className="slide-content slide-grid-2">
+      <div className="slide-left">
+        <div className="fade-in">
+          <div className="overline">THE MOMENT</div>
+        </div>
+        <div className="fade-in" style={{animationDelay: '0.1s'}}>
+          <h2 className="section-title">
+            Trading Was Democratized.<br />
+            <span className="gold">Intelligence Wasn't.</span>
+          </h2>
+        </div>
+        <div className="fade-in" style={{animationDelay: '0.2s'}}>
+          <div className="problem-summary">
+            <p className="summary-lead">
+              Robinhood gave everyone a brokerage account. Coinbase made crypto accessible.
+              Commission-free trading removed the execution barrier.
+            </p>
+            <p className="summary-lead" style={{marginTop: '1rem', color: '#d4af37'}}>
+              <strong>But Wall Street kept the real advantage: information.</strong>
+            </p>
+          </div>
+        </div>
+        <div className="fade-in" style={{animationDelay: '0.3s'}}>
+          <div className="key-stat-box">
+            <div className="ksb-value">$45B/year</div>
+            <div className="ksb-label">What institutions spend on alternative data, research teams, and Bloomberg terminals</div>
+          </div>
+        </div>
+      </div>
+      <div className="slide-right">
+        {[
+          { icon: '📡', title: 'Information Asymmetry', desc: 'Hedge funds have research teams, satellite imagery, and sentiment feeds. Retail has CNBC headlines and social media rumors.' },
+          { icon: '🎭', title: 'The Noise Problem', desc: 'In the age of paid promoters, pump-and-dump Discord groups, and AI-generated "analysis," how do you know who to trust?' },
+          { icon: '🦍', title: 'r/wallstreetbets Proved It', desc: 'January 2021: A decentralized community spotted what Wall Street missed. Coordinated conviction beat billion-dollar hedge funds. But no infrastructure existed to sustain it.' },
+          { icon: '🔮', title: 'Prediction Markets Work', desc: 'Polymarket outperformed pollsters. Superforecasters beat the CIA. Crowdsourced estimates beat Wall Street consensus. The crowd knows—when measured right.' }
+        ].map((item, i) => (
+          <div key={i} className="problem-card fade-in" style={{animationDelay: `${0.2 + i * 0.1}s`}}>
+            <div className="pc-icon">{item.icon}</div>
+            <div className="pc-content">
+              <h4>{item.title}</h4>
+              <p>{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const ProblemSlide = () => (
     <div className="slide-content slide-grid-2">
       <div className="slide-left">
@@ -601,11 +650,15 @@ const QuantaPitchDeckFinal = () => {
             <div className="summary-points">
               <div className="sp-item">
                 <span className="sp-bullet">→</span>
-                <span>Retail traders lack credible ways to prove skill</span>
+                <span>Trading was democratized—intelligence wasn't</span>
               </div>
               <div className="sp-item">
                 <span className="sp-bullet">→</span>
-                <span>Competitions reward luck and recklessness over consistency</span>
+                <span>Retail lacks credible ways to prove skill or access quality signals</span>
+              </div>
+              <div className="sp-item">
+                <span className="sp-bullet">→</span>
+                <span>Markets flooded with noise: paid promoters, fake screenshots, pump-and-dumps</span>
               </div>
               <div className="sp-item">
                 <span className="sp-bullet">→</span>
@@ -623,9 +676,9 @@ const QuantaPitchDeckFinal = () => {
       </div>
       <div className="slide-right">
         {[
+          { icon: '📡', title: 'Information Asymmetry', desc: 'Institutions spend $45B/year on data, research, and terminals. Retail gets headlines and social media. Same market, different game.' },
           { icon: '🎯', title: 'Risk Rewarded Over Skill', desc: 'Most competitions reward maximum risk-taking, not skill. Winners are often lucky outliers, not consistent performers.' },
           { icon: '🔒', title: 'Gatekept Verification', desc: 'Proving a track record requires expensive audits or platform lock-in. Self-reported returns are meaningless.' },
-          { icon: '🌍', title: 'Geographic Barriers', desc: 'Non-U.S. traders can\'t access legitimate competitions. Talent is excluded by jurisdiction, not ability.' },
           { icon: '📉', title: 'No Skin in the Game', desc: 'Paper trading competitions don\'t separate real conviction from noise. Cheap talk pollutes signal quality.' }
         ].map((item, i) => (
           <div key={i} className="problem-card fade-in" style={{animationDelay: `${0.2 + i * 0.1}s`}}>
@@ -669,34 +722,35 @@ const QuantaPitchDeckFinal = () => {
     <div className="slide-content">
       <div className="slide-header">
         <div className="overline">PROVEN MODEL</div>
-        <h2 className="section-title">The <span className="gold">Numerai</span> Precedent</h2>
+        <h2 className="section-title">Crowd Intelligence <span className="gold">Works</span></h2>
       </div>
       <div className="precedent-layout fade-in" style={{animationDelay: '0.1s'}}>
         <div className="precedent-main">
           <div className="pm-stats">
             <div className="pm-stat">
               <div className="pms-value">$550M</div>
-              <div className="pms-label">Assets Under Management</div>
+              <div className="pms-label">Numerai AUM</div>
             </div>
             <div className="pm-stat">
-              <div className="pms-value">25%</div>
-              <div className="pms-label">2024 Net Returns</div>
+              <div className="pms-value">$6B+</div>
+              <div className="pms-label">WSB vs. Hedge Funds</div>
             </div>
             <div className="pm-stat">
               <div className="pms-value">15,000+</div>
-              <div className="pms-label">Active Data Scientists</div>
+              <div className="pms-label">Numerai Contributors</div>
             </div>
           </div>
           <div className="pm-description">
             <p>
-              Numerai built a <strong>$550M hedge fund</strong> powered entirely by crowdsourced
-              predictions from anonymous data scientists worldwide. Their model proves that
-              <strong> aggregated signal from skilled participants </strong>
-              can generate institutional-grade alpha.
+              <strong>Numerai</strong> built a $550M hedge fund powered by crowdsourced predictions—proving
+              aggregated signal generates institutional-grade alpha.
             </p>
             <p>
-              QUANTA applies this proven framework to <strong>portfolio-based signals</strong>—making
-              participation accessible to traders without ML expertise.
+              <strong>r/wallstreetbets (2021)</strong> demonstrated that decentralized communities can
+              identify opportunities institutions miss—$6B+ in hedge fund losses when the crowd got it right.
+            </p>
+            <p style={{color: '#d4af37'}}>
+              QUANTA builds the infrastructure to do this <strong>continuously</strong>—with verified track records.
             </p>
           </div>
         </div>
@@ -711,15 +765,15 @@ const QuantaPitchDeckFinal = () => {
           <div className="ph-item">
             <div className="ph-icon">✓</div>
             <div className="ph-content">
-              <strong>Stake Creates Accountability</strong>
-              <span>NMR staking separates signal from noise</span>
+              <strong>Decentralized Conviction Wins</strong>
+              <span>r/wallstreetbets proved crowds can beat institutions</span>
             </div>
           </div>
           <div className="ph-item">
             <div className="ph-icon">✓</div>
             <div className="ph-content">
-              <strong>Global Talent Pool</strong>
-              <span>15,000+ anonymous contributors worldwide</span>
+              <strong>Missing: Sustainable Infrastructure</strong>
+              <span>One-time events aren't repeatable without verified track records</span>
             </div>
           </div>
         </div>
@@ -2971,6 +3025,7 @@ const QuantaPitchDeckFinal = () => {
 
   const slideComponents = {
     intro: IntroSlide,
+    whyNow: WhyNowSlide,
     problem: ProblemSlide,
     solution: SolutionSlide,
     precedent: PrecedentSlide,
